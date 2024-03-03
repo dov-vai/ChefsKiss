@@ -11,6 +11,7 @@ data class Recipe(
     val title: String,
     val description: String,
     val cookingTime: Int,
+    val servings: Int,
     val rating: Int,
     val favorite: Boolean,
     val imagePath: Uri
