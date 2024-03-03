@@ -8,6 +8,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.javainiai.chefskiss.ui.homescreen.HomeScreen
 import com.javainiai.chefskiss.ui.homescreen.HomeScreenDestination
+import com.javainiai.chefskiss.ui.recipescreen.AddRecipeDestination
+import com.javainiai.chefskiss.ui.recipescreen.AddRecipeScreen
 
 @Composable
 fun ChefsKissNavHost(
@@ -21,7 +23,12 @@ fun ChefsKissNavHost(
         modifier = modifier
     ) {
         composable(route = HomeScreenDestination.route) {
-            HomeScreen(drawerState)
+            HomeScreen(drawerState) {
+                navController.navigate(it)
+            }
+        }
+        composable(route = AddRecipeDestination.route) {
+            AddRecipeScreen(navigateBack = { navController.popBackStack() })
         }
     }
 

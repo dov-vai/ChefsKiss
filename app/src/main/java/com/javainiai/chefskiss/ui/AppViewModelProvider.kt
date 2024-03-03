@@ -6,11 +6,15 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.javainiai.chefskiss.ChefsKissApplication
 import com.javainiai.chefskiss.ui.homescreen.HomeScreenViewModel
+import com.javainiai.chefskiss.ui.recipescreen.AddRecipeViewModel
 
 object AppViewModelProvider {
     val Factory = viewModelFactory {
         initializer {
             HomeScreenViewModel()
+        }
+        initializer {
+            AddRecipeViewModel(chefsKissApplication().container.recipesRepository)
         }
     }
 }
