@@ -41,7 +41,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
-import com.javainiai.chefskiss.data.Recipe
+import com.javainiai.chefskiss.data.recipe.Recipe
 import com.javainiai.chefskiss.ui.AppViewModelProvider
 import com.javainiai.chefskiss.ui.navigation.NavigationDestination
 import kotlinx.coroutines.launch
@@ -54,13 +54,19 @@ object HomeScreenDestination : NavigationDestination {
 fun HomeScreen(
     drawerState: DrawerState,
     modifier: Modifier = Modifier,
-    viewModel: HomeScreenViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: HomeScreenViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    navigateTo: (String) -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
 
     Scaffold(modifier = modifier,
         topBar = { SearchTopBar(onMenuClick = { coroutineScope.launch { drawerState.open() } }) },
-        bottomBar = { RecipeBottomBar({ /* TODO */ }, { /* TODO */ }, { /* TODO */ }) }
+        bottomBar = {
+            RecipeBottomBar(
+                { /* TODO */ },
+                { /* TODO */ },
+                { /* TODO */ })
+        }
     ) { padding ->
         LazyColumn(contentPadding = padding, horizontalAlignment = Alignment.CenterHorizontally) {
             /* TODO */
