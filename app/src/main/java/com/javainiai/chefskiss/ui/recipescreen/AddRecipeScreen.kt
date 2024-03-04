@@ -106,9 +106,9 @@ fun AddRecipeScreen(
                     title = uiState.title,
                     onTitleChange = viewModel::updateTitle,
                     cookingTime = uiState.cookingTime,
-                    onCookingTimeChange = { viewModel.updateCookingTime(it) },
+                    onCookingTimeChange = viewModel::updateCookingTime,
                     servings = uiState.servings,
-                    onServingsChange = { viewModel.updateServings(it) },
+                    onServingsChange = viewModel::updateServings,
                     modifier = Modifier
                         .padding(20.dp)
                         .fillMaxWidth()
@@ -116,9 +116,9 @@ fun AddRecipeScreen(
 
                 1 -> RecipeIngredients(
                     ingredient = uiState.ingredient,
-                    updateIngredient = { viewModel.updateIngredient(it) },
+                    updateIngredient = viewModel::updateIngredient,
                     ingredients = uiState.ingredients,
-                    updateIngredients = { viewModel.updateIngredients(it) },
+                    updateIngredients = viewModel::updateIngredients,
                     modifier = Modifier
                         .padding(20.dp)
                         .fillMaxWidth()
@@ -126,7 +126,7 @@ fun AddRecipeScreen(
 
                 2 -> RecipeDirections(
                     directions = uiState.directions,
-                    onDirectionsChange = { viewModel.updateDirections(it) })
+                    onDirectionsChange = viewModel::updateDirections)
             }
         }
     }
