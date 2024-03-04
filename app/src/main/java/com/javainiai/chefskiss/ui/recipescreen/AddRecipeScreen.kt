@@ -1,5 +1,6 @@
 package com.javainiai.chefskiss.ui.recipescreen
 
+import android.content.Intent
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -45,6 +46,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -126,7 +128,8 @@ fun AddRecipeScreen(
 
                 2 -> RecipeDirections(
                     directions = uiState.directions,
-                    onDirectionsChange = viewModel::updateDirections)
+                    onDirectionsChange = viewModel::updateDirections
+                )
             }
         }
     }
@@ -145,9 +148,15 @@ fun RecipeOverview(
     onServingsChange: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
+
     val galleryLauncher =
-        rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri ->
-            if (uri != null) {
+        rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) {
+            it?.let { uri ->
+                context.contentResolver.takePersistableUriPermission(
+                    uri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
                 updateSelectedImage(uri)
             }
         }
