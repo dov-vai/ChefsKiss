@@ -11,7 +11,7 @@ import com.javainiai.chefskiss.ui.recipescreen.AddRecipeViewModel
 object AppViewModelProvider {
     val Factory = viewModelFactory {
         initializer {
-            HomeScreenViewModel()
+            HomeScreenViewModel(chefsKissApplication().container.recipesRepository)
         }
         initializer {
             AddRecipeViewModel(chefsKissApplication().container.recipesRepository)
