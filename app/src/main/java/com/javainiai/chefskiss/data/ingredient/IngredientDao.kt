@@ -1,13 +1,12 @@
 package com.javainiai.chefskiss.data.ingredient
 
-import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
-@Dao
+
 interface IngredientDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(item: Ingredient)

@@ -1,6 +1,7 @@
 package com.javainiai.chefskiss.ui.homescreen
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -33,6 +35,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,9 +45,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
-import com.javainiai.chefskiss.data.Recipe
+import com.javainiai.chefskiss.data.recipe.Recipe
 import com.javainiai.chefskiss.ui.AppViewModelProvider
 import com.javainiai.chefskiss.ui.navigation.NavigationDestination
+import com.javainiai.chefskiss.ui.recipescreen.RecipeDetailsDestination
 import kotlinx.coroutines.launch
 
 object HomeScreenDestination : NavigationDestination {
@@ -54,16 +59,30 @@ object HomeScreenDestination : NavigationDestination {
 fun HomeScreen(
     drawerState: DrawerState,
     modifier: Modifier = Modifier,
-    viewModel: HomeScreenViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: HomeScreenViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    navigateTo: (String) -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
 
+    val homeUiState by viewModel.homeUiState.collectAsState()
+
     Scaffold(modifier = modifier,
         topBar = { SearchTopBar(onMenuClick = { coroutineScope.launch { drawerState.open() } }) },
-        bottomBar = { RecipeBottomBar({ /* TODO */ }, { /* TODO */ }, { /* TODO */ }) }
+        bottomBar = {
+            RecipeBottomBar(
+                { /* TODO */ },
+                { /* TODO */ },
+                { /* TODO */ })
+        }
     ) { padding ->
         LazyColumn(contentPadding = padding, horizontalAlignment = Alignment.CenterHorizontally) {
-            /* TODO */
+            items(items = homeUiState.recipeList) { recipe ->
+                RecipeCard(
+                    recipe = recipe,
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .clickable { navigateTo("${RecipeDetailsDestination.route}/${recipe.id}") })
+            }
         }
     }
 }
@@ -72,7 +91,7 @@ fun HomeScreen(
 fun RecipeCard(recipe: Recipe, modifier: Modifier = Modifier) {
     Card(
         modifier = modifier,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
     ) {
         Row(
             modifier = Modifier
@@ -89,7 +108,10 @@ fun RecipeCard(recipe: Recipe, modifier: Modifier = Modifier) {
                     .clip(RoundedCornerShape(4.dp)),
                 contentScale = ContentScale.Crop
             )
-            Column(modifier = Modifier.padding(8.dp)) {
+            Column(
+                modifier = Modifier.padding(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
                 Text(text = recipe.title, maxLines = 1)
                 Row {
                     Icon(imageVector = Icons.Default.Timer, contentDescription = "Time to cook")
@@ -98,7 +120,8 @@ fun RecipeCard(recipe: Recipe, modifier: Modifier = Modifier) {
                             "%02d:%02d",
                             recipe.cookingTime / 60,
                             recipe.cookingTime % 60
-                        )
+                        ),
+                        modifier = Modifier.padding(end = 8.dp)
                     )
                     Icon(imageVector = Icons.Default.Star, contentDescription = "Rating")
                     Text(text = recipe.rating.toString())

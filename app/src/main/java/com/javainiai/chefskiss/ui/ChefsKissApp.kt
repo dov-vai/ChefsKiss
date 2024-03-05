@@ -29,6 +29,7 @@ fun ChefsKissApp(
     ModalNavigationDrawer(
         modifier = modifier,
         drawerState = drawerState,
+        gesturesEnabled = drawerState.isOpen,
         drawerContent = { ChefsKissDrawerSheet() }) {
         ChefsKissNavHost(drawerState = drawerState, navController = navController)
     }
