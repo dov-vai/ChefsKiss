@@ -48,6 +48,7 @@ import coil.compose.AsyncImage
 import com.javainiai.chefskiss.data.recipe.Recipe
 import com.javainiai.chefskiss.ui.AppViewModelProvider
 import com.javainiai.chefskiss.ui.navigation.NavigationDestination
+import com.javainiai.chefskiss.ui.recipescreen.RecipeDetailsDestination
 import kotlinx.coroutines.launch
 
 object HomeScreenDestination : NavigationDestination {
@@ -76,7 +77,11 @@ fun HomeScreen(
     ) { padding ->
         LazyColumn(contentPadding = padding, horizontalAlignment = Alignment.CenterHorizontally) {
             items(items = homeUiState.recipeList) { recipe ->
-                RecipeCard(recipe = recipe, modifier = Modifier.padding(8.dp))
+                RecipeCard(
+                    recipe = recipe,
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .clickable { navigateTo("${RecipeDetailsDestination.route}/${recipe.id}") })
             }
         }
     }

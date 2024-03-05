@@ -10,6 +10,9 @@ class OfflineRecipesRepository(
 ) : RecipesRepository {
     override fun getAllRecipesStream(): Flow<List<Recipe>> = recipeDao.getAllRecipes()
     override fun getRecipeStream(id: Int): Flow<Recipe?> = recipeDao.getRecipe(id)
+    override fun getRecipeWithIngredients(id: Int): Flow<RecipeWithIngredients?> =
+        recipeDao.getRecipeWithIngredients(id)
+
     override fun getRecentRecipes(): Flow<List<Recipe>> = recipeDao.getRecentRecipes()
     override suspend fun insertRecipe(recipe: Recipe): Long = recipeDao.insert(recipe)
     override suspend fun insertRecipeWithIngredients(
