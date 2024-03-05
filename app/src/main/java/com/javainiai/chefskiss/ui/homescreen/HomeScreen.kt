@@ -48,6 +48,7 @@ import coil.compose.AsyncImage
 import com.javainiai.chefskiss.data.recipe.Recipe
 import com.javainiai.chefskiss.ui.AppViewModelProvider
 import com.javainiai.chefskiss.ui.navigation.NavigationDestination
+import com.javainiai.chefskiss.ui.recipescreen.AddRecipeDestination
 import com.javainiai.chefskiss.ui.recipescreen.RecipeDetailsDestination
 import kotlinx.coroutines.launch
 
@@ -71,7 +72,7 @@ fun HomeScreen(
         bottomBar = {
             RecipeBottomBar(
                 { /* TODO */ },
-                { /* TODO */ },
+                { navigateTo(AddRecipeDestination.route) },
                 { /* TODO */ })
         }
     ) { padding ->
