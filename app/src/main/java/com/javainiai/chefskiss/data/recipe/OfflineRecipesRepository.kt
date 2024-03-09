@@ -14,6 +14,15 @@ class OfflineRecipesRepository(
         recipeDao.getRecipeWithIngredients(id)
 
     override fun getRecentRecipes(): Flow<List<Recipe>> = recipeDao.getRecentRecipes()
+    override fun getRecipesByCookingTime(isAsc: Boolean): Flow<List<Recipe>> =
+        recipeDao.getRecipesByCookingTime(isAsc)
+
+    override fun getRecipesByRating(isAsc: Boolean): Flow<List<Recipe>> =
+        recipeDao.getRecipesByRating(isAsc)
+
+    override fun getRecipesByServings(isAsc: Boolean): Flow<List<Recipe>> =
+        recipeDao.getRecipesByServings(isAsc)
+
     override suspend fun insertRecipe(recipe: Recipe): Long = recipeDao.insert(recipe)
     override suspend fun insertRecipeWithIngredients(
         recipe: Recipe,
