@@ -32,10 +32,30 @@ interface RecipeDao {
     @Query("SELECT * from recipes WHERE id = :id")
     fun getRecipeWithIngredients(id: Int): Flow<RecipeWithIngredients>
 
-    @Transaction
     @Query("SELECT * from recipes")
     fun getAllRecipes(): Flow<List<Recipe>>
 
     @Query("SELECT * from recipes ORDER BY id DESC")
     fun getRecentRecipes(): Flow<List<Recipe>>
+
+    @Query(
+        "SELECT * from recipes ORDER BY " +
+                "CASE WHEN :isAsc = 1 THEN cookingTime END ASC," +
+                "CASE WHEN :isAsc = 0 THEN cookingTime END DESC"
+    )
+    fun getRecipesByCookingTime(isAsc: Boolean): Flow<List<Recipe>>
+
+    @Query(
+        "SELECT * from recipes ORDER BY " +
+                "CASE WHEN :isAsc = 1 THEN rating END ASC," +
+                "CASE WHEN :isAsc = 0 THEN rating END DESC"
+    )
+    fun getRecipesByRating(isAsc: Boolean): Flow<List<Recipe>>
+
+    @Query(
+        "SELECT * from recipes ORDER BY " +
+                "CASE WHEN :isAsc = 1 THEN servings END ASC," +
+                "CASE WHEN :isAsc = 0 THEN servings END DESC"
+    )
+    fun getRecipesByServings(isAsc: Boolean): Flow<List<Recipe>>
 }

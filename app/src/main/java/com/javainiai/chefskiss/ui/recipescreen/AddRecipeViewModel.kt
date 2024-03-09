@@ -134,9 +134,7 @@ class AddRecipeViewModel(private val recipesRepository: RecipesRepository) : Vie
                         recipeId = 0,
                         name = i.title,
                         size = i.amount.toFloatOrNull() ?: 0f,
-                        unit = i.units,
-                        // TODO: setting allergens in add screen in IngredientDisplay
-                        allergen = false
+                        unit = i.units
                     )
 
                     list.add(ingredient)

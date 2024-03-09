@@ -24,6 +24,5 @@ data class Ingredient(
     val recipeId: Int,
     val name: String,
     val size: Float,
-    val unit: String,
-    val allergen: Boolean
+    val unit: String
 )
