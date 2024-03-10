@@ -9,8 +9,8 @@ class OfflineRecipesRepository(
     private val ingredientDao: IngredientDao
 ) : RecipesRepository {
     override fun getAllRecipesStream(): Flow<List<Recipe>> = recipeDao.getAllRecipes()
-    override fun getRecipeStream(id: Int): Flow<Recipe?> = recipeDao.getRecipe(id)
-    override fun getRecipeWithIngredients(id: Int): Flow<RecipeWithIngredients?> =
+    override fun getRecipeStream(id: Long): Flow<Recipe?> = recipeDao.getRecipe(id)
+    override fun getRecipeWithIngredients(id: Long): Flow<RecipeWithIngredients?> =
         recipeDao.getRecipeWithIngredients(id)
 
     override fun getRecentRecipes(): Flow<List<Recipe>> = recipeDao.getRecentRecipes()
@@ -31,7 +31,7 @@ class OfflineRecipesRepository(
         val recipeId = insertRecipe(recipe)
 
         for (ingredient in ingredients) {
-            ingredientDao.insert(ingredient.copy(recipeId = recipeId.toInt()))
+            ingredientDao.insert(ingredient.copy(recipeId = recipeId))
         }
     }
 

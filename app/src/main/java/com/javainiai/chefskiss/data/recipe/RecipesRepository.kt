@@ -5,8 +5,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface RecipesRepository {
     fun getAllRecipesStream(): Flow<List<Recipe>>
-    fun getRecipeStream(id: Int): Flow<Recipe?>
-    fun getRecipeWithIngredients(id: Int): Flow<RecipeWithIngredients?>
+    fun getRecipeStream(id: Long): Flow<Recipe?>
+    fun getRecipeWithIngredients(id: Long): Flow<RecipeWithIngredients?>
     fun getRecentRecipes(): Flow<List<Recipe>>
     fun getRecipesByCookingTime(isAsc: Boolean): Flow<List<Recipe>>
     fun getRecipesByRating(isAsc: Boolean): Flow<List<Recipe>>

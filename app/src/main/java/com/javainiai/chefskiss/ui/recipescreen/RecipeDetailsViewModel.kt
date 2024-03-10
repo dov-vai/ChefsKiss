@@ -25,7 +25,8 @@ class RecipeDetailsViewModel(
     savedStateHandle: SavedStateHandle,
     private val recipesRepository: RecipesRepository
 ) : ViewModel() {
-    private val recipeId: Int = checkNotNull(savedStateHandle[RecipeDetailsDestination.recipeIdArg])
+    private val recipeId: Long =
+        checkNotNull(savedStateHandle[RecipeDetailsDestination.recipeIdArg])
 
     val uiState: StateFlow<RecipeDisplayUiState> = recipesRepository
         .getRecipeWithIngredients(recipeId)

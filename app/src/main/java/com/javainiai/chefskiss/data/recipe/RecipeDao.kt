@@ -26,11 +26,11 @@ interface RecipeDao {
     suspend fun delete(item: Recipe)
 
     @Query("SELECT * from recipes WHERE id = :id")
-    fun getRecipe(id: Int): Flow<Recipe>
+    fun getRecipe(id: Long): Flow<Recipe>
 
     @Transaction
     @Query("SELECT * from recipes WHERE id = :id")
-    fun getRecipeWithIngredients(id: Int): Flow<RecipeWithIngredients>
+    fun getRecipeWithIngredients(id: Long): Flow<RecipeWithIngredients>
 
     @Query("SELECT * from recipes")
     fun getAllRecipes(): Flow<List<Recipe>>

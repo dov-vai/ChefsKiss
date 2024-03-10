@@ -19,9 +19,9 @@ import com.javainiai.chefskiss.data.recipe.Recipe
 )
 data class Ingredient(
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    val id: Long = 0,
     @ColumnInfo(index = true)
-    val recipeId: Int,
+    val recipeId: Long,
     val name: String,
     val size: Float,
     val unit: String
