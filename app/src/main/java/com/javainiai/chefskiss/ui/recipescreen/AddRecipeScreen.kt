@@ -7,6 +7,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,20 +17,26 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material.icons.filled.Tag
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.filled.Title
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -45,6 +53,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -54,6 +63,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import com.javainiai.chefskiss.data.tag.Tag
 import com.javainiai.chefskiss.ui.AppViewModelProvider
 import com.javainiai.chefskiss.ui.navigation.NavigationDestination
 import com.javainiai.chefskiss.ui.theme.ChefsKissTheme
@@ -78,6 +88,7 @@ fun AddRecipeScreen(
     viewModel: AddRecipeViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val tags by viewModel.tags.collectAsState()
 
     val coroutineScope = rememberCoroutineScope()
 
@@ -85,7 +96,7 @@ fun AddRecipeScreen(
         mutableIntStateOf(0)
     }
 
-    val tabs = listOf("Overview", "Ingredients", "Directions")
+    val tabs = listOf("Overview", "Tags", "Ingredients", "Directions")
 
     Scaffold(topBar = {
         AddRecipeTopBar(
@@ -113,10 +124,26 @@ fun AddRecipeScreen(
                     onServingsChange = viewModel::updateServings,
                     modifier = Modifier
                         .padding(20.dp)
+                        .verticalScroll(rememberScrollState())
                         .fillMaxWidth()
                 )
 
-                1 -> RecipeIngredients(
+                1 -> RecipeTags(
+                    tag = uiState.tag,
+                    onTagChange = viewModel::updateTag,
+                    onAddTag = viewModel::addTag,
+                    onRemoveTag = viewModel::removeTag,
+                    tags = tags,
+                    selectedTags = uiState.tags,
+                    updateTags = viewModel::updateTags,
+                    tagRemoveMode = uiState.tagRemoveMode,
+                    updateMode = viewModel::updateTagRemoveMode,
+                    modifier = Modifier
+                        .padding(20.dp)
+                        .fillMaxWidth()
+                )
+
+                2 -> RecipeIngredients(
                     ingredient = uiState.ingredient,
                     updateIngredient = viewModel::updateIngredient,
                     ingredients = uiState.ingredients,
@@ -126,7 +153,7 @@ fun AddRecipeScreen(
                         .fillMaxWidth()
                 )
 
-                2 -> RecipeDirections(
+                3 -> RecipeDirections(
                     directions = uiState.directions,
                     onDirectionsChange = viewModel::updateDirections
                 )
@@ -173,7 +200,7 @@ fun RecipeOverview(
                 contentDescription = "Selected image",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .size(256.dp)
+                    .size(128.dp)
                     .clickable { galleryLauncher.launch("image/*") })
         } else {
             Button(onClick = { galleryLauncher.launch("image/*") }) {
@@ -225,6 +252,94 @@ fun RecipeOverview(
                 )
             }
         )
+
+    }
+}
+
+@Composable
+fun RecipeTags(
+    tag: String,
+    onTagChange: (String) -> Unit,
+    onAddTag: () -> Unit,
+    onRemoveTag: (Tag) -> Unit,
+    tags: List<Tag>,
+    selectedTags: List<Tag>,
+    updateTags: (List<Tag>) -> Unit,
+    tagRemoveMode: Boolean,
+    updateMode: (Boolean) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            TextField(
+                value = tag,
+                onValueChange = { onTagChange(it) },
+                label = { Text(text = "Add new tag") },
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Done
+                ),
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        onAddTag()
+                        KeyboardActions.Default.onDone
+                    }
+                ),
+                trailingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Tag,
+                        contentDescription = "Tag"
+                    )
+                }
+            )
+            IconButton(
+                onClick = { updateMode(!tagRemoveMode) },
+                colors = IconButtonDefaults.iconButtonColors(containerColor = if (tagRemoveMode) Color.Red else Color.Transparent)
+            ) {
+                Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete tags")
+            }
+        }
+        RecipeTagsCard(
+            tags = tags,
+            selectedTags = selectedTags,
+            updateTags = updateTags,
+            tagRemoveMode = tagRemoveMode,
+            onRemoveTag = onRemoveTag,
+            modifier = Modifier
+                .verticalScroll(rememberScrollState())
+                .padding(12.dp)
+        )
+    }
+
+}
+
+
+@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
+@Composable
+fun RecipeTagsCard(
+    tags: List<Tag>,
+    selectedTags: List<Tag>,
+    updateTags: (List<Tag>) -> Unit,
+    tagRemoveMode: Boolean,
+    onRemoveTag: (Tag) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    FlowRow(modifier = modifier, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        tags.forEach {
+            FilterChip(
+                selected = selectedTags.contains(it),
+                onClick = {
+                    if (tagRemoveMode)
+                        onRemoveTag(it)
+                    else {
+                        if (selectedTags.contains(it))
+                            updateTags(selectedTags - it)
+                        else
+                            updateTags(selectedTags + it)
+                    }
+                },
+                label = { Text(it.title) }
+            )
+        }
     }
 }
 

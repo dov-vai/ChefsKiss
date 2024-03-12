@@ -11,6 +11,7 @@ import com.javainiai.chefskiss.data.ingredient.Ingredient
 import com.javainiai.chefskiss.data.ingredient.IngredientDao
 import com.javainiai.chefskiss.data.recipe.Recipe
 import com.javainiai.chefskiss.data.recipe.RecipeDao
+import com.javainiai.chefskiss.data.recipe.RecipeTagCrossRef
 import com.javainiai.chefskiss.data.tag.Tag
 import com.javainiai.chefskiss.data.tag.TagDao
 
@@ -28,7 +29,7 @@ class Converters {
 
 
 @Database(
-    entities = [Recipe::class, Ingredient::class, Tag::class],
+    entities = [Recipe::class, Ingredient::class, Tag::class, RecipeTagCrossRef::class],
     version = 1,
     exportSchema = false
 )

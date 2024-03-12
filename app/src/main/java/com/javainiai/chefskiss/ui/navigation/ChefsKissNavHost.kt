@@ -37,7 +37,7 @@ fun ChefsKissNavHost(
         composable(
             route = RecipeDetailsDestination.routeWithArgs,
             arguments = listOf(navArgument(RecipeDetailsDestination.recipeIdArg) {
-                type = NavType.IntType
+                type = NavType.LongType
             })
         ) {
             RecipeDetailsScreen(navigateBack = { navController.navigateUp() })

@@ -2,13 +2,18 @@ package com.javainiai.chefskiss.ui.recipescreen
 
 import android.net.Uri
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.javainiai.chefskiss.data.ingredient.Ingredient
 import com.javainiai.chefskiss.data.recipe.Recipe
 import com.javainiai.chefskiss.data.recipe.RecipesRepository
 import com.javainiai.chefskiss.data.tag.Tag
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 data class IngredientDisplay(
     val title: String,
@@ -23,8 +28,10 @@ data class AddRecipeUiState(
     val imageUri: Uri,
     val ingredient: IngredientDisplay,
     val ingredients: List<IngredientDisplay>,
+    val tag: String,
     val tags: List<Tag>,
-    val directions: String
+    val directions: String,
+    val tagRemoveMode: Boolean
 )
 
 class AddRecipeViewModel(private val recipesRepository: RecipesRepository) : ViewModel() {
@@ -37,11 +44,21 @@ class AddRecipeViewModel(private val recipesRepository: RecipesRepository) : Vie
                 Uri.EMPTY,
                 IngredientDisplay("", "", ""),
                 listOf(),
+                "",
                 listOf(),
-                ""
+                "",
+                false
             )
         )
     val uiState = _uiState.asStateFlow()
+
+    val tags: StateFlow<List<Tag>> = recipesRepository
+        .getAllTags()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+            initialValue = listOf()
+        )
 
     fun updateTitle(title: String) {
         _uiState.update { currentState ->
@@ -87,6 +104,40 @@ class AddRecipeViewModel(private val recipesRepository: RecipesRepository) : Vie
         _uiState.update { currentState ->
             currentState.copy(
                 ingredients = ingredients
+            )
+        }
+    }
+
+    fun updateTag(tag: String) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                tag = tag
+            )
+        }
+    }
+
+    fun addTag() {
+        // don't add empty tags...
+        if (_uiState.value.tag == "")
+            return
+
+        viewModelScope.launch {
+            recipesRepository.insertTag(Tag(title = _uiState.value.tag))
+            updateTag("")
+        }
+    }
+
+    fun removeTag(tag: Tag) {
+        viewModelScope.launch {
+            recipesRepository.deleteTag(tag)
+            updateTags(_uiState.value.tags - tag)
+        }
+    }
+
+    fun updateTagRemoveMode(mode: Boolean) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                tagRemoveMode = mode
             )
         }
     }
@@ -140,11 +191,15 @@ class AddRecipeViewModel(private val recipesRepository: RecipesRepository) : Vie
                     list.add(ingredient)
                 }
 
-                recipesRepository.insertRecipeWithIngredients(recipe, list)
+                recipesRepository.insertRecipeWithIngredientsAndTags(recipe, list, tags)
             }
         } else {
             return false
         }
         return true
+    }
+
+    companion object {
+        private const val TIMEOUT_MILLIS = 5_000L
     }
 }
