@@ -7,7 +7,6 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import com.javainiai.chefskiss.data.ingredient.Ingredient
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -15,9 +14,8 @@ interface RecipeDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(item: Recipe): Long
 
-    @Transaction
-    @Insert
-    suspend fun insert(item: Recipe, ingredients: List<Ingredient>)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(item: RecipeTagCrossRef)
 
     @Update
     suspend fun update(item: Recipe)
@@ -31,6 +29,10 @@ interface RecipeDao {
     @Transaction
     @Query("SELECT * from recipes WHERE id = :id")
     fun getRecipeWithIngredients(id: Long): Flow<RecipeWithIngredients>
+
+    @Transaction
+    @Query("SELECT * from recipes WHERE id = :id")
+    fun getRecipeWithTags(id: Long): Flow<RecipeWithTags>
 
     @Query("SELECT * from recipes")
     fun getAllRecipes(): Flow<List<Recipe>>

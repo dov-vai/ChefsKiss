@@ -4,9 +4,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface TagsRepository {
     fun getAllTagsStream(): Flow<List<Tag>>
-    fun getTagStream(id: Int): Flow<Tag?>
-    fun getAllRecipeTags(recipeId: Int): Flow<List<Tag>>
-    suspend fun insertTag(tag: Tag)
+    fun getTagStream(id: Long): Flow<Tag?>
+    suspend fun insertTag(tag: Tag): Long
     suspend fun deleteTag(tag: Tag)
     suspend fun updateTag(tag: Tag)
 }
