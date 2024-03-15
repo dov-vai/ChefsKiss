@@ -30,9 +30,10 @@ import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SearchBar
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -43,6 +44,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.javainiai.chefskiss.data.recipe.Recipe
@@ -50,6 +52,7 @@ import com.javainiai.chefskiss.ui.AppViewModelProvider
 import com.javainiai.chefskiss.ui.navigation.NavigationDestination
 import com.javainiai.chefskiss.ui.recipescreen.AddRecipeDestination
 import com.javainiai.chefskiss.ui.recipescreen.RecipeDetailsDestination
+import com.javainiai.chefskiss.ui.search.SearchDestination
 import kotlinx.coroutines.launch
 
 object HomeScreenDestination : NavigationDestination {
@@ -68,7 +71,11 @@ fun HomeScreen(
     val homeUiState by viewModel.homeUiState.collectAsState()
 
     Scaffold(modifier = modifier,
-        topBar = { SearchTopBar(onMenuClick = { coroutineScope.launch { drawerState.open() } }) },
+        topBar = {
+            SearchTopBar(
+                onMenuClick = { coroutineScope.launch { drawerState.open() } },
+                onSearchClick = { navigateTo(SearchDestination.route) })
+        },
         bottomBar = {
             RecipeBottomBar(
                 { /* TODO */ },
@@ -185,31 +192,41 @@ fun RecipeBottomBar(
     }
 }
 
+
+@Composable
+fun FakeSearchBar(onMenuClick: () -> Unit, modifier: Modifier = Modifier) {
+    Surface(
+        shape = RoundedCornerShape(32.dp),
+        modifier = modifier,
+        color = MaterialTheme.colorScheme.surface,
+        tonalElevation = 5.dp
+    ) {
+        Row(modifier = Modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = { onMenuClick() }) {
+                Icon(imageVector = Icons.Default.Menu, contentDescription = "Menu")
+            }
+            Text(text = "Search", fontSize = 16.sp)
+            Spacer(modifier = Modifier.weight(1f))
+            Icon(
+                imageVector = Icons.Default.Search,
+                contentDescription = "Search",
+                modifier = Modifier.padding(8.dp)
+            )
+        }
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchTopBar(onMenuClick: () -> Unit) {
+fun SearchTopBar(onMenuClick: () -> Unit, onSearchClick: () -> Unit) {
     CenterAlignedTopAppBar(
         title = {
-            SearchBar(
-                query = "",
-                onQueryChange = {},
-                onSearch = {},
-                active = false,
-                onActiveChange = {},
-                trailingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = "Search"
-                    )
-                },
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.Menu,
-                        contentDescription = "Navigation drawer",
-                        modifier = Modifier.clickable { onMenuClick() })
-                },
-                placeholder = { Text(text = "Search") }
-            ) {}
+            FakeSearchBar(
+                onMenuClick = onMenuClick,
+                modifier = Modifier
+                    .padding(8.dp)
+                    .fillMaxWidth()
+                    .clickable { onSearchClick() })
         },
         modifier = Modifier.height(70.dp)
     )
