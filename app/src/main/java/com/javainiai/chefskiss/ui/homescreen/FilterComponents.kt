@@ -1,4 +1,4 @@
-package com.javainiai.chefskiss.ui.search
+package com.javainiai.chefskiss.ui.homescreen
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -10,87 +10,82 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
-import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
-import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.OutlinedCard
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import com.javainiai.chefskiss.data.Sort
 import com.javainiai.chefskiss.data.tag.Tag
-import com.javainiai.chefskiss.ui.AppViewModelProvider
-import com.javainiai.chefskiss.ui.navigation.NavigationDestination
 
-object SearchDestination : NavigationDestination {
-    override val route = "search"
+@Composable
+fun FilterDrawer(
+    drawerState: DrawerState,
+    drawerContent: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit
+) {
+    // Setting the layout to go from right to left is a hack
+    // As Jetpack Compose doesn't (yet) provide a side drawer that goes from right to left
+    CompositionLocalProvider(value = LocalLayoutDirection provides LayoutDirection.Rtl) {
+        ModalNavigationDrawer(drawerContent = drawerContent, drawerState = drawerState) {
+            CompositionLocalProvider(value = LocalLayoutDirection provides LayoutDirection.Ltr) {
+                content()
+            }
+        }
+    }
 }
 
 @Composable
-fun SearchScreen(
-    navigateBack: () -> Unit,
-    viewModel: SearchScreenViewModel = viewModel(factory = AppViewModelProvider.Factory)
+fun FilterSheet(
+    onClear: () -> Unit,
+    onApply: () -> Unit,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit
 ) {
-    val uiState by viewModel.uiState.collectAsState()
-    val tags by viewModel.tags.collectAsState()
-
-    Scaffold(topBar = {
-        TopSearchBar(
-            uiState.query,
-            viewModel::updateQuery,
-            viewModel::doSearch,
-            uiState.searchActive,
-            viewModel::updateActive,
-            navigateBack
-        )
-    }) { padding ->
-        Column(modifier = Modifier.padding(padding)) {
-            OrderSelection(
-                ascending = uiState.ascending,
-                updateOrder = viewModel::updateOrder,
+    ModalDrawerSheet {
+        CompositionLocalProvider(value = LocalLayoutDirection provides LayoutDirection.Ltr) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier
-                    .padding(8.dp)
+                    .padding(16.dp)
                     .fillMaxWidth()
-            )
-            RatingCard(
-                rating = uiState.rating,
-                onRatingChange = viewModel::updateRating,
-                modifier = Modifier
-                    .padding(8.dp)
-                    .fillMaxWidth()
-            )
-            SortCard(
-                selectedSort = uiState.sortingMethod,
-                updateSortingMethod = viewModel::updateSortingMethod,
-                modifier = Modifier
-                    .padding(8.dp)
-                    .fillMaxWidth()
-            )
-            TagCard(
-                tags = tags,
-                selectedTags = uiState.selectedTags,
-                updateTags = viewModel::updateTags,
-                modifier = Modifier
-                    .padding(8.dp)
-                    .fillMaxWidth()
-            )
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(text = "Filters")
+                    Spacer(modifier = Modifier.weight(1f))
+                    TextButton(onClick = onClear) {
+                        Text(text = "Clear")
+                    }
+                    TextButton(onClick = onApply) {
+                        Text(text = "Apply")
+                    }
+                }
+                content()
+            }
         }
     }
 }
@@ -224,55 +219,17 @@ fun RatingCard(rating: Int, onRatingChange: (Int) -> Unit, modifier: Modifier = 
                     Icon(
                         imageVector = Icons.Default.Star,
                         contentDescription = null,
-                        modifier = Modifier.clickable { onRatingChange(it + 1) })
+                        modifier = Modifier.clickable { onRatingChange(it + 1) }
+                    )
                 }
                 repeat(5 - rating) {
                     Icon(
                         imageVector = Icons.Default.StarBorder,
                         contentDescription = null,
-                        modifier = Modifier.clickable { onRatingChange(rating + it + 1) })
+                        modifier = Modifier.clickable { onRatingChange(rating + it + 1) }
+                    )
                 }
             }
         }
     }
-}
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun TopSearchBar(
-    query: String,
-    onQueryChange: (String) -> Unit,
-    onSearch: (String) -> Unit,
-    active: Boolean,
-    onActiveChange: (Boolean) -> Unit,
-    onBack: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    CenterAlignedTopAppBar(title = {
-        SearchBar(
-            modifier = modifier,
-            query = query,
-            onQueryChange = onQueryChange,
-            onSearch = onSearch,
-            active = active,
-            onActiveChange = onActiveChange,
-            leadingIcon = {
-                IconButton(onClick = onBack) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back"
-                    )
-                }
-            },
-            trailingIcon = {
-                IconButton(onClick = { onQueryChange("") }) {
-                    Icon(imageVector = Icons.Default.Clear, contentDescription = "Clear text")
-                }
-            }
-        ) {
-
-        }
-    })
-
 }

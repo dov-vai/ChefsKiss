@@ -1,5 +1,8 @@
 package com.javainiai.chefskiss.data.recipe
 
+import androidx.sqlite.db.SimpleSQLiteQuery
+import androidx.sqlite.db.SupportSQLiteQuery
+import com.javainiai.chefskiss.data.Sort
 import com.javainiai.chefskiss.data.ingredient.Ingredient
 import com.javainiai.chefskiss.data.ingredient.IngredientDao
 import com.javainiai.chefskiss.data.tag.Tag
@@ -20,7 +23,9 @@ class OfflineRecipesRepository(
     override fun getRecipeWithTags(id: Long): Flow<RecipeWithTags?> =
         recipeDao.getRecipeWithTags(id)
 
-    override fun getRecentRecipes(): Flow<List<Recipe>> = recipeDao.getRecentRecipes()
+    override fun getRecipesByTimeAdded(isAsc: Boolean): Flow<List<Recipe>> =
+        recipeDao.getRecipesByTimeAdded(isAsc)
+
     override fun getRecipesByCookingTime(isAsc: Boolean): Flow<List<Recipe>> =
         recipeDao.getRecipesByCookingTime(isAsc)
 
@@ -29,6 +34,45 @@ class OfflineRecipesRepository(
 
     override fun getRecipesByServings(isAsc: Boolean): Flow<List<Recipe>> =
         recipeDao.getRecipesByServings(isAsc)
+
+    override fun getRecipeIdsByTagIds(tagIds: List<Long>): List<Long> =
+        recipeDao.getRecipeIdsByTagIds(tagIds)
+
+    override fun query(query: SupportSQLiteQuery): Flow<List<Recipe>> = recipeDao.query(query)
+    override fun query(
+        recipeName: String,
+        rating: Int,
+        isAsc: Boolean,
+        sortingMethod: Sort,
+        tags: List<Tag>
+    ): Flow<List<Recipe>> {
+        var query = "SELECT * FROM recipes WHERE rating >= ${rating}"
+
+        if (recipeName != "") {
+            query += " AND title LIKE '%${recipeName}%'"
+        }
+
+        if (tags.isNotEmpty()) {
+            val recipeIds = getRecipeIdsByTagIds(tags.map { it.id })
+            query += " AND id IN (${recipeIds.joinToString()})"
+        }
+
+        val sort = when (sortingMethod) {
+            Sort.COOKING_TIME -> "cookingTime"
+            Sort.PORTION -> "servings"
+            Sort.RATING -> "rating"
+            Sort.ADDED -> "id"
+        }
+
+        query += " ORDER BY ${sort}"
+
+        val order = if (isAsc) "ASC" else "DESC"
+
+        query += " ${order}"
+
+        return recipeDao.query(SimpleSQLiteQuery(query))
+    }
+
 
     override suspend fun insertTag(tag: Tag): Long = tagDao.insert(tag)
     override suspend fun deleteTag(tag: Tag) = tagDao.delete(tag)

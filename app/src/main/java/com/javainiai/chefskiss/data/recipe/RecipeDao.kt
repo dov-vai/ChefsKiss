@@ -5,8 +5,10 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.RawQuery
 import androidx.room.Transaction
 import androidx.room.Update
+import androidx.sqlite.db.SupportSQLiteQuery
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -37,8 +39,12 @@ interface RecipeDao {
     @Query("SELECT * from recipes")
     fun getAllRecipes(): Flow<List<Recipe>>
 
-    @Query("SELECT * from recipes ORDER BY id DESC")
-    fun getRecentRecipes(): Flow<List<Recipe>>
+    @Query(
+        "SELECT * from recipes ORDER BY " +
+                "CASE WHEN :isAsc = 1 THEN id END ASC," +
+                "CASE WHEN :isAsc = 0 THEN id END DESC"
+    )
+    fun getRecipesByTimeAdded(isAsc: Boolean): Flow<List<Recipe>>
 
     @Query(
         "SELECT * from recipes ORDER BY " +
@@ -60,4 +66,10 @@ interface RecipeDao {
                 "CASE WHEN :isAsc = 0 THEN servings END DESC"
     )
     fun getRecipesByServings(isAsc: Boolean): Flow<List<Recipe>>
+
+    @RawQuery(observedEntities = [Recipe::class])
+    fun query(query: SupportSQLiteQuery): Flow<List<Recipe>>
+
+    @Query("SELECT recipeId from recipes_tags WHERE tagId IN (:tagIds)")
+    fun getRecipeIdsByTagIds(tagIds: List<Long>): List<Long>
 }

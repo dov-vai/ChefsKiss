@@ -36,8 +36,7 @@ class RecipeDetailsViewModel(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
             initialValue = RecipeDisplayUiState(
-                Recipe(0, "", "", 0, 0, 0, false, Uri.EMPTY),
-                listOf()
+                Recipe(0, "", "", 0, 0, 0, false, Uri.EMPTY), listOf()
             )
         )
 
