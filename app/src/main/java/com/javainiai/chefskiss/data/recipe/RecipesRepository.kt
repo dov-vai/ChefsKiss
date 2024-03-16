@@ -1,5 +1,7 @@
 package com.javainiai.chefskiss.data.recipe
 
+import androidx.sqlite.db.SupportSQLiteQuery
+import com.javainiai.chefskiss.data.Sort
 import com.javainiai.chefskiss.data.ingredient.Ingredient
 import com.javainiai.chefskiss.data.tag.Tag
 import kotlinx.coroutines.flow.Flow
@@ -10,10 +12,20 @@ interface RecipesRepository {
     fun getRecipeStream(id: Long): Flow<Recipe?>
     fun getRecipeWithIngredients(id: Long): Flow<RecipeWithIngredients?>
     fun getRecipeWithTags(id: Long): Flow<RecipeWithTags?>
-    fun getRecentRecipes(): Flow<List<Recipe>>
+    fun getRecipesByTimeAdded(isAsc: Boolean): Flow<List<Recipe>>
     fun getRecipesByCookingTime(isAsc: Boolean): Flow<List<Recipe>>
     fun getRecipesByRating(isAsc: Boolean): Flow<List<Recipe>>
     fun getRecipesByServings(isAsc: Boolean): Flow<List<Recipe>>
+    fun getRecipeIdsByTagIds(tagIds: List<Long>): List<Long>
+    fun query(query: SupportSQLiteQuery): Flow<List<Recipe>>
+    fun query(
+        recipeName: String,
+        rating: Int,
+        isAsc: Boolean,
+        sortingMethod: Sort,
+        tags: List<Tag>
+    ): Flow<List<Recipe>>
+
     suspend fun insertTag(tag: Tag): Long
     suspend fun deleteTag(tag: Tag)
     suspend fun insertRecipe(recipe: Recipe): Long
