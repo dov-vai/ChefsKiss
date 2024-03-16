@@ -12,13 +12,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.RestaurantMenu
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.BottomAppBar
@@ -27,6 +30,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
@@ -35,6 +39,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.rememberDrawerState
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -42,9 +50,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.javainiai.chefskiss.data.recipe.Recipe
@@ -52,7 +61,6 @@ import com.javainiai.chefskiss.ui.AppViewModelProvider
 import com.javainiai.chefskiss.ui.navigation.NavigationDestination
 import com.javainiai.chefskiss.ui.recipescreen.AddRecipeDestination
 import com.javainiai.chefskiss.ui.recipescreen.RecipeDetailsDestination
-import com.javainiai.chefskiss.ui.search.SearchDestination
 import kotlinx.coroutines.launch
 
 object HomeScreenDestination : NavigationDestination {
@@ -67,29 +75,65 @@ fun HomeScreen(
     navigateTo: (String) -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
-
     val homeUiState by viewModel.homeUiState.collectAsState()
+    val searchUiState by viewModel.searchUiState.collectAsState()
+    val tags by viewModel.tags.collectAsState()
+    val filterDrawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
-    Scaffold(modifier = modifier,
-        topBar = {
-            SearchTopBar(
-                onMenuClick = { coroutineScope.launch { drawerState.open() } },
-                onSearchClick = { navigateTo(SearchDestination.route) })
-        },
-        bottomBar = {
-            RecipeBottomBar(
-                { /* TODO */ },
-                { navigateTo(AddRecipeDestination.route) },
-                { /* TODO */ })
+    FilterDrawer(drawerState = filterDrawerState, drawerContent = {
+        FilterSheet(onClear = viewModel::clear, onApply = viewModel::doSearch) {
+            OrderSelection(
+                ascending = searchUiState.ascending,
+                updateOrder = viewModel::updateOrder,
+                modifier = Modifier.fillMaxWidth()
+            )
+            RatingCard(
+                rating = searchUiState.rating,
+                onRatingChange = viewModel::updateRating,
+                modifier = Modifier.fillMaxWidth()
+            )
+            SortCard(
+                selectedSort = searchUiState.sortingMethod,
+                updateSortingMethod = viewModel::updateSortingMethod,
+                modifier = Modifier.fillMaxWidth()
+            )
+            TagCard(
+                tags = tags,
+                selectedTags = searchUiState.selectedTags,
+                updateTags = viewModel::updateTags,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
-    ) { padding ->
-        LazyColumn(contentPadding = padding, horizontalAlignment = Alignment.CenterHorizontally) {
-            items(items = homeUiState.recipeList) { recipe ->
-                RecipeCard(
-                    recipe = recipe,
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .clickable { navigateTo("${RecipeDetailsDestination.route}/${recipe.id}") })
+    }) {
+        Scaffold(modifier = modifier,
+            topBar = {
+                SearchTopBar(
+                    query = searchUiState.query,
+                    onQueryChange = viewModel::updateQuery,
+                    onMenuClick = { coroutineScope.launch { drawerState.open() } },
+                    onSearch = viewModel::doSearch,
+                    onFilterClick = { coroutineScope.launch { filterDrawerState.open() } }
+                )
+            },
+            bottomBar = {
+                RecipeBottomBar(
+                    { /* TODO */ },
+                    { navigateTo(AddRecipeDestination.route) },
+                    { /* TODO */ })
+            }
+        ) { padding ->
+            LazyColumn(
+                contentPadding = padding,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                items(items = homeUiState.recipeList) { recipe ->
+                    RecipeCard(
+                        recipe = recipe,
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .clickable { navigateTo("${RecipeDetailsDestination.route}/${recipe.id}") }
+                    )
+                }
             }
         }
     }
@@ -147,7 +191,7 @@ fun RecipeCard(recipe: Recipe, modifier: Modifier = Modifier) {
 
 @Composable
 fun RecipeBottomBar(
-    recentOnClick: () -> Unit,
+    recipesOnClick: () -> Unit,
     addOnClick: () -> Unit,
     favoritesOnClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -157,12 +201,12 @@ fun RecipeBottomBar(
             Spacer(modifier = Modifier.weight(1f))
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 FilledTonalButton(
-                    onClick = recentOnClick,
+                    onClick = recipesOnClick,
                     colors = ButtonDefaults.filledTonalButtonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
                 ) {
-                    Icon(imageVector = Icons.Default.History, contentDescription = "Recent recipes")
+                    Icon(imageVector = Icons.Default.RestaurantMenu, contentDescription = "Recipes")
                 }
-                Text(text = "Recent")
+                Text(text = "Recipes")
             }
             Spacer(modifier = Modifier.weight(1f))
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -192,41 +236,76 @@ fun RecipeBottomBar(
     }
 }
 
-
 @Composable
-fun FakeSearchBar(onMenuClick: () -> Unit, modifier: Modifier = Modifier) {
-    Surface(
-        shape = RoundedCornerShape(32.dp),
-        modifier = modifier,
-        color = MaterialTheme.colorScheme.surface,
-        tonalElevation = 5.dp
-    ) {
-        Row(modifier = Modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = { onMenuClick() }) {
-                Icon(imageVector = Icons.Default.Menu, contentDescription = "Menu")
-            }
-            Text(text = "Search", fontSize = 16.sp)
-            Spacer(modifier = Modifier.weight(1f))
-            Icon(
-                imageVector = Icons.Default.Search,
-                contentDescription = "Search",
-                modifier = Modifier.padding(8.dp)
-            )
-        }
+fun ChefsKissSearchBar(
+    query: String,
+    onQueryChange: (String) -> Unit,
+    onMenuClick: () -> Unit,
+    onSearch: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(modifier = modifier) {
+        TextField(
+            value = query,
+            onValueChange = onQueryChange,
+            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
+            keyboardActions = KeyboardActions(onSearch = { onSearch() }),
+            singleLine = true,
+            leadingIcon = {
+                IconButton(onClick = onMenuClick) {
+                    Icon(imageVector = Icons.Default.Menu, contentDescription = "Menu")
+                }
+            },
+            trailingIcon = {
+                if (query != "") {
+                    IconButton(onClick = { onQueryChange("") }) {
+                        Icon(imageVector = Icons.Default.Clear, contentDescription = "Clear")
+                    }
+                }
+            },
+            shape = RoundedCornerShape(32.dp),
+            colors = TextFieldDefaults.colors(
+                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp),
+                focusedContainerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp),
+                disabledIndicatorColor = Color.Transparent,
+                errorIndicatorColor = Color.Transparent,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent
+            ),
+            placeholder = { Text(text = "Search") }
+        )
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchTopBar(onMenuClick: () -> Unit, onSearchClick: () -> Unit) {
+fun SearchTopBar(
+    query: String,
+    onQueryChange: (String) -> Unit,
+    onMenuClick: () -> Unit,
+    onSearch: () -> Unit,
+    onFilterClick: () -> Unit
+) {
     CenterAlignedTopAppBar(
         title = {
-            FakeSearchBar(
-                onMenuClick = onMenuClick,
-                modifier = Modifier
-                    .padding(8.dp)
-                    .fillMaxWidth()
-                    .clickable { onSearchClick() })
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                ChefsKissSearchBar(
+                    query = query,
+                    onQueryChange = onQueryChange,
+                    onMenuClick = onMenuClick,
+                    onSearch = onSearch,
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(top = 4.dp)
+                )
+                IconButton(onClick = onFilterClick) {
+                    Icon(imageVector = Icons.Default.FilterList, contentDescription = "Filter")
+                }
+            }
+
         },
         modifier = Modifier.height(70.dp)
     )
