@@ -92,6 +92,11 @@ fun HomeScreen(
                 onRatingChange = viewModel::updateRating,
                 modifier = Modifier.fillMaxWidth()
             )
+            FavoriteButton(
+                favorite = searchUiState.favorite,
+                updateFavorite = viewModel::updateFavorite,
+                modifier = Modifier.fillMaxWidth()
+            )
             SortCard(
                 selectedSort = searchUiState.sortingMethod,
                 updateSortingMethod = viewModel::updateSortingMethod,
@@ -118,8 +123,7 @@ fun HomeScreen(
             bottomBar = {
                 RecipeBottomBar(
                     { /* TODO */ },
-                    { navigateTo(AddRecipeDestination.route) },
-                    { /* TODO */ })
+                    { navigateTo(AddRecipeDestination.route) })
             }
         ) { padding ->
             LazyColumn(
@@ -193,7 +197,6 @@ fun RecipeCard(recipe: Recipe, modifier: Modifier = Modifier) {
 fun RecipeBottomBar(
     recipesOnClick: () -> Unit,
     addOnClick: () -> Unit,
-    favoritesOnClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     BottomAppBar(modifier = modifier) {
@@ -217,19 +220,6 @@ fun RecipeBottomBar(
                     Icon(imageVector = Icons.Default.Add, contentDescription = "Add recipe")
                 }
                 Text(text = "Add")
-            }
-            Spacer(modifier = Modifier.weight(1f))
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                FilledTonalButton(
-                    onClick = favoritesOnClick,
-                    colors = ButtonDefaults.filledTonalButtonColors(containerColor = MaterialTheme.colorScheme.background)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Favorite,
-                        contentDescription = "Favorite recipes"
-                    )
-                }
-                Text(text = "Favorites")
             }
             Spacer(modifier = Modifier.weight(1f))
         }
