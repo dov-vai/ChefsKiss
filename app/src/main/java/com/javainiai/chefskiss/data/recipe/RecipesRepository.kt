@@ -9,8 +9,11 @@ import kotlinx.coroutines.flow.Flow
 interface RecipesRepository {
     fun getAllTags(): Flow<List<Tag>>
     fun getAllRecipesStream(): Flow<List<Recipe>>
+    fun getShoppingList(): Flow<List<ShopRecipe>>
+    fun getRecipesByIds(recipeIds: List<Long>): Flow<List<Recipe>>
     fun getRecipeStream(id: Long): Flow<Recipe?>
     fun getRecipeWithIngredients(id: Long): Flow<RecipeWithIngredients?>
+    fun getRecipesWithIngredients(recipeIds: List<Long>): Flow<List<RecipeWithIngredients>>
     fun getRecipeWithTags(id: Long): Flow<RecipeWithTags?>
     fun getRecipesByTimeAdded(isAsc: Boolean): Flow<List<Recipe>>
     fun getRecipesByCookingTime(isAsc: Boolean): Flow<List<Recipe>>
@@ -38,4 +41,8 @@ interface RecipesRepository {
 
     suspend fun deleteRecipe(recipe: Recipe)
     suspend fun updateRecipe(recipe: Recipe)
+
+    suspend fun insertShopRecipe(recipe: ShopRecipe)
+    suspend fun deleteShopRecipe(recipe: ShopRecipe)
+
 }

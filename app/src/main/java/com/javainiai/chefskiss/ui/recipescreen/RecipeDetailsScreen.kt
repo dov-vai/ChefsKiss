@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.RestaurantMenu
 import androidx.compose.material.icons.filled.ShoppingBasket
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.icons.filled.Timer
@@ -81,6 +82,7 @@ fun RecipeDetailsScreen(
         topBar = {
             RecipeTopBar(
                 isFavorite = uiState.recipe.favorite,
+                onShopping = viewModel::addToShoppingList,
                 onBack = navigateBack,
                 onDelete = {
                     coroutineScope.launch {
@@ -263,7 +265,12 @@ fun ConfirmationDialog(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RecipeTopBar(isFavorite: Boolean, onBack: () -> Unit, onDelete: () -> Unit) {
+fun RecipeTopBar(
+    isFavorite: Boolean,
+    onShopping: () -> Unit,
+    onBack: () -> Unit,
+    onDelete: () -> Unit
+) {
     var showDialog by remember {
         mutableStateOf(false)
     }
@@ -293,6 +300,12 @@ fun RecipeTopBar(isFavorite: Boolean, onBack: () -> Unit, onDelete: () -> Unit) 
                 Spacer(modifier = Modifier.weight(1f))
                 IconButton(onClick = { /*TODO*/ }) {
                     Icon(imageVector = Icons.Default.Timer, contentDescription = "Timer")
+                }
+                IconButton(onClick = onShopping) {
+                    Icon(
+                        imageVector = Icons.Default.ShoppingCart,
+                        contentDescription = "Add to shopping list"
+                    )
                 }
                 IconButton(onClick = { /*TODO*/ }) {
                     Icon(

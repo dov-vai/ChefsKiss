@@ -9,6 +9,7 @@ import com.javainiai.chefskiss.ChefsKissApplication
 import com.javainiai.chefskiss.ui.homescreen.HomeScreenViewModel
 import com.javainiai.chefskiss.ui.recipescreen.AddRecipeViewModel
 import com.javainiai.chefskiss.ui.recipescreen.RecipeDetailsViewModel
+import com.javainiai.chefskiss.ui.shoppinglist.ShoppingListViewModel
 
 object AppViewModelProvider {
     val Factory = viewModelFactory {
@@ -23,6 +24,9 @@ object AppViewModelProvider {
                 this.createSavedStateHandle(),
                 chefsKissApplication().container.recipesRepository
             )
+        }
+        initializer {
+            ShoppingListViewModel(chefsKissApplication().container.recipesRepository)
         }
     }
 }

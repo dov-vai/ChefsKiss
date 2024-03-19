@@ -14,11 +14,15 @@ import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.javainiai.chefskiss.ui.homescreen.HomeScreenDestination
 import com.javainiai.chefskiss.ui.navigation.ChefsKissNavHost
+import com.javainiai.chefskiss.ui.shoppinglist.ShoppingListDestination
+import kotlinx.coroutines.launch
 
 @Composable
 fun ChefsKissApp(
@@ -26,18 +30,33 @@ fun ChefsKissApp(
     navController: NavHostController = rememberNavController(),
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val coroutineScope = rememberCoroutineScope()
     ModalNavigationDrawer(
         modifier = modifier,
         drawerState = drawerState,
         gesturesEnabled = drawerState.isOpen,
-        drawerContent = { ChefsKissDrawerSheet() }) {
+        drawerContent = {
+            ChefsKissDrawerSheet(
+                currentDestinationRoute = navController.currentDestination?.route
+                    ?: HomeScreenDestination.route
+            ) {
+                navController.navigate(it)
+                coroutineScope.launch {
+                    drawerState.close()
+                }
+            }
+        }) {
         ChefsKissNavHost(drawerState = drawerState, navController = navController)
     }
 }
 
 
 @Composable
-fun ChefsKissDrawerSheet(modifier: Modifier = Modifier) {
+fun ChefsKissDrawerSheet(
+    modifier: Modifier = Modifier,
+    currentDestinationRoute: String,
+    navigateTo: (String) -> Unit
+) {
     ModalDrawerSheet(modifier = modifier) {
         Text(text = "Chef's Kiss", modifier = Modifier.padding(16.dp))
         NavigationDrawerItem(
@@ -51,8 +70,8 @@ fun ChefsKissDrawerSheet(modifier: Modifier = Modifier) {
                     Text(text = "Home")
                 }
             },
-            selected = true,
-            onClick = { /*TODO*/ }
+            selected = currentDestinationRoute == HomeScreenDestination.route,
+            onClick = { navigateTo(HomeScreenDestination.route) }
         )
         NavigationDrawerItem(
             label = {
@@ -80,7 +99,7 @@ fun ChefsKissDrawerSheet(modifier: Modifier = Modifier) {
                 }
             },
             selected = false,
-            onClick = { /*TODO*/ }
+            onClick = { navigateTo(ShoppingListDestination.route) }
         )
     }
 }

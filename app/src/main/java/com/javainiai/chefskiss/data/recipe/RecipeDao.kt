@@ -19,6 +19,12 @@ interface RecipeDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(item: RecipeTagCrossRef)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(item: ShopRecipe)
+
+    @Delete
+    suspend fun delete(item: ShopRecipe)
+
     @Update
     suspend fun update(item: Recipe)
 
@@ -33,11 +39,18 @@ interface RecipeDao {
     fun getRecipeWithIngredients(id: Long): Flow<RecipeWithIngredients>
 
     @Transaction
+    @Query("SELECT * from recipes WHERE id in (:recipeIds)")
+    fun getRecipesWithIngredients(recipeIds: List<Long>): Flow<List<RecipeWithIngredients>>
+
+    @Transaction
     @Query("SELECT * from recipes WHERE id = :id")
     fun getRecipeWithTags(id: Long): Flow<RecipeWithTags>
 
     @Query("SELECT * from recipes")
     fun getAllRecipes(): Flow<List<Recipe>>
+
+    @Query("SELECT * from shopping_list")
+    fun getShoppingList(): Flow<List<ShopRecipe>>
 
     @Query(
         "SELECT * from recipes ORDER BY " +
@@ -72,4 +85,7 @@ interface RecipeDao {
 
     @Query("SELECT recipeId from recipes_tags WHERE tagId IN (:tagIds)")
     fun getRecipeIdsByTagIds(tagIds: List<Long>): List<Long>
+
+    @Query("SELECT * from recipes WHERE id in (:recipeIds)")
+    fun getRecipesByIds(recipeIds: List<Long>): Flow<List<Recipe>>
 }
