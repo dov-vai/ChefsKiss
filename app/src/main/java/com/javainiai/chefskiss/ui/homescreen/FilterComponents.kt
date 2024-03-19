@@ -243,7 +243,7 @@ fun FavoriteButton(favorite: Boolean,
             Row{
                 FilterChip(
                     selected = favorite,
-                    onClick = { updateFavorite(true) },
+                    onClick = { updateFavorite(!favorite) },
                     label = { Text(text = "Favorite") })
             }
         }
