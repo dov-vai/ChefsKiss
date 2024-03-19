@@ -23,7 +23,8 @@ interface RecipesRepository {
         rating: Int,
         isAsc: Boolean,
         sortingMethod: Sort,
-        tags: List<Tag>
+        tags: List<Tag>,
+        favorite: Boolean
     ): Flow<List<Recipe>>
 
     suspend fun insertTag(tag: Tag): Long

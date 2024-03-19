@@ -44,12 +44,17 @@ class OfflineRecipesRepository(
         rating: Int,
         isAsc: Boolean,
         sortingMethod: Sort,
-        tags: List<Tag>
+        tags: List<Tag>,
+        favorite: Boolean
     ): Flow<List<Recipe>> {
         var query = "SELECT * FROM recipes WHERE rating >= ${rating}"
 
         if (recipeName != "") {
             query += " AND title LIKE '%${recipeName}%'"
+        }
+        if (favorite)
+        {
+            query += " AND favorite = true"
         }
 
         if (tags.isNotEmpty()) {

@@ -27,12 +27,13 @@ data class SearchUiState(
     val rating: Int,
     val selectedTags: List<Tag>,
     val sortingMethod: Sort,
-    val ascending: Boolean
+    val ascending: Boolean,
+    val favorite: Boolean
 )
 
 class HomeScreenViewModel(val recipesRepository: RecipesRepository) : ViewModel() {
     private var _finalSearch =
-        MutableStateFlow(SearchUiState("", 0, listOf(), Sort.ADDED, false))
+        MutableStateFlow(SearchUiState("", 0, listOf(), Sort.ADDED, false, false))
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val homeUiState: StateFlow<HomeUiState> = _finalSearch.flatMapLatest {
@@ -42,7 +43,8 @@ class HomeScreenViewModel(val recipesRepository: RecipesRepository) : ViewModel(
                 rating = it.rating,
                 isAsc = it.ascending,
                 sortingMethod = it.sortingMethod,
-                tags = it.selectedTags
+                tags = it.selectedTags,
+                favorite = it.favorite
             )
         }
     }
@@ -54,7 +56,7 @@ class HomeScreenViewModel(val recipesRepository: RecipesRepository) : ViewModel(
         )
 
     private var _searchUiState =
-        MutableStateFlow(SearchUiState("", 0, listOf(), Sort.ADDED, false))
+        MutableStateFlow(SearchUiState("", 0, listOf(), Sort.ADDED, false, false))
 
     val searchUiState = _searchUiState.asStateFlow()
 
@@ -105,14 +107,21 @@ class HomeScreenViewModel(val recipesRepository: RecipesRepository) : ViewModel(
             )
         }
     }
-
+    fun updateFavorite(favorite: Boolean) {
+        _searchUiState.update { currentState ->
+            currentState.copy(
+                favorite = favorite
+            )
+        }
+    }
     fun clear() {
         _searchUiState.update { currentState ->
             currentState.copy(
                 rating = 0,
                 selectedTags = listOf(),
                 sortingMethod = Sort.ADDED,
-                ascending = false
+                ascending = false,
+                favorite = false
             )
         }
     }
@@ -126,7 +135,8 @@ class HomeScreenViewModel(val recipesRepository: RecipesRepository) : ViewModel(
                     rating = rating,
                     selectedTags = selectedTags,
                     sortingMethod = sortingMethod,
-                    ascending = ascending
+                    ascending = ascending,
+                    favorite = favorite
                 )
             }
         }
