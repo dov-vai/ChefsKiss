@@ -16,9 +16,17 @@ class OfflineRecipesRepository(
 ) : RecipesRepository {
     override fun getAllTags(): Flow<List<Tag>> = tagDao.getAllTags()
     override fun getAllRecipesStream(): Flow<List<Recipe>> = recipeDao.getAllRecipes()
+    override fun getShoppingList(): Flow<List<ShopRecipe>> = recipeDao.getShoppingList()
+
+    override fun getRecipesByIds(recipeIds: List<Long>): Flow<List<Recipe>> =
+        recipeDao.getRecipesByIds(recipeIds)
+
     override fun getRecipeStream(id: Long): Flow<Recipe?> = recipeDao.getRecipe(id)
     override fun getRecipeWithIngredients(id: Long): Flow<RecipeWithIngredients?> =
         recipeDao.getRecipeWithIngredients(id)
+
+    override fun getRecipesWithIngredients(recipeIds: List<Long>): Flow<List<RecipeWithIngredients>> =
+        recipeDao.getRecipesWithIngredients(recipeIds)
 
     override fun getRecipeWithTags(id: Long): Flow<RecipeWithTags?> =
         recipeDao.getRecipeWithTags(id)
@@ -52,8 +60,7 @@ class OfflineRecipesRepository(
         if (recipeName != "") {
             query += " AND title LIKE '%${recipeName}%'"
         }
-        if (favorite)
-        {
+        if (favorite) {
             query += " AND favorite = true"
         }
 
@@ -100,4 +107,6 @@ class OfflineRecipesRepository(
 
     override suspend fun deleteRecipe(recipe: Recipe) = recipeDao.delete(recipe)
     override suspend fun updateRecipe(recipe: Recipe) = recipeDao.update(recipe)
+    override suspend fun insertShopRecipe(recipe: ShopRecipe) = recipeDao.insert(recipe)
+    override suspend fun deleteShopRecipe(recipe: ShopRecipe) = recipeDao.delete(recipe)
 }

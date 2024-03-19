@@ -10,11 +10,13 @@ import androidx.lifecycle.viewModelScope
 import com.javainiai.chefskiss.data.ingredient.Ingredient
 import com.javainiai.chefskiss.data.recipe.Recipe
 import com.javainiai.chefskiss.data.recipe.RecipesRepository
+import com.javainiai.chefskiss.data.recipe.ShopRecipe
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 data class RecipeDisplayUiState(
     val recipe: Recipe,
@@ -50,6 +52,12 @@ class RecipeDetailsViewModel(
 
     suspend fun deleteRecipe() {
         recipesRepository.deleteRecipe(uiState.value.recipe)
+    }
+
+    fun addToShoppingList() {
+        viewModelScope.launch {
+            recipesRepository.insertShopRecipe(ShopRecipe(uiState.value.recipe.id))
+        }
     }
 
     companion object {

@@ -233,14 +233,17 @@ fun RatingCard(rating: Int, onRatingChange: (Int) -> Unit, modifier: Modifier = 
         }
     }
 }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FavoriteButton(favorite: Boolean,
-                   updateFavorite: (Boolean) -> Unit,
-                   modifier: Modifier = Modifier) {
+fun FavoriteButton(
+    favorite: Boolean,
+    updateFavorite: (Boolean) -> Unit,
+    modifier: Modifier = Modifier
+) {
     OutlinedCard(modifier = modifier) {
         Column(modifier = Modifier.padding(12.dp)) {
-            Row{
+            Row {
                 FilterChip(
                     selected = favorite,
                     onClick = { updateFavorite(!favorite) },

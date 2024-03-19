@@ -14,6 +14,8 @@ import com.javainiai.chefskiss.ui.recipescreen.AddRecipeDestination
 import com.javainiai.chefskiss.ui.recipescreen.AddRecipeScreen
 import com.javainiai.chefskiss.ui.recipescreen.RecipeDetailsDestination
 import com.javainiai.chefskiss.ui.recipescreen.RecipeDetailsScreen
+import com.javainiai.chefskiss.ui.shoppinglist.ShoppingList
+import com.javainiai.chefskiss.ui.shoppinglist.ShoppingListDestination
 
 @Composable
 fun ChefsKissNavHost(
@@ -41,6 +43,9 @@ fun ChefsKissNavHost(
             })
         ) {
             RecipeDetailsScreen(navigateBack = { navController.navigateUp() })
+        }
+        composable(route = ShoppingListDestination.route) {
+            ShoppingList(navigateBack = { navController.navigateUp() })
         }
     }
 

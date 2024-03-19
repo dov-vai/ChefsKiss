@@ -107,6 +107,7 @@ class HomeScreenViewModel(val recipesRepository: RecipesRepository) : ViewModel(
             )
         }
     }
+
     fun updateFavorite(favorite: Boolean) {
         _searchUiState.update { currentState ->
             currentState.copy(
@@ -114,6 +115,7 @@ class HomeScreenViewModel(val recipesRepository: RecipesRepository) : ViewModel(
             )
         }
     }
+
     fun clear() {
         _searchUiState.update { currentState ->
             currentState.copy(
