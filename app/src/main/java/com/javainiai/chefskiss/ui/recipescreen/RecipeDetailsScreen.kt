@@ -171,7 +171,7 @@ fun IngredientCard(ingredient: Ingredient, modifier: Modifier = Modifier) {
     Card(modifier = modifier) {
         Row(modifier = Modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
             Text(
-                text = "${ingredient.name} ${ingredient.size} ${ingredient.unit}",
+                text = "${ingredient.name} ${if (ingredient.size == 0f) "" else ingredient.size} ${ingredient.unit}",
                 fontSize = 20.sp
             )
             Spacer(modifier = Modifier.weight(1f))
