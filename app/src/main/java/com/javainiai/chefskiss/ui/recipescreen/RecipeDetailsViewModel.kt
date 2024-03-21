@@ -11,6 +11,7 @@ import com.javainiai.chefskiss.data.ingredient.Ingredient
 import com.javainiai.chefskiss.data.recipe.Recipe
 import com.javainiai.chefskiss.data.recipe.RecipesRepository
 import com.javainiai.chefskiss.data.recipe.ShopRecipe
+import com.javainiai.chefskiss.data.tag.Tag
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
@@ -42,6 +43,15 @@ class RecipeDetailsViewModel(
             )
         )
 
+    val tags: StateFlow<List<Tag>> = recipesRepository
+        .getRecipeWithTags(recipeId)
+        .filterNotNull()
+        .map { it.tags }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+            initialValue = listOf()
+        )
 
     var screenIndex by mutableIntStateOf(0)
         private set
