@@ -26,7 +26,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -76,7 +75,7 @@ fun IngredientCard(ingredient: Ingredient, modifier: Modifier = Modifier) {
 
     Row(modifier = Modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
         Text(
-            text = "${ingredient.name} ${ingredient.size} ${ingredient.unit}",
+            text = "${ingredient.name} ${if (ingredient.size == 0f) "" else ingredient.size} ${ingredient.unit}",
             fontSize = 20.sp
         )
         Spacer(modifier = Modifier.weight(1f))

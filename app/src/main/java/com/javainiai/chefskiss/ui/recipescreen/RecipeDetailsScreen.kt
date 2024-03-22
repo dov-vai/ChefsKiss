@@ -1,5 +1,6 @@
 package com.javainiai.chefskiss.ui.recipescreen
 
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -37,6 +38,7 @@ import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -54,12 +56,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.javainiai.chefskiss.data.ingredient.Ingredient
 import com.javainiai.chefskiss.data.recipe.Recipe
+import com.javainiai.chefskiss.data.tag.Tag
 import com.javainiai.chefskiss.ui.AppViewModelProvider
 import com.javainiai.chefskiss.ui.navigation.NavigationDestination
 import kotlinx.coroutines.launch
@@ -76,6 +80,7 @@ fun RecipeDetailsScreen(
     viewModel: RecipeDetailsViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val tags by viewModel.tags.collectAsState()
     val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
@@ -95,7 +100,12 @@ fun RecipeDetailsScreen(
         bottomBar = { RecipeBottomBar(viewModel.screenIndex, viewModel::updateScreenIndex) }
     ) { padding ->
         when (viewModel.screenIndex) {
-            0 -> RecipeAbout(recipe = uiState.recipe, modifier = Modifier.padding(padding))
+            0 -> RecipeAbout(
+                recipe = uiState.recipe,
+                tags = tags,
+                modifier = Modifier.padding(padding)
+            )
+
             1 -> RecipeIngredients(
                 ingredients = uiState.ingredients,
                 modifier = Modifier.padding(padding)
@@ -107,11 +117,11 @@ fun RecipeDetailsScreen(
 }
 
 @Composable
-fun RecipeAbout(recipe: Recipe, modifier: Modifier = Modifier) {
+fun RecipeAbout(recipe: Recipe, tags: List<Tag>, modifier: Modifier = Modifier) {
     Surface(modifier = modifier) {
         Column(
             modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             AsyncImage(
                 model = recipe.imagePath,
@@ -132,6 +142,26 @@ fun RecipeAbout(recipe: Recipe, modifier: Modifier = Modifier) {
                 }
             }
             Divider(modifier = Modifier.padding(10.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                tags.forEach {
+                    OutlinedCard {
+                        Text(text = it.title, modifier = Modifier.padding(8.dp))
+                    }
+                }
+            }
+            Row {
+                Icon(
+                    imageVector = Icons.Default.RestaurantMenu,
+                    contentDescription = "Title",
+                    modifier = Modifier.padding(end = 4.dp)
+                )
+                Text(text = recipe.title, fontWeight = FontWeight.Bold)
+            }
             Row {
                 Icon(
                     imageVector = Icons.Default.Timer,
@@ -171,7 +201,7 @@ fun IngredientCard(ingredient: Ingredient, modifier: Modifier = Modifier) {
     Card(modifier = modifier) {
         Row(modifier = Modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
             Text(
-                text = "${ingredient.name} ${ingredient.size} ${ingredient.unit}",
+                text = "${ingredient.name} ${if (ingredient.size == 0f) "" else ingredient.size} ${ingredient.unit}",
                 fontSize = 20.sp
             )
             Spacer(modifier = Modifier.weight(1f))

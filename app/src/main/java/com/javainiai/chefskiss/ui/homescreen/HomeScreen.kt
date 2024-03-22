@@ -52,6 +52,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -81,7 +82,10 @@ fun HomeScreen(
     val filterDrawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
     FilterDrawer(drawerState = filterDrawerState, drawerContent = {
-        FilterSheet(onClear = viewModel::clear, onApply = viewModel::doSearch) {
+        FilterSheet(onClear = viewModel::clear, onApply = {
+            viewModel.doSearch()
+            coroutineScope.launch { filterDrawerState.close() }
+        }) {
             OrderSelection(
                 ascending = searchUiState.ascending,
                 updateOrder = viewModel::updateOrder,
@@ -238,12 +242,16 @@ fun ChefsKissSearchBar(
     onSearch: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val focusManager = LocalFocusManager.current
     Surface(modifier = modifier) {
         TextField(
             value = query,
             onValueChange = onQueryChange,
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
-            keyboardActions = KeyboardActions(onSearch = { onSearch() }),
+            keyboardActions = KeyboardActions(onSearch = {
+                onSearch()
+                focusManager.clearFocus()
+            }),
             singleLine = true,
             leadingIcon = {
                 IconButton(onClick = onMenuClick) {
@@ -252,7 +260,10 @@ fun ChefsKissSearchBar(
             },
             trailingIcon = {
                 if (query != "") {
-                    IconButton(onClick = { onQueryChange("") }) {
+                    IconButton(onClick = {
+                        onQueryChange("")
+                        onSearch()
+                    }) {
                         Icon(imageVector = Icons.Default.Clear, contentDescription = "Clear")
                     }
                 }
