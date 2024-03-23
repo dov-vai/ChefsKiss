@@ -81,6 +81,7 @@ fun RecipeDetailsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val tags by viewModel.tags.collectAsState()
+    val checkedIngredients by viewModel.checkedIngredients.collectAsState()
     val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
@@ -109,6 +110,8 @@ fun RecipeDetailsScreen(
 
             1 -> RecipeIngredients(
                 ingredients = uiState.ingredients,
+                checkedIngredients = checkedIngredients,
+                updateChecked = viewModel::updateCheckedIngredients,
                 modifier = Modifier.padding(padding)
             )
 
@@ -194,11 +197,12 @@ fun RecipeAbout(recipe: Recipe, tags: List<Tag>, modifier: Modifier = Modifier) 
 }
 
 @Composable
-fun IngredientCard(ingredient: Ingredient, modifier: Modifier = Modifier) {
-    var checked by remember {
-        mutableStateOf(false)
-    }
-
+fun IngredientCard(
+    ingredient: Ingredient,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier
+) {
     Card(modifier = modifier) {
         Row(modifier = Modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
             Text(
@@ -206,18 +210,32 @@ fun IngredientCard(ingredient: Ingredient, modifier: Modifier = Modifier) {
                 fontSize = 20.sp
             )
             Spacer(modifier = Modifier.weight(1f))
-            Checkbox(checked = checked, onCheckedChange = { checked = !checked })
+            Checkbox(checked = checked, onCheckedChange = { onCheckedChange(it) })
         }
     }
 }
 
 @Composable
-fun RecipeIngredients(ingredients: List<Ingredient>, modifier: Modifier = Modifier) {
+fun RecipeIngredients(
+    ingredients: List<Ingredient>,
+    checkedIngredients: List<Ingredient>,
+    updateChecked: (List<Ingredient>) -> Unit,
+    modifier: Modifier = Modifier
+) {
     Surface(modifier = modifier) {
         LazyColumn {
-            items(ingredients) {
+            items(ingredients) { ingredient ->
                 IngredientCard(
-                    ingredient = it, modifier = Modifier
+                    ingredient = ingredient,
+                    checked = checkedIngredients.contains(ingredient),
+                    onCheckedChange = {
+                        if (it) {
+                            updateChecked(checkedIngredients + ingredient)
+                        } else {
+                            updateChecked(checkedIngredients - ingredient)
+                        }
+                    },
+                    modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp)
                 )

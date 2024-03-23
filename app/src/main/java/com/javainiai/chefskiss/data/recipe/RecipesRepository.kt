@@ -38,6 +38,7 @@ interface RecipesRepository {
         ingredients: List<Ingredient>,
         tags: List<Tag>
     )
+
     suspend fun deleteRecipe(recipe: Recipe)
     suspend fun updateRecipe(recipe: Recipe)
     suspend fun insertShopRecipe(recipe: ShopRecipe)
