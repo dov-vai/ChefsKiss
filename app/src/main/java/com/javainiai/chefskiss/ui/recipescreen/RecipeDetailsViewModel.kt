@@ -12,16 +12,19 @@ import com.javainiai.chefskiss.data.recipe.Recipe
 import com.javainiai.chefskiss.data.recipe.RecipesRepository
 import com.javainiai.chefskiss.data.recipe.ShopRecipe
 import com.javainiai.chefskiss.data.tag.Tag
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 data class RecipeDisplayUiState(
     val recipe: Recipe,
-    val ingredients: List<Ingredient>
+    val ingredients: List<Ingredient>,
 )
 
 class RecipeDetailsViewModel(
@@ -53,6 +56,9 @@ class RecipeDetailsViewModel(
             initialValue = listOf()
         )
 
+    private var _checkedIngredients = MutableStateFlow(listOf<Ingredient>())
+    val checkedIngredients = _checkedIngredients.asStateFlow()
+
     var screenIndex by mutableIntStateOf(0)
         private set
 
@@ -69,11 +75,16 @@ class RecipeDetailsViewModel(
             recipesRepository.insertShopRecipe(ShopRecipe(uiState.value.recipe.id))
         }
     }
+
     fun updateFavorite() {
         val updatedRecipe = uiState.value.recipe.copy(favorite = !uiState.value.recipe.favorite)
         viewModelScope.launch {
             recipesRepository.updateRecipe(updatedRecipe)
         }
+    }
+
+    fun updateCheckedIngredients(ingredients: List<Ingredient>) {
+        _checkedIngredients.update { ingredients }
     }
 
     companion object {
