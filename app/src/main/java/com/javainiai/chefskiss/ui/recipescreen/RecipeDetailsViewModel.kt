@@ -62,7 +62,7 @@ class RecipeDetailsViewModel(
     fun updateFavorite() {
         val updatedRecipe = uiState.value.recipe.copy(favorite = !uiState.value.recipe.favorite)
         viewModelScope.launch {
-            recipesRepository.updateFavoriteRecipe(updatedRecipe)
+            recipesRepository.updateRecipe(updatedRecipe)
         }
     }
 

@@ -88,6 +88,4 @@ interface RecipeDao {
 
     @Query("SELECT * from recipes WHERE id in (:recipeIds)")
     fun getRecipesByIds(recipeIds: List<Long>): Flow<List<Recipe>>
-    @Update
-    suspend fun updateFavorite(item: Recipe)
 }

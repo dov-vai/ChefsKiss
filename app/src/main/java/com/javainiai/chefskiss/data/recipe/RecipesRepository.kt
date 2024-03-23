@@ -42,6 +42,4 @@ interface RecipesRepository {
     suspend fun updateRecipe(recipe: Recipe)
     suspend fun insertShopRecipe(recipe: ShopRecipe)
     suspend fun deleteShopRecipe(recipe: ShopRecipe)
-    suspend fun updateFavoriteRecipe(recipe: Recipe)
-
 }
