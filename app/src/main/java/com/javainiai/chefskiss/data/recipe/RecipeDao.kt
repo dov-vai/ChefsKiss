@@ -22,6 +22,12 @@ interface RecipeDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(item: ShopRecipe)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(item: ShopIngredient)
+
+    @Delete
+    suspend fun delete(item: ShopIngredient)
+
     @Delete
     suspend fun delete(item: ShopRecipe)
 
@@ -51,6 +57,9 @@ interface RecipeDao {
 
     @Query("SELECT * from shopping_list")
     fun getShoppingList(): Flow<List<ShopRecipe>>
+
+    @Query("SELECT * from shopping_checked_ingredients")
+    fun getShoppingCheckedIngredients(): Flow<List<ShopIngredient>>
 
     @Query(
         "SELECT * from recipes ORDER BY " +

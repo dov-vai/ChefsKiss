@@ -10,6 +10,7 @@ interface RecipesRepository {
     fun getAllTags(): Flow<List<Tag>>
     fun getAllRecipesStream(): Flow<List<Recipe>>
     fun getShoppingList(): Flow<List<ShopRecipe>>
+    fun getShoppingCheckedIngredients(): Flow<List<ShopIngredient>>
     fun getRecipesByIds(recipeIds: List<Long>): Flow<List<Recipe>>
     fun getRecipeStream(id: Long): Flow<Recipe?>
     fun getRecipeWithIngredients(id: Long): Flow<RecipeWithIngredients?>
@@ -43,4 +44,6 @@ interface RecipesRepository {
     suspend fun updateRecipe(recipe: Recipe)
     suspend fun insertShopRecipe(recipe: ShopRecipe)
     suspend fun deleteShopRecipe(recipe: ShopRecipe)
+    suspend fun insertShopIngredient(item: ShopIngredient)
+    suspend fun deleteShopIngredient(item: ShopIngredient)
 }

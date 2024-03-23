@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.javainiai.chefskiss.data.recipe.Recipe
 import com.javainiai.chefskiss.data.recipe.RecipeWithIngredients
 import com.javainiai.chefskiss.data.recipe.RecipesRepository
+import com.javainiai.chefskiss.data.recipe.ShopIngredient
 import com.javainiai.chefskiss.data.recipe.ShopRecipe
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -21,22 +22,44 @@ data class ShoppingListUiState(
 class ShoppingListViewModel(private val recipesRepository: RecipesRepository) : ViewModel() {
 
     val uiState: StateFlow<ShoppingListUiState> =
-        recipesRepository.getShoppingList().map { shoppingList ->
-            ShoppingListUiState(
-                recipesRepository.getRecipesWithIngredients(shoppingList.map { it.recipeId })
-                    .first()
-            )
-        }
+        recipesRepository
+            .getShoppingList()
+            .map { shoppingList ->
+                ShoppingListUiState(
+                    recipesRepository.getRecipesWithIngredients(shoppingList.map { it.recipeId })
+                        .first()
+                )
+            }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
                 initialValue = ShoppingListUiState(listOf())
             )
 
+    val checkedIngredients: StateFlow<List<ShopIngredient>> =
+        recipesRepository
+            .getShoppingCheckedIngredients()
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+                initialValue = listOf()
+            )
 
     fun removeRecipe(recipe: Recipe) {
         viewModelScope.launch {
             recipesRepository.deleteShopRecipe(ShopRecipe(recipe.id))
+        }
+    }
+
+    fun addCheckedIngredient(ingredient: ShopIngredient) {
+        viewModelScope.launch {
+            recipesRepository.insertShopIngredient(ingredient)
+        }
+    }
+
+    fun removeCheckedIngredient(ingredient: ShopIngredient) {
+        viewModelScope.launch {
+            recipesRepository.deleteShopIngredient(ingredient)
         }
     }
 

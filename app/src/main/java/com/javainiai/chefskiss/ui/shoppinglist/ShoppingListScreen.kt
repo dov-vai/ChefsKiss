@@ -37,6 +37,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.javainiai.chefskiss.data.ingredient.Ingredient
 import com.javainiai.chefskiss.data.recipe.Recipe
+import com.javainiai.chefskiss.data.recipe.ShopIngredient
 import com.javainiai.chefskiss.ui.AppViewModelProvider
 import com.javainiai.chefskiss.ui.navigation.NavigationDestination
 
@@ -50,6 +51,7 @@ fun ShoppingList(
     navigateBack: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val checkedIngredients by viewModel.checkedIngredients.collectAsState()
 
     Scaffold(topBar = { ShoppingListTopBar(onBackClick = { navigateBack() }) }) { padding ->
         LazyColumn(contentPadding = padding) {
@@ -58,6 +60,9 @@ fun ShoppingList(
                     recipe = it.recipe,
                     ingredients = it.ingredients,
                     onRemove = { viewModel.removeRecipe(it.recipe) },
+                    checkedIngredients = checkedIngredients,
+                    removeCheckedIngredient = viewModel::removeCheckedIngredient,
+                    addCheckedIngredient = viewModel::addCheckedIngredient,
                     modifier = Modifier.padding(16.dp)
                 )
             }
@@ -68,18 +73,19 @@ fun ShoppingList(
 
 
 @Composable
-fun IngredientCard(ingredient: Ingredient, modifier: Modifier = Modifier) {
-    var checked by remember {
-        mutableStateOf(false)
-    }
-
+fun IngredientCard(
+    ingredient: Ingredient,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier
+) {
     Row(modifier = Modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
         Text(
             text = "${ingredient.name} ${if (ingredient.size == 0f) "" else ingredient.size} ${ingredient.unit}",
             fontSize = 20.sp
         )
         Spacer(modifier = Modifier.weight(1f))
-        Checkbox(checked = checked, onCheckedChange = { checked = !checked })
+        Checkbox(checked = checked, onCheckedChange = { onCheckedChange(it) })
     }
 }
 
@@ -87,6 +93,9 @@ fun IngredientCard(ingredient: Ingredient, modifier: Modifier = Modifier) {
 fun RecipeCard(
     recipe: Recipe,
     ingredients: List<Ingredient>,
+    checkedIngredients: List<ShopIngredient>,
+    removeCheckedIngredient: (ShopIngredient) -> Unit,
+    addCheckedIngredient: (ShopIngredient) -> Unit,
     onRemove: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -122,8 +131,18 @@ fun RecipeCard(
             }
             if (opened) {
                 Column {
-                    ingredients.forEach {
-                        IngredientCard(ingredient = it)
+                    ingredients.forEach { ingredient ->
+                        val shopIngredient = ShopIngredient(ingredient.id, ingredient.recipeId)
+                        IngredientCard(ingredient = ingredient,
+                            checked = checkedIngredients.contains(shopIngredient),
+                            onCheckedChange = {
+                                if (it) {
+                                    addCheckedIngredient(shopIngredient)
+                                } else {
+                                    removeCheckedIngredient(shopIngredient)
+                                }
+                            }
+                        )
                     }
                 }
             }
