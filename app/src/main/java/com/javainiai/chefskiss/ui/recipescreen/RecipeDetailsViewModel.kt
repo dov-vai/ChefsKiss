@@ -59,6 +59,12 @@ class RecipeDetailsViewModel(
             recipesRepository.insertShopRecipe(ShopRecipe(uiState.value.recipe.id))
         }
     }
+    fun updateFavorite() {
+        val updatedRecipe = uiState.value.recipe.copy(favorite = !uiState.value.recipe.favorite)
+        viewModelScope.launch {
+            recipesRepository.updateFavoriteRecipe(updatedRecipe)
+        }
+    }
 
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L

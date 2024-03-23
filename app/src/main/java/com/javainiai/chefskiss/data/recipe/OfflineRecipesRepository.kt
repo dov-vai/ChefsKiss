@@ -109,4 +109,5 @@ class OfflineRecipesRepository(
     override suspend fun updateRecipe(recipe: Recipe) = recipeDao.update(recipe)
     override suspend fun insertShopRecipe(recipe: ShopRecipe) = recipeDao.insert(recipe)
     override suspend fun deleteShopRecipe(recipe: ShopRecipe) = recipeDao.delete(recipe)
+    override suspend fun updateFavoriteRecipe(recipe: Recipe) = recipeDao.updateFavorite(recipe)
 }
