@@ -87,6 +87,7 @@ fun RecipeDetailsScreen(
         topBar = {
             RecipeTopBar(
                 isFavorite = uiState.recipe.favorite,
+                onFavorite = viewModel::updateFavorite,
                 onShopping = viewModel::addToShoppingList,
                 onBack = navigateBack,
                 onDelete = {
@@ -297,6 +298,7 @@ fun ConfirmationDialog(
 @Composable
 fun RecipeTopBar(
     isFavorite: Boolean,
+    onFavorite: () -> Unit,
     onShopping: () -> Unit,
     onBack: () -> Unit,
     onDelete: () -> Unit
@@ -337,7 +339,7 @@ fun RecipeTopBar(
                         contentDescription = "Add to shopping list"
                     )
                 }
-                IconButton(onClick = { /*TODO*/ }) {
+                IconButton(onClick = onFavorite) {
                     Icon(
                         imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                         contentDescription = "Favorite"
