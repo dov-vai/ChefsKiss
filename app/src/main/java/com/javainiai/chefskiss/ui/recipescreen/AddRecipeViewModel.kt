@@ -1,12 +1,15 @@
 package com.javainiai.chefskiss.ui.recipescreen
 
 import android.net.Uri
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.javainiai.chefskiss.data.ingredient.Ingredient
 import com.javainiai.chefskiss.data.recipe.Recipe
 import com.javainiai.chefskiss.data.recipe.RecipesRepository
 import com.javainiai.chefskiss.data.tag.Tag
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -59,6 +62,20 @@ class AddRecipeViewModel(private val recipesRepository: RecipesRepository) : Vie
             started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
             initialValue = listOf()
         )
+
+    val snackbarHostState = SnackbarHostState()
+
+    private var messageInProgress: Job? = null
+    private fun showMessage(message: String) {
+        // cancel in case it hasn't finished so the message can be shown immediately
+        messageInProgress?.cancel()
+        messageInProgress = viewModelScope.launch {
+            snackbarHostState.showSnackbar(
+                message = message,
+                duration = SnackbarDuration.Short
+            )
+        }
+    }
 
     fun updateTitle(title: String) {
         _uiState.update { currentState ->

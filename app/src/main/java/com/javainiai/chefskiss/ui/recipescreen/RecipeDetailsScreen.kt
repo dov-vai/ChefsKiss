@@ -40,6 +40,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -84,6 +85,7 @@ fun RecipeDetailsScreen(
     val checkedIngredients by viewModel.checkedIngredients.collectAsState()
     val coroutineScope = rememberCoroutineScope()
 
+
     Scaffold(
         topBar = {
             RecipeTopBar(
@@ -99,7 +101,8 @@ fun RecipeDetailsScreen(
                 }
             )
         },
-        bottomBar = { RecipeBottomBar(viewModel.screenIndex, viewModel::updateScreenIndex) }
+        bottomBar = { RecipeBottomBar(viewModel.screenIndex, viewModel::updateScreenIndex) },
+        snackbarHost = { SnackbarHost(hostState = viewModel.snackbarHostState) }
     ) { padding ->
         when (viewModel.screenIndex) {
             0 -> RecipeAbout(
