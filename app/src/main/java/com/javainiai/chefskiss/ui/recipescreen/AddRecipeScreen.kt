@@ -38,6 +38,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
@@ -102,7 +103,9 @@ fun AddRecipeScreen(
         AddRecipeTopBar(
             onBack = navigateBack,
             onSave = { coroutineScope.launch { if (viewModel.saveToDatabase()) navigateBack() } })
-    }) { padding ->
+    },
+        snackbarHost = { SnackbarHost(hostState = viewModel.snackbarHostState) }
+    ) { padding ->
         Column(modifier = Modifier.padding(padding)) {
             TabRow(selectedTabIndex = tabIndex) {
                 tabs.forEachIndexed { index, label ->
