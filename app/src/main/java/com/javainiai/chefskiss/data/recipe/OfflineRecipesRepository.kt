@@ -17,6 +17,8 @@ class OfflineRecipesRepository(
     override fun getAllTags(): Flow<List<Tag>> = tagDao.getAllTags()
     override fun getAllRecipesStream(): Flow<List<Recipe>> = recipeDao.getAllRecipes()
     override fun getShoppingList(): Flow<List<ShopRecipe>> = recipeDao.getShoppingList()
+    override fun getShoppingCheckedIngredients(): Flow<List<ShopIngredient>> =
+        recipeDao.getShoppingCheckedIngredients()
 
     override fun getRecipesByIds(recipeIds: List<Long>): Flow<List<Recipe>> =
         recipeDao.getRecipesByIds(recipeIds)
@@ -109,4 +111,6 @@ class OfflineRecipesRepository(
     override suspend fun updateRecipe(recipe: Recipe) = recipeDao.update(recipe)
     override suspend fun insertShopRecipe(recipe: ShopRecipe) = recipeDao.insert(recipe)
     override suspend fun deleteShopRecipe(recipe: ShopRecipe) = recipeDao.delete(recipe)
+    override suspend fun insertShopIngredient(item: ShopIngredient) = recipeDao.insert(item)
+    override suspend fun deleteShopIngredient(item: ShopIngredient) = recipeDao.delete(item)
 }
