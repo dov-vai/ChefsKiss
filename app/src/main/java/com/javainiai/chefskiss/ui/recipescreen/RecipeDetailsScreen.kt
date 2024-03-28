@@ -1,5 +1,6 @@
 package com.javainiai.chefskiss.ui.recipescreen
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -108,7 +109,8 @@ fun RecipeDetailsScreen(
             0 -> RecipeAbout(
                 recipe = uiState.recipe,
                 tags = tags,
-                modifier = Modifier.padding(padding)
+                modifier = Modifier.padding(padding),
+                onRating = viewModel::updateRating
             )
 
             1 -> RecipeIngredients(
@@ -124,7 +126,7 @@ fun RecipeDetailsScreen(
 }
 
 @Composable
-fun RecipeAbout(recipe: Recipe, tags: List<Tag>, modifier: Modifier = Modifier) {
+fun RecipeAbout(recipe: Recipe, tags: List<Tag>, modifier: Modifier = Modifier, onRating: (Int) -> Unit) {
     Surface(modifier = modifier) {
         Column(
             modifier = Modifier.padding(16.dp),
@@ -142,10 +144,14 @@ fun RecipeAbout(recipe: Recipe, tags: List<Tag>, modifier: Modifier = Modifier) 
             Row {
                 Spacer(modifier = Modifier.weight(1f))
                 repeat(recipe.rating) {
-                    Icon(imageVector = Icons.Default.Star, contentDescription = null)
+                    Icon(imageVector = Icons.Default.Star,
+                        contentDescription = null,
+                        modifier = Modifier.clickable { onRating(it + 1) })
                 }
                 repeat(5 - recipe.rating) {
-                    Icon(imageVector = Icons.Default.StarBorder, contentDescription = null)
+                    Icon(imageVector = Icons.Default.StarBorder,
+                        contentDescription = null,
+                        modifier = Modifier.clickable { onRating(recipe.rating + it + 1) })
                 }
             }
             Divider(modifier = Modifier.padding(10.dp))
