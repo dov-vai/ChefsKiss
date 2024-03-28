@@ -101,6 +101,13 @@ class RecipeDetailsViewModel(
         }
         showMessage(if (!uiState.value.recipe.favorite) "Added to favorites" else "Removed from favorites")
     }
+    fun updateRating(rating: Int)
+    {
+        val updatedRecipe=uiState.value.recipe.copy(rating = rating)
+        viewModelScope.launch {
+            recipesRepository.updateRecipe(updatedRecipe)
+        }
+    }
 
     fun updateCheckedIngredients(ingredients: List<Ingredient>) {
         _checkedIngredients.update { ingredients }
