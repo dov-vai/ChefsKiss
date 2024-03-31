@@ -36,6 +36,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -126,7 +127,12 @@ fun RecipeDetailsScreen(
 }
 
 @Composable
-fun RecipeAbout(recipe: Recipe, tags: List<Tag>, modifier: Modifier = Modifier, onRating: (Int) -> Unit) {
+fun RecipeAbout(
+    recipe: Recipe,
+    tags: List<Tag>,
+    modifier: Modifier = Modifier,
+    onRating: (Int) -> Unit
+) {
     Surface(modifier = modifier) {
         Column(
             modifier = Modifier.padding(16.dp),
@@ -154,7 +160,7 @@ fun RecipeAbout(recipe: Recipe, tags: List<Tag>, modifier: Modifier = Modifier, 
                         modifier = Modifier.clickable { onRating(recipe.rating + it + 1) })
                 }
             }
-            Divider(modifier = Modifier.padding(10.dp))
+            HorizontalDivider(modifier = Modifier.padding(10.dp))
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -317,7 +323,8 @@ fun ConfirmationDialog(
             Text(text = "Dismiss")
         }
     },
-        text = text
+        text = text,
+        modifier = modifier
     )
 }
 

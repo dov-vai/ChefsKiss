@@ -2,7 +2,7 @@ package com.javainiai.chefskiss.data.recipe
 
 import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.sqlite.db.SupportSQLiteQuery
-import com.javainiai.chefskiss.data.Sort
+import com.javainiai.chefskiss.data.enums.Sort
 import com.javainiai.chefskiss.data.ingredient.Ingredient
 import com.javainiai.chefskiss.data.ingredient.IngredientDao
 import com.javainiai.chefskiss.data.tag.Tag

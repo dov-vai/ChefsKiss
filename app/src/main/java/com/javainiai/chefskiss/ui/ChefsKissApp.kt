@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.javainiai.chefskiss.ui.homescreen.HomeScreenDestination
+import com.javainiai.chefskiss.ui.mealplanner.MealPlannerDestination
 import com.javainiai.chefskiss.ui.navigation.ChefsKissNavHost
 import com.javainiai.chefskiss.ui.shoppinglist.ShoppingListDestination
 import kotlinx.coroutines.launch
@@ -85,7 +86,7 @@ fun ChefsKissDrawerSheet(
                 }
             },
             selected = false,
-            onClick = { /*TODO*/ }
+            onClick = { navigateTo(MealPlannerDestination.route) }
         )
         NavigationDrawerItem(
             label = {

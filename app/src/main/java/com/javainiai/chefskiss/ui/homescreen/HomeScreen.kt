@@ -82,10 +82,15 @@ fun HomeScreen(
     val filterDrawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
     FilterDrawer(drawerState = filterDrawerState, drawerContent = {
-        FilterSheet(onClear = viewModel::clear, onApply = {
-            viewModel.doSearch()
-            coroutineScope.launch { filterDrawerState.close() }
-        }) {
+        FilterSheet(
+            onClear = viewModel::clear, onApply = {
+                viewModel.doSearch()
+                coroutineScope.launch { filterDrawerState.close() }
+            },
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth()
+        ) {
             OrderSelection(
                 ascending = searchUiState.ascending,
                 updateOrder = viewModel::updateOrder,
