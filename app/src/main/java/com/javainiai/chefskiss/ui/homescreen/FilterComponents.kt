@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -48,7 +47,11 @@ fun FilterDrawer(
     // Setting the layout to go from right to left is a hack
     // As Jetpack Compose doesn't (yet) provide a side drawer that goes from right to left
     CompositionLocalProvider(value = LocalLayoutDirection provides LayoutDirection.Rtl) {
-        ModalNavigationDrawer(drawerContent = drawerContent, drawerState = drawerState) {
+        ModalNavigationDrawer(
+            drawerContent = drawerContent,
+            drawerState = drawerState,
+            modifier = modifier
+        ) {
             CompositionLocalProvider(value = LocalLayoutDirection provides LayoutDirection.Ltr) {
                 content()
             }
@@ -67,9 +70,7 @@ fun FilterSheet(
         CompositionLocalProvider(value = LocalLayoutDirection provides LayoutDirection.Ltr) {
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier
-                    .padding(16.dp)
-                    .fillMaxWidth()
+                modifier = modifier
             ) {
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),

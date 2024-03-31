@@ -322,7 +322,8 @@ fun ConfirmationDialog(
             Text(text = "Dismiss")
         }
     },
-        text = text
+        text = text,
+        modifier = modifier
     )
 }
 
