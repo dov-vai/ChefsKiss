@@ -1,4 +1,4 @@
-package com.javainiai.chefskiss.data
+package com.javainiai.chefskiss.data.enums
 
 enum class Sort {
     COOKING_TIME,

@@ -35,7 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import com.javainiai.chefskiss.data.Sort
+import com.javainiai.chefskiss.data.enums.Sort
 import com.javainiai.chefskiss.data.tag.Tag
 
 @Composable

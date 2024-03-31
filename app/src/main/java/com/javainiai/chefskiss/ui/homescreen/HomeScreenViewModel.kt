@@ -2,7 +2,7 @@ package com.javainiai.chefskiss.ui.homescreen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.javainiai.chefskiss.data.Sort
+import com.javainiai.chefskiss.data.enums.Sort
 import com.javainiai.chefskiss.data.recipe.Recipe
 import com.javainiai.chefskiss.data.recipe.RecipesRepository
 import com.javainiai.chefskiss.data.tag.Tag
