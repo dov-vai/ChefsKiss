@@ -10,6 +10,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.javainiai.chefskiss.ui.homescreen.HomeScreen
 import com.javainiai.chefskiss.ui.homescreen.HomeScreenDestination
+import com.javainiai.chefskiss.ui.mealplanner.MealPlannerDestination
+import com.javainiai.chefskiss.ui.mealplanner.MealPlannerScreen
 import com.javainiai.chefskiss.ui.recipescreen.AddRecipeDestination
 import com.javainiai.chefskiss.ui.recipescreen.AddRecipeScreen
 import com.javainiai.chefskiss.ui.recipescreen.RecipeDetailsDestination
@@ -46,6 +48,9 @@ fun ChefsKissNavHost(
         }
         composable(route = ShoppingListDestination.route) {
             ShoppingList(navigateBack = { navController.navigateUp() })
+        }
+        composable(route = MealPlannerDestination.route) {
+            MealPlannerScreen(navigateBack = { navController.navigateUp() })
         }
     }
 

@@ -7,6 +7,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.javainiai.chefskiss.ChefsKissApplication
 import com.javainiai.chefskiss.ui.homescreen.HomeScreenViewModel
+import com.javainiai.chefskiss.ui.mealplanner.MealPlannerViewModel
 import com.javainiai.chefskiss.ui.recipescreen.AddRecipeViewModel
 import com.javainiai.chefskiss.ui.recipescreen.RecipeDetailsViewModel
 import com.javainiai.chefskiss.ui.shoppinglist.ShoppingListViewModel
@@ -27,6 +28,9 @@ object AppViewModelProvider {
         }
         initializer {
             ShoppingListViewModel(chefsKissApplication().container.recipesRepository)
+        }
+        initializer {
+            MealPlannerViewModel(chefsKissApplication().container.recipesRepository)
         }
     }
 }
