@@ -126,7 +126,12 @@ fun RecipeDetailsScreen(
 }
 
 @Composable
-fun RecipeAbout(recipe: Recipe, tags: List<Tag>, modifier: Modifier = Modifier, onRating: (Int) -> Unit) {
+fun RecipeAbout(
+    recipe: Recipe,
+    tags: List<Tag>,
+    modifier: Modifier = Modifier,
+    onRating: (Int) -> Unit
+) {
     Surface(modifier = modifier) {
         Column(
             modifier = Modifier.padding(16.dp),
