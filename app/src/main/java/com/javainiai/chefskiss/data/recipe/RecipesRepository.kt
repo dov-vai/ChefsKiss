@@ -21,6 +21,7 @@ interface RecipesRepository {
     fun getRecipesByRating(isAsc: Boolean): Flow<List<Recipe>>
     fun getRecipesByServings(isAsc: Boolean): Flow<List<Recipe>>
     fun getRecipeIdsByTagIds(tagIds: List<Long>): List<Long>
+    fun getPlannerRecipesByDate(date: String): Flow<List<PlannerRecipe>>
     fun query(query: SupportSQLiteQuery): Flow<List<Recipe>>
     fun query(
         recipeName: String,
@@ -46,4 +47,7 @@ interface RecipesRepository {
     suspend fun deleteShopRecipe(recipe: ShopRecipe)
     suspend fun insertShopIngredient(item: ShopIngredient)
     suspend fun deleteShopIngredient(item: ShopIngredient)
+    suspend fun insertPlannerRecipe(item: PlannerRecipe)
+    suspend fun updatePlannerRecipe(item: PlannerRecipe)
+    suspend fun deletePlannerRecipe(item: PlannerRecipe)
 }

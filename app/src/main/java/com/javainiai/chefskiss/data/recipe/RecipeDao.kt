@@ -25,14 +25,23 @@ interface RecipeDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(item: ShopIngredient)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(item: PlannerRecipe)
+
     @Delete
     suspend fun delete(item: ShopIngredient)
 
     @Delete
     suspend fun delete(item: ShopRecipe)
 
+    @Delete
+    suspend fun delete(item: PlannerRecipe)
+
     @Update
     suspend fun update(item: Recipe)
+
+    @Update
+    suspend fun update(item: PlannerRecipe)
 
     @Delete
     suspend fun delete(item: Recipe)
@@ -97,4 +106,10 @@ interface RecipeDao {
 
     @Query("SELECT * from recipes WHERE id in (:recipeIds)")
     fun getRecipesByIds(recipeIds: List<Long>): Flow<List<Recipe>>
+
+    /**
+     * @param date Must be in format yyyy-mm-dd
+     */
+    @Query("SELECT * from planner_recipes WHERE date=:date")
+    fun getPlannerRecipesByDate(date: String): Flow<List<PlannerRecipe>>
 }

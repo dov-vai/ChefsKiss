@@ -9,6 +9,7 @@ import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import com.javainiai.chefskiss.data.ingredient.Ingredient
 import com.javainiai.chefskiss.data.ingredient.IngredientDao
+import com.javainiai.chefskiss.data.recipe.PlannerRecipe
 import com.javainiai.chefskiss.data.recipe.Recipe
 import com.javainiai.chefskiss.data.recipe.RecipeDao
 import com.javainiai.chefskiss.data.recipe.RecipeTagCrossRef
@@ -31,7 +32,7 @@ class Converters {
 
 
 @Database(
-    entities = [Recipe::class, ShopRecipe::class, ShopIngredient::class, Ingredient::class, Tag::class, RecipeTagCrossRef::class],
+    entities = [Recipe::class, PlannerRecipe::class, ShopRecipe::class, ShopIngredient::class, Ingredient::class, Tag::class, RecipeTagCrossRef::class],
     version = 1,
     exportSchema = false
 )
