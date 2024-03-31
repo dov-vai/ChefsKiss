@@ -48,6 +48,9 @@ class OfflineRecipesRepository(
     override fun getRecipeIdsByTagIds(tagIds: List<Long>): List<Long> =
         recipeDao.getRecipeIdsByTagIds(tagIds)
 
+    override fun getPlannerRecipesByDate(date: String): Flow<List<PlannerRecipe>> =
+        recipeDao.getPlannerRecipesByDate(date)
+
     override fun query(query: SupportSQLiteQuery): Flow<List<Recipe>> = recipeDao.query(query)
     override fun query(
         recipeName: String,
@@ -113,4 +116,7 @@ class OfflineRecipesRepository(
     override suspend fun deleteShopRecipe(recipe: ShopRecipe) = recipeDao.delete(recipe)
     override suspend fun insertShopIngredient(item: ShopIngredient) = recipeDao.insert(item)
     override suspend fun deleteShopIngredient(item: ShopIngredient) = recipeDao.delete(item)
+    override suspend fun insertPlannerRecipe(item: PlannerRecipe) = recipeDao.insert(item)
+    override suspend fun updatePlannerRecipe(item: PlannerRecipe) = recipeDao.update(item)
+    override suspend fun deletePlannerRecipe(item: PlannerRecipe) = recipeDao.delete(item)
 }
