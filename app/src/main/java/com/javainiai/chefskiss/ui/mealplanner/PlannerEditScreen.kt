@@ -97,7 +97,9 @@ fun PlannerEditScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlannerEditTopBar(title: String, navigateBack: () -> Unit, modifier: Modifier = Modifier) {
-    CenterAlignedTopAppBar(title = { Text(text = title) },
+    CenterAlignedTopAppBar(
+        modifier = modifier,
+        title = { Text(text = title) },
         navigationIcon = {
             IconButton(onClick = navigateBack) {
                 Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")

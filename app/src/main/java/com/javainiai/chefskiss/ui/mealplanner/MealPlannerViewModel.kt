@@ -5,12 +5,14 @@ import androidx.lifecycle.viewModelScope
 import com.javainiai.chefskiss.data.CalendarUtils
 import com.javainiai.chefskiss.data.recipe.PlannerRecipeWithRecipe
 import com.javainiai.chefskiss.data.recipe.RecipesRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -42,7 +44,9 @@ class MealPlannerViewModel(recipesRepository: RecipesRepository) : ViewModel() {
                 }
             )
             .map {
-                it.groupBy { it.plannerRecipe.date }
+                withContext(Dispatchers.IO) {
+                    it.groupBy { it.plannerRecipe.date }
+                }
             }
             .stateIn(
                 scope = viewModelScope,

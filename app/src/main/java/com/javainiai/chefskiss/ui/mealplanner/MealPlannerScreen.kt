@@ -8,15 +8,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -28,6 +29,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,6 +40,7 @@ import com.javainiai.chefskiss.data.CalendarUtils
 import com.javainiai.chefskiss.data.recipe.PlannerRecipeWithRecipe
 import com.javainiai.chefskiss.ui.AppViewModelProvider
 import com.javainiai.chefskiss.ui.navigation.NavigationDestination
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -47,18 +50,19 @@ object MealPlannerDestination : NavigationDestination {
 
 @Composable
 fun MealPlannerScreen(
-    navigateBack: () -> Unit,
+    drawerState: DrawerState,
     viewModel: MealPlannerViewModel = viewModel(factory = AppViewModelProvider.Factory),
     navigateTo: (String) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val plannerRecipes by viewModel.plannerRecipes.collectAsState()
+    val coroutineScope = rememberCoroutineScope()
     Scaffold(topBar = {
         MealPlannerTopBar(
             title = uiState.title,
             onBack = {},
             onForward = {},
-            navigateBack = navigateBack
+            onMenuClick = { coroutineScope.launch { drawerState.open() } }
         )
     }) { padding ->
         LazyColumn(contentPadding = padding) {
@@ -112,7 +116,7 @@ fun MealPlannerTopBar(
     title: String,
     onBack: () -> Unit,
     onForward: () -> Unit,
-    navigateBack: () -> Unit,
+    onMenuClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     CenterAlignedTopAppBar(
@@ -138,8 +142,8 @@ fun MealPlannerTopBar(
             }
         },
         navigationIcon = {
-            IconButton(onClick = navigateBack) {
-                Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+            IconButton(onClick = onMenuClick) {
+                Icon(imageVector = Icons.Default.Menu, contentDescription = "Open navigation menu")
             }
         },
         modifier = modifier

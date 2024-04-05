@@ -9,12 +9,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -27,6 +28,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,6 +43,7 @@ import com.javainiai.chefskiss.data.recipe.Recipe
 import com.javainiai.chefskiss.data.recipe.ShopIngredient
 import com.javainiai.chefskiss.ui.AppViewModelProvider
 import com.javainiai.chefskiss.ui.navigation.NavigationDestination
+import kotlinx.coroutines.launch
 
 object ShoppingListDestination : NavigationDestination {
     override val route = "shopping"
@@ -48,13 +51,14 @@ object ShoppingListDestination : NavigationDestination {
 
 @Composable
 fun ShoppingList(
-    viewModel: ShoppingListViewModel = viewModel(factory = AppViewModelProvider.Factory),
-    navigateBack: () -> Unit
+    drawerState: DrawerState,
+    viewModel: ShoppingListViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val checkedIngredients by viewModel.checkedIngredients.collectAsState()
+    val coroutineScope = rememberCoroutineScope()
 
-    Scaffold(topBar = { ShoppingListTopBar(onBackClick = { navigateBack() }) },
+    Scaffold(topBar = { ShoppingListTopBar(onMenuClick = { coroutineScope.launch { drawerState.open() } }) },
         snackbarHost = { SnackbarHost(hostState = viewModel.snackbarHostState) }
     ) { padding ->
         LazyColumn(contentPadding = padding) {
@@ -155,16 +159,16 @@ fun RecipeCard(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ShoppingListTopBar(onBackClick: () -> Unit, modifier: Modifier = Modifier) {
+fun ShoppingListTopBar(onMenuClick: () -> Unit, modifier: Modifier = Modifier) {
     CenterAlignedTopAppBar(
         title = {
             Text(text = "Shopping List")
         },
         navigationIcon = {
-            IconButton(onClick = onBackClick) {
+            IconButton(onClick = onMenuClick) {
                 Icon(
-                    imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                    contentDescription = "Back"
+                    imageVector = Icons.Default.Menu,
+                    contentDescription = "Open navigation drawer"
                 )
             }
         },
