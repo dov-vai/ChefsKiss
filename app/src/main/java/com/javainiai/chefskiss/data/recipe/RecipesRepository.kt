@@ -22,6 +22,8 @@ interface RecipesRepository {
     fun getRecipesByServings(isAsc: Boolean): Flow<List<Recipe>>
     fun getRecipeIdsByTagIds(tagIds: List<Long>): List<Long>
     fun getPlannerRecipesByDate(date: String): Flow<List<PlannerRecipe>>
+    fun getPlannerRecipesWithRecipes(date: String): Flow<List<PlannerRecipeWithRecipe>>
+    fun getPlannerRecipesWithRecipes(dates: List<String>): Flow<List<PlannerRecipeWithRecipe>>
     fun query(query: SupportSQLiteQuery): Flow<List<Recipe>>
     fun query(
         recipeName: String,
