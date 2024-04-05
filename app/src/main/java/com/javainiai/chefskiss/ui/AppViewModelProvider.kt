@@ -8,6 +8,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.javainiai.chefskiss.ChefsKissApplication
 import com.javainiai.chefskiss.ui.homescreen.HomeScreenViewModel
 import com.javainiai.chefskiss.ui.mealplanner.MealPlannerViewModel
+import com.javainiai.chefskiss.ui.mealplanner.PlannerEditViewModel
 import com.javainiai.chefskiss.ui.recipescreen.AddRecipeViewModel
 import com.javainiai.chefskiss.ui.recipescreen.RecipeDetailsViewModel
 import com.javainiai.chefskiss.ui.shoppinglist.ShoppingListViewModel
@@ -31,6 +32,12 @@ object AppViewModelProvider {
         }
         initializer {
             MealPlannerViewModel(chefsKissApplication().container.recipesRepository)
+        }
+        initializer {
+            PlannerEditViewModel(
+                this.createSavedStateHandle(),
+                chefsKissApplication().container.recipesRepository
+            )
         }
     }
 }
