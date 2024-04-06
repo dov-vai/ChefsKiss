@@ -14,6 +14,8 @@ import com.javainiai.chefskiss.ui.recipescreen.AddRecipeDestination
 import com.javainiai.chefskiss.ui.recipescreen.AddRecipeScreen
 import com.javainiai.chefskiss.ui.recipescreen.RecipeDetailsDestination
 import com.javainiai.chefskiss.ui.recipescreen.RecipeDetailsScreen
+import com.javainiai.chefskiss.ui.selectionscreen.SelectionDestination
+import com.javainiai.chefskiss.ui.selectionscreen.SelectionScreen
 
 @Composable
 fun ChefsKissNavHost(
@@ -28,7 +30,10 @@ fun ChefsKissNavHost(
         modifier = modifier
     ) {
         composable(route = NavDrawerNavigatorDestination.route) {
-            NavDrawerNavigator(drawerState = drawerState, currentDestination = currentDestination) {
+            NavDrawerNavigator(
+                drawerState = drawerState,
+                currentDestination = currentDestination,
+                navigateBack = { navController.navigateUp() }) {
                 navController.navigate(it)
             }
         }
@@ -43,13 +48,18 @@ fun ChefsKissNavHost(
         ) {
             RecipeDetailsScreen(navigateBack = { navController.navigateUp() })
         }
+        composable(route = SelectionDestination.route) {
+            SelectionScreen(navigateBack = { navController.navigateUp() })
+        }
         composable(
             route = PlannerEditDestination.routeWithArgs,
             arguments = listOf(navArgument(PlannerEditDestination.plannerDateArg) {
                 type = NavType.StringType
             })
         ) {
-            PlannerEditScreen(navigateBack = { navController.navigateUp() })
+            PlannerEditScreen(
+                navigateBack = { navController.navigateUp() },
+                navigateToSelection = { navController.navigate(SelectionDestination.route) })
         }
     }
 

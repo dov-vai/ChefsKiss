@@ -3,6 +3,7 @@ package com.javainiai.chefskiss.ui.mealplanner
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.javainiai.chefskiss.data.datasources.SelectedRecipeDataSource
 import com.javainiai.chefskiss.data.enums.Meal
 import com.javainiai.chefskiss.data.recipe.PlannerRecipe
 import com.javainiai.chefskiss.data.recipe.PlannerRecipeWithRecipe
@@ -26,6 +27,7 @@ data class MealEditUiState(
 )
 
 class PlannerEditViewModel(
+    selectedRecipeDataSource: SelectedRecipeDataSource,
     savedStateHandle: SavedStateHandle,
     private val recipesRepository: RecipesRepository
 ) : ViewModel() {
@@ -33,11 +35,10 @@ class PlannerEditViewModel(
         checkNotNull(savedStateHandle[PlannerEditDestination.plannerDateArg])
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val selectedRecipe: StateFlow<Recipe?> = savedStateHandle
-        .getStateFlow("selectedRecipe", (null as Long?))
-        .flatMapLatest { recipeId ->
-            recipesRepository.getRecipeStream(recipeId ?: 1)
-        }.stateIn(
+    val selectedRecipe: StateFlow<Recipe?> = selectedRecipeDataSource.recipeId
+        .filterNotNull()
+        .flatMapLatest { recipesRepository.getRecipeStream(it) }
+        .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
             initialValue = null

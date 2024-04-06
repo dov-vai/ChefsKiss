@@ -16,6 +16,7 @@ object NavDrawerNavigatorDestination : NavigationDestination {
 fun NavDrawerNavigator(
     drawerState: DrawerState,
     currentDestination: String,
+    navigateBack: () -> Unit,
     navigateTo: (String) -> Unit
 ) {
     when (currentDestination) {

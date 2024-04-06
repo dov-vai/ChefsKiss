@@ -31,7 +31,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.javainiai.chefskiss.data.enums.Meal
 import com.javainiai.chefskiss.data.recipe.PlannerRecipeWithRecipe
 import com.javainiai.chefskiss.ui.AppViewModelProvider
-import com.javainiai.chefskiss.ui.homescreen.RecipeCard
+import com.javainiai.chefskiss.ui.components.RecipeCard
 import com.javainiai.chefskiss.ui.navigation.NavigationDestination
 
 object PlannerEditDestination : NavigationDestination {
@@ -43,6 +43,7 @@ object PlannerEditDestination : NavigationDestination {
 @Composable
 fun PlannerEditScreen(
     navigateBack: () -> Unit,
+    navigateToSelection: () -> Unit,
     viewModel: PlannerEditViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -71,7 +72,7 @@ fun PlannerEditScreen(
                 RecipeCard(recipe = it, modifier = Modifier.padding(16.dp))
             }
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                FilledTonalButton(onClick = { /*TODO*/ }) {
+                FilledTonalButton(onClick = navigateToSelection) {
                     Text(text = "Select Recipe")
                 }
                 FilledTonalButton(onClick = viewModel::insertPlannerRecipe) {
@@ -116,7 +117,7 @@ fun PlannerRecipeCard(
 ) {
     Card(modifier = modifier) {
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(8.dp)) {
-            Text(text = recipe.plannerRecipe.type.title)
+            Text(text = recipe.plannerRecipe.type.title.padEnd(20))
             Spacer(modifier = Modifier.weight(1f))
             Text(text = recipe.recipe.title)
             Spacer(modifier = Modifier.weight(1f))

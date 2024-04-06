@@ -6,17 +6,19 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.javainiai.chefskiss.ChefsKissApplication
+import com.javainiai.chefskiss.ui.components.SearchScreenViewModel
 import com.javainiai.chefskiss.ui.homescreen.HomeScreenViewModel
 import com.javainiai.chefskiss.ui.mealplanner.MealPlannerViewModel
 import com.javainiai.chefskiss.ui.mealplanner.PlannerEditViewModel
 import com.javainiai.chefskiss.ui.recipescreen.AddRecipeViewModel
 import com.javainiai.chefskiss.ui.recipescreen.RecipeDetailsViewModel
+import com.javainiai.chefskiss.ui.selectionscreen.SelectionScreenViewModel
 import com.javainiai.chefskiss.ui.shoppinglist.ShoppingListViewModel
 
 object AppViewModelProvider {
     val Factory = viewModelFactory {
         initializer {
-            HomeScreenViewModel(chefsKissApplication().container.recipesRepository)
+            HomeScreenViewModel()
         }
         initializer {
             AddRecipeViewModel(chefsKissApplication().container.recipesRepository)
@@ -35,9 +37,18 @@ object AppViewModelProvider {
         }
         initializer {
             PlannerEditViewModel(
+                chefsKissApplication().container.selectedRecipeDataSource,
                 this.createSavedStateHandle(),
                 chefsKissApplication().container.recipesRepository
             )
+        }
+        initializer {
+            SearchScreenViewModel(
+                chefsKissApplication().container.recipesRepository
+            )
+        }
+        initializer {
+            SelectionScreenViewModel(chefsKissApplication().container.selectedRecipeDataSource)
         }
     }
 }

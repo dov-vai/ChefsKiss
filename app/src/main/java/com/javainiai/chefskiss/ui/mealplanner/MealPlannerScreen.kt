@@ -1,5 +1,6 @@
 package com.javainiai.chefskiss.ui.mealplanner
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -40,6 +41,7 @@ import com.javainiai.chefskiss.data.CalendarUtils
 import com.javainiai.chefskiss.data.recipe.PlannerRecipeWithRecipe
 import com.javainiai.chefskiss.ui.AppViewModelProvider
 import com.javainiai.chefskiss.ui.navigation.NavigationDestination
+import com.javainiai.chefskiss.ui.recipescreen.RecipeDetailsDestination
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -84,7 +86,11 @@ fun MealPlannerScreen(
                             PlannerRecipeCard(
                                 recipe = recipe,
                                 cardColor = if (date == uiState.currentDate) MaterialTheme.colorScheme.secondary else CardDefaults.cardColors().containerColor,
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        navigateTo("${RecipeDetailsDestination.route}/${recipe.recipe.id}")
+                                    }
                             )
                         }
                     }
@@ -102,7 +108,7 @@ fun PlannerRecipeCard(
 ) {
     Card(modifier = modifier, colors = CardDefaults.cardColors(containerColor = cardColor)) {
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(8.dp)) {
-            Text(text = recipe.plannerRecipe.type.title)
+            Text(text = recipe.plannerRecipe.type.title.padEnd(20))
             Spacer(modifier = Modifier.weight(1f))
             Text(text = recipe.recipe.title)
             Spacer(modifier = Modifier.weight(1f))
