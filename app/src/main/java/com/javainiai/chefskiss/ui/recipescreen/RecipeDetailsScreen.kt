@@ -3,12 +3,14 @@ package com.javainiai.chefskiss.ui.recipescreen
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -17,10 +19,12 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.MenuBook
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.RestaurantMenu
 import androidx.compose.material.icons.filled.ShoppingBasket
@@ -33,6 +37,8 @@ import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.HorizontalDivider
@@ -340,6 +346,10 @@ fun RecipeTopBar(
         mutableStateOf(false)
     }
 
+    var expanded by remember {
+        mutableStateOf(false)
+    }
+
     if (showDialog) {
         ConfirmationDialog(
             onDismiss = { showDialog = false },
@@ -363,15 +373,6 @@ fun RecipeTopBar(
         title = {
             Row {
                 Spacer(modifier = Modifier.weight(1f))
-                IconButton(onClick = { /*TODO*/ }) {
-                    Icon(imageVector = Icons.Default.Timer, contentDescription = "Timer")
-                }
-                IconButton(onClick = onShopping) {
-                    Icon(
-                        imageVector = Icons.Default.ShoppingCart,
-                        contentDescription = "Add to shopping list"
-                    )
-                }
                 IconButton(onClick = onFavorite) {
                     Icon(
                         imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
@@ -383,6 +384,34 @@ fun RecipeTopBar(
                 }
                 IconButton(onClick = { showDialog = true }) {
                     Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete")
+                }
+                Box(
+                    modifier = Modifier
+                        .wrapContentSize(Alignment.TopEnd)
+                ) {
+                    IconButton(onClick = { expanded = !expanded }) {
+                        Icon(imageVector = Icons.Default.MoreVert, contentDescription = "More")
+                    }
+                    DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                        DropdownMenuItem(leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.ShoppingCart,
+                                contentDescription = "Add to shopping list"
+                            )
+                        }, text = { Text(text = "Add to shopping list") }, onClick = onShopping)
+                        DropdownMenuItem(leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.CalendarMonth,
+                                contentDescription = "Add to meal planner"
+                            )
+                        }, text = { Text(text = "Add to meal planner") }, onClick = { /*TODO*/ })
+                        DropdownMenuItem(leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Timer,
+                                contentDescription = "Set timer"
+                            )
+                        }, text = { Text(text = "Set timer") }, onClick = { /*TODO*/ })
+                    }
                 }
             }
         })
