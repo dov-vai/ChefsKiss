@@ -5,6 +5,8 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -36,11 +38,13 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -67,14 +71,20 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import com.javainiai.chefskiss.data.CalendarUtils
+import com.javainiai.chefskiss.data.enums.Meal
 import com.javainiai.chefskiss.data.ingredient.Ingredient
+import com.javainiai.chefskiss.data.recipe.PlannerRecipe
 import com.javainiai.chefskiss.data.recipe.Recipe
 import com.javainiai.chefskiss.data.tag.Tag
 import com.javainiai.chefskiss.ui.AppViewModelProvider
 import com.javainiai.chefskiss.ui.navigation.NavigationDestination
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 object RecipeDetailsDestination : NavigationDestination {
     override val route = "recipe_display"
@@ -105,6 +115,15 @@ fun RecipeDetailsScreen(
                         viewModel.deleteRecipe()
                         navigateBack()
                     }
+                },
+                onAddToMealPlanner = { date, type ->
+                    viewModel.addToMealPlanner(
+                        PlannerRecipe(
+                            date = date,
+                            recipeId = uiState.recipe.id,
+                            type = type
+                        )
+                    )
                 }
             )
         },
@@ -333,6 +352,61 @@ fun ConfirmationDialog(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@Composable
+fun MealPlannerDialog(
+    onDismiss: () -> Unit,
+    onAddToMealPlanner: (String, Meal) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var selectedType by remember { mutableStateOf(Meal.BREAKFAST) }
+
+    Dialog(onDismissRequest = onDismiss) {
+        Card(modifier = modifier) {
+            Column(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(text = "Quick add to Meal Planner")
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Meal.entries.forEach {
+                        FilterChip(
+                            selected = selectedType == it,
+                            onClick = { selectedType = it },
+                            label = { Text(text = it.title) })
+                    }
+                }
+                HorizontalDivider()
+                val startOfWeek = CalendarUtils.getStartOfWeek()
+                val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                val weekdayFormat = SimpleDateFormat("EEEE, MM-dd", Locale.getDefault())
+                repeat(7) {
+                    val date = CalendarUtils.datePlusOffset(startOfWeek, it)
+                    val dateString = dateFormat.format(date)
+                    val weekdayString = weekdayFormat.format(date)
+                    Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondary)) {
+                        Text(
+                            text = weekdayString,
+                            modifier = Modifier
+                                .clickable {
+                                    onAddToMealPlanner(
+                                        dateString,
+                                        selectedType
+                                    )
+                                    onDismiss()
+                                }
+                                .padding(8.dp)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecipeTopBar(
@@ -340,9 +414,14 @@ fun RecipeTopBar(
     onFavorite: () -> Unit,
     onShopping: () -> Unit,
     onBack: () -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    onAddToMealPlanner: (String, Meal) -> Unit
 ) {
     var showDialog by remember {
+        mutableStateOf(false)
+    }
+
+    var showMealPlannerDialog by remember {
         mutableStateOf(false)
     }
 
@@ -359,6 +438,13 @@ fun RecipeTopBar(
             },
             onDismissRequest = { showDialog = false },
             text = { Text("Are you sure that you want to delete this recipe? (Can't be recovered)") })
+    }
+
+    if (showMealPlannerDialog) {
+        MealPlannerDialog(
+            onDismiss = { showMealPlannerDialog = false },
+            onAddToMealPlanner = onAddToMealPlanner
+        )
     }
 
     TopAppBar(
@@ -398,19 +484,27 @@ fun RecipeTopBar(
                                 imageVector = Icons.Default.ShoppingCart,
                                 contentDescription = "Add to shopping list"
                             )
-                        }, text = { Text(text = "Add to shopping list") }, onClick = onShopping)
+                        }, text = { Text(text = "Add to shopping list") }, onClick = {
+                            expanded = false
+                            onShopping()
+                        })
                         DropdownMenuItem(leadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.CalendarMonth,
                                 contentDescription = "Add to meal planner"
                             )
-                        }, text = { Text(text = "Add to meal planner") }, onClick = { /*TODO*/ })
+                        }, text = { Text(text = "Add to meal planner") }, onClick = {
+                            expanded = false
+                            showMealPlannerDialog = true
+                        })
                         DropdownMenuItem(leadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Timer,
                                 contentDescription = "Set timer"
                             )
-                        }, text = { Text(text = "Set timer") }, onClick = { /*TODO*/ })
+                        }, text = { Text(text = "Set timer") }, onClick = {
+                            expanded = false
+                        })
                     }
                 }
             }
