@@ -10,6 +10,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.javainiai.chefskiss.data.ingredient.Ingredient
+import com.javainiai.chefskiss.data.recipe.PlannerRecipe
 import com.javainiai.chefskiss.data.recipe.Recipe
 import com.javainiai.chefskiss.data.recipe.RecipesRepository
 import com.javainiai.chefskiss.data.recipe.ShopRecipe
@@ -111,6 +112,13 @@ class RecipeDetailsViewModel(
 
     fun updateCheckedIngredients(ingredients: List<Ingredient>) {
         _checkedIngredients.update { ingredients }
+    }
+
+    fun addToMealPlanner(plannerRecipe: PlannerRecipe) {
+        viewModelScope.launch {
+            recipesRepository.insertPlannerRecipe(plannerRecipe)
+        }
+        showMessage("Added to ${plannerRecipe.date} as ${plannerRecipe.type.title}")
     }
 
     companion object {
