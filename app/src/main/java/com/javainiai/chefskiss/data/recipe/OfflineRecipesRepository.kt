@@ -51,6 +51,12 @@ class OfflineRecipesRepository(
     override fun getPlannerRecipesByDate(date: String): Flow<List<PlannerRecipe>> =
         recipeDao.getPlannerRecipesByDate(date)
 
+    override fun getPlannerRecipesWithRecipes(date: String): Flow<List<PlannerRecipeWithRecipe>> =
+        recipeDao.getPlannerRecipesWithRecipes(date)
+
+    override fun getPlannerRecipesWithRecipes(dates: List<String>): Flow<List<PlannerRecipeWithRecipe>> =
+        recipeDao.getPlannerRecipesWithRecipes(dates)
+
     override fun query(query: SupportSQLiteQuery): Flow<List<Recipe>> = recipeDao.query(query)
     override fun query(
         recipeName: String,

@@ -1,4 +1,4 @@
-package com.javainiai.chefskiss.ui.homescreen
+package com.javainiai.chefskiss.ui.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -115,11 +115,6 @@ fun OrderSelection(
     }
 }
 
-data class SortingMethod(
-    val title: String,
-    val method: Sort
-)
-
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun SortCard(
@@ -130,13 +125,6 @@ fun SortCard(
     var opened by remember {
         mutableStateOf(false)
     }
-
-    val chips = mutableListOf(
-        SortingMethod("Time added", Sort.ADDED),
-        SortingMethod("Cooking time", Sort.COOKING_TIME),
-        SortingMethod("Rating", Sort.RATING),
-        SortingMethod("Portion size", Sort.PORTION)
-    )
 
     OutlinedCard(
         modifier = modifier
@@ -154,10 +142,10 @@ fun SortCard(
             }
             if (opened) {
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    chips.forEach {
+                    Sort.entries.forEach {
                         FilterChip(
-                            selected = selectedSort == it.method,
-                            onClick = { updateSortingMethod(it.method) },
+                            selected = selectedSort == it,
+                            onClick = { updateSortingMethod(it) },
                             label = { Text(it.title) })
                     }
                 }

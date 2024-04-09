@@ -14,7 +14,11 @@ import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -31,6 +35,7 @@ fun ChefsKissApp(
     navController: NavHostController = rememberNavController(),
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    var currentDestination by rememberSaveable { mutableStateOf(HomeScreenDestination.route) }
     val coroutineScope = rememberCoroutineScope()
     ModalNavigationDrawer(
         modifier = modifier,
@@ -38,16 +43,21 @@ fun ChefsKissApp(
         gesturesEnabled = drawerState.isOpen,
         drawerContent = {
             ChefsKissDrawerSheet(
-                currentDestinationRoute = navController.currentDestination?.route
-                    ?: HomeScreenDestination.route
-            ) {
-                navController.navigate(it)
-                coroutineScope.launch {
-                    drawerState.close()
-                }
-            }
-        }) {
-        ChefsKissNavHost(drawerState = drawerState, navController = navController)
+                updateDestination = {
+                    currentDestination = it
+                    coroutineScope.launch {
+                        drawerState.close()
+                    }
+                },
+                currentDestination = currentDestination
+            )
+        }
+    ) {
+        ChefsKissNavHost(
+            drawerState = drawerState,
+            currentDestination = currentDestination,
+            navController = navController
+        )
     }
 }
 
@@ -55,8 +65,8 @@ fun ChefsKissApp(
 @Composable
 fun ChefsKissDrawerSheet(
     modifier: Modifier = Modifier,
-    currentDestinationRoute: String,
-    navigateTo: (String) -> Unit
+    updateDestination: (String) -> Unit,
+    currentDestination: String
 ) {
     ModalDrawerSheet(modifier = modifier) {
         Text(text = "Chef's Kiss", modifier = Modifier.padding(16.dp))
@@ -71,8 +81,8 @@ fun ChefsKissDrawerSheet(
                     Text(text = "Home")
                 }
             },
-            selected = currentDestinationRoute == HomeScreenDestination.route,
-            onClick = { navigateTo(HomeScreenDestination.route) }
+            selected = currentDestination == HomeScreenDestination.route,
+            onClick = { updateDestination(HomeScreenDestination.route) }
         )
         NavigationDrawerItem(
             label = {
@@ -85,8 +95,8 @@ fun ChefsKissDrawerSheet(
                     Text(text = "Meal Planner")
                 }
             },
-            selected = false,
-            onClick = { navigateTo(MealPlannerDestination.route) }
+            selected = currentDestination == MealPlannerDestination.route,
+            onClick = { updateDestination(MealPlannerDestination.route) }
         )
         NavigationDrawerItem(
             label = {
@@ -99,8 +109,8 @@ fun ChefsKissDrawerSheet(
                     Text(text = "Shopping List")
                 }
             },
-            selected = false,
-            onClick = { navigateTo(ShoppingListDestination.route) }
+            selected = currentDestination == ShoppingListDestination.route,
+            onClick = { updateDestination(ShoppingListDestination.route) }
         )
     }
 }

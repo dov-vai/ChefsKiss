@@ -112,4 +112,12 @@ interface RecipeDao {
      */
     @Query("SELECT * from planner_recipes WHERE date=:date")
     fun getPlannerRecipesByDate(date: String): Flow<List<PlannerRecipe>>
+
+    @Transaction
+    @Query("SELECT * from planner_recipes WHERE date=:date")
+    fun getPlannerRecipesWithRecipes(date: String): Flow<List<PlannerRecipeWithRecipe>>
+
+    @Transaction
+    @Query("SELECT * from planner_recipes WHERE date IN (:dates)")
+    fun getPlannerRecipesWithRecipes(dates: List<String>): Flow<List<PlannerRecipeWithRecipe>>
 }

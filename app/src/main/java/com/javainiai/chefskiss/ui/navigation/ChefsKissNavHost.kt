@@ -8,30 +8,32 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.javainiai.chefskiss.ui.homescreen.HomeScreen
-import com.javainiai.chefskiss.ui.homescreen.HomeScreenDestination
-import com.javainiai.chefskiss.ui.mealplanner.MealPlannerDestination
-import com.javainiai.chefskiss.ui.mealplanner.MealPlannerScreen
+import com.javainiai.chefskiss.ui.mealplanner.PlannerEditDestination
+import com.javainiai.chefskiss.ui.mealplanner.PlannerEditScreen
 import com.javainiai.chefskiss.ui.recipescreen.AddRecipeDestination
 import com.javainiai.chefskiss.ui.recipescreen.AddRecipeScreen
 import com.javainiai.chefskiss.ui.recipescreen.RecipeDetailsDestination
 import com.javainiai.chefskiss.ui.recipescreen.RecipeDetailsScreen
-import com.javainiai.chefskiss.ui.shoppinglist.ShoppingList
-import com.javainiai.chefskiss.ui.shoppinglist.ShoppingListDestination
+import com.javainiai.chefskiss.ui.selectionscreen.SelectionDestination
+import com.javainiai.chefskiss.ui.selectionscreen.SelectionScreen
 
 @Composable
 fun ChefsKissNavHost(
     drawerState: DrawerState,
+    currentDestination: String,
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
     NavHost(
         navController = navController,
-        startDestination = HomeScreenDestination.route,
+        startDestination = NavDrawerNavigatorDestination.route,
         modifier = modifier
     ) {
-        composable(route = HomeScreenDestination.route) {
-            HomeScreen(drawerState) {
+        composable(route = NavDrawerNavigatorDestination.route) {
+            NavDrawerNavigator(
+                drawerState = drawerState,
+                currentDestination = currentDestination,
+                navigateBack = { navController.navigateUp() }) {
                 navController.navigate(it)
             }
         }
@@ -46,11 +48,18 @@ fun ChefsKissNavHost(
         ) {
             RecipeDetailsScreen(navigateBack = { navController.navigateUp() })
         }
-        composable(route = ShoppingListDestination.route) {
-            ShoppingList(navigateBack = { navController.navigateUp() })
+        composable(route = SelectionDestination.route) {
+            SelectionScreen(navigateBack = { navController.navigateUp() })
         }
-        composable(route = MealPlannerDestination.route) {
-            MealPlannerScreen(navigateBack = { navController.navigateUp() })
+        composable(
+            route = PlannerEditDestination.routeWithArgs,
+            arguments = listOf(navArgument(PlannerEditDestination.plannerDateArg) {
+                type = NavType.StringType
+            })
+        ) {
+            PlannerEditScreen(
+                navigateBack = { navController.navigateUp() },
+                navigateToSelection = { navController.navigate(SelectionDestination.route) })
         }
     }
 

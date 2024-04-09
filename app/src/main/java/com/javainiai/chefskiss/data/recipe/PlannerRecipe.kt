@@ -23,6 +23,7 @@ data class PlannerRecipe(
     val id: Long = 0,
     @ColumnInfo(index = true)
     val date: String, // format of yyyy-mm-dd
+    @ColumnInfo(index = true)
     val recipeId: Long,
     val type: Meal
 )
