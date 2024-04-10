@@ -1,5 +1,6 @@
 package com.javainiai.chefskiss.ui.shoppinglist
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,9 +21,11 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -34,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -43,6 +47,7 @@ import com.javainiai.chefskiss.data.recipe.Recipe
 import com.javainiai.chefskiss.data.recipe.ShopIngredient
 import com.javainiai.chefskiss.ui.AppViewModelProvider
 import com.javainiai.chefskiss.ui.navigation.NavigationDestination
+import com.javainiai.chefskiss.ui.recipescreen.IngredientCard
 import kotlinx.coroutines.launch
 
 object ShoppingListDestination : NavigationDestination {
@@ -80,23 +85,6 @@ fun ShoppingList(
 
 
 @Composable
-fun IngredientCard(
-    ingredient: Ingredient,
-    checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Row(modifier = Modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text(
-            text = "${ingredient.name} ${if (ingredient.size == 0f) "" else ingredient.size} ${ingredient.unit}",
-            fontSize = 20.sp
-        )
-        Spacer(modifier = Modifier.weight(1f))
-        Checkbox(checked = checked, onCheckedChange = { onCheckedChange(it) })
-    }
-}
-
-@Composable
 fun RecipeCard(
     recipe: Recipe,
     ingredients: List<Ingredient>,
@@ -113,7 +101,7 @@ fun RecipeCard(
         modifier = modifier
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 AsyncImage(
                     model = recipe.imagePath,
                     contentDescription = null,
@@ -123,9 +111,7 @@ fun RecipeCard(
                         .clip(RoundedCornerShape(8.dp)),
                     contentScale = ContentScale.Crop
                 )
-                Spacer(modifier = Modifier.weight(1f))
-                Text(text = recipe.title)
-                Spacer(modifier = Modifier.weight(1f))
+                Text(text = recipe.title, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
                 IconButton(onClick = onRemove) {
                     Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete")
                 }
@@ -141,6 +127,7 @@ fun RecipeCard(
                     ingredients.forEach { ingredient ->
                         val shopIngredient = ShopIngredient(ingredient.id, ingredient.recipeId)
                         IngredientCard(ingredient = ingredient,
+                            containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp),
                             checked = checkedIngredients.contains(shopIngredient),
                             onCheckedChange = {
                                 if (it) {

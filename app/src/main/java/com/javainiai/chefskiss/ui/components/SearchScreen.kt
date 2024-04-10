@@ -46,6 +46,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.javainiai.chefskiss.data.recipe.Recipe
@@ -149,10 +150,10 @@ fun RecipeCard(recipe: Recipe, modifier: Modifier = Modifier) {
                 contentScale = ContentScale.Crop
             )
             Column(
-                modifier = Modifier.padding(8.dp),
+                modifier = Modifier.padding(8.dp).weight(1f),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Text(text = recipe.title, maxLines = 1)
+                Text(text = recipe.title, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Row {
                     Icon(imageVector = Icons.Default.Timer, contentDescription = "Time to cook")
                     Text(
@@ -167,7 +168,6 @@ fun RecipeCard(recipe: Recipe, modifier: Modifier = Modifier) {
                     Text(text = recipe.rating.toString())
                 }
             }
-            Spacer(modifier = Modifier.weight(1f))
             Icon(
                 imageVector = if (recipe.favorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                 contentDescription = "Favorite recipe"

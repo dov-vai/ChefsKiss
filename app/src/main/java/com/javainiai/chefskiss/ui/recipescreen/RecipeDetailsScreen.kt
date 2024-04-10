@@ -66,9 +66,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -241,16 +243,15 @@ fun RecipeAbout(
 fun IngredientCard(
     ingredient: Ingredient,
     checked: Boolean,
+    containerColor: Color = CardDefaults.cardColors().containerColor,
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card(modifier = modifier) {
-        Row(modifier = Modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                text = "${ingredient.name} ${if (ingredient.size == 0f) "" else ingredient.size} ${ingredient.unit}",
-                fontSize = 20.sp
-            )
-            Spacer(modifier = Modifier.weight(1f))
+    Card(modifier = modifier, colors = CardDefaults.cardColors(containerColor = containerColor)) {
+        Row(modifier = Modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(text = ingredient.name, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+            Text(text = if (ingredient.size == 0f) "" else ingredient.size.toString())
+            Text(text = ingredient.unit, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
             Checkbox(checked = checked, onCheckedChange = { onCheckedChange(it) })
         }
     }
@@ -264,7 +265,7 @@ fun RecipeIngredients(
     modifier: Modifier = Modifier
 ) {
     Surface(modifier = modifier) {
-        LazyColumn {
+        LazyColumn{
             items(ingredients) { ingredient ->
                 IngredientCard(
                     ingredient = ingredient,
@@ -278,7 +279,7 @@ fun RecipeIngredients(
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp)
+                        .padding(8.dp)
                 )
             }
         }
