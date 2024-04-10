@@ -35,6 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.javainiai.chefskiss.data.CalendarUtils
@@ -109,9 +110,12 @@ fun PlannerRecipeCard(
     Card(modifier = modifier, colors = CardDefaults.cardColors(containerColor = cardColor)) {
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(8.dp)) {
             Text(text = recipe.plannerRecipe.type.title.padEnd(20))
-            Spacer(modifier = Modifier.weight(1f))
-            Text(text = recipe.recipe.title)
-            Spacer(modifier = Modifier.weight(1f))
+            Text(
+                text = recipe.recipe.title,
+                maxLines = 1,
+                modifier = Modifier.weight(1f),
+                overflow = TextOverflow.Ellipsis
+            )
         }
     }
 }

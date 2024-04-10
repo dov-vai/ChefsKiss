@@ -32,6 +32,7 @@ import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.filled.Title
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
@@ -60,6 +61,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
@@ -311,7 +313,7 @@ fun RecipeTags(
 }
 
 
-@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun RecipeTagsCard(
     tags: List<Tag>,
@@ -381,7 +383,7 @@ fun RecipeIngredients(
                 focusManager.moveFocus(FocusDirection.Next)
             })
         )
-        LazyColumn {
+        LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             items(items = ingredients) {
                 IngredientCard(ingredient = it, onRemove = { updateIngredients(ingredients - it) })
             }
@@ -393,11 +395,26 @@ fun RecipeIngredients(
 fun IngredientCard(
     ingredient: IngredientDisplay,
     onRemove: () -> Unit,
+    containerColor: Color = CardDefaults.cardColors().containerColor,
     modifier: Modifier = Modifier
 ) {
-    Card(modifier = modifier) {
-        Row(modifier = Modifier.padding(4.dp), verticalAlignment = Alignment.CenterVertically) {
-            Text(text = "${ingredient.title} ${ingredient.amount} ${ingredient.units}")
+    Card(modifier = modifier, colors = CardDefaults.cardColors(containerColor = containerColor)) {
+        Row(
+            modifier = Modifier.padding(4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(
+                text = ingredient.title,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f)
+            )
+            Text(text = ingredient.amount)
+            Text(
+                text = ingredient.units,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f)
+            )
             IconButton(onClick = onRemove) {
                 Icon(imageVector = Icons.Default.Remove, contentDescription = "Remove")
             }
