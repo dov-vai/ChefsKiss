@@ -26,6 +26,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.javainiai.chefskiss.data.enums.Meal
@@ -116,11 +117,9 @@ fun PlannerRecipeCard(
     modifier: Modifier = Modifier
 ) {
     Card(modifier = modifier) {
-        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(8.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(text = recipe.plannerRecipe.type.title.padEnd(20))
-            Spacer(modifier = Modifier.weight(1f))
-            Text(text = recipe.recipe.title)
-            Spacer(modifier = Modifier.weight(1f))
+            Text(text = recipe.recipe.title, overflow = TextOverflow.Ellipsis, maxLines = 1, modifier = Modifier.weight(1f))
             IconButton(onClick = onDelete) {
                 Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete recipe")
             }
