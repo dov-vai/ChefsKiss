@@ -95,6 +95,7 @@ object RecipeDetailsDestination : NavigationDestination {
 @Composable
 fun RecipeDetailsScreen(
     navigateBack: () -> Unit,
+    navigateTo: (String) -> Unit,
     viewModel: RecipeDetailsViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -108,6 +109,7 @@ fun RecipeDetailsScreen(
             RecipeTopBar(
                 isFavorite = uiState.recipe.favorite,
                 onFavorite = viewModel::updateFavorite,
+                onEdit = { navigateTo("${EditRecipeDestination.route}/${uiState.recipe.id}") },
                 onShopping = viewModel::addToShoppingList,
                 onBack = navigateBack,
                 onDelete = {
@@ -412,6 +414,7 @@ fun MealPlannerDialog(
 fun RecipeTopBar(
     isFavorite: Boolean,
     onFavorite: () -> Unit,
+    onEdit: () -> Unit,
     onShopping: () -> Unit,
     onBack: () -> Unit,
     onDelete: () -> Unit,
@@ -465,7 +468,7 @@ fun RecipeTopBar(
                         contentDescription = "Favorite"
                     )
                 }
-                IconButton(onClick = { /*TODO*/ }) {
+                IconButton(onClick = onEdit) {
                     Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit")
                 }
                 IconButton(onClick = { showDialog = true }) {

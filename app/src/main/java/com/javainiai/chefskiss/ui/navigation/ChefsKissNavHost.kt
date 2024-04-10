@@ -12,6 +12,7 @@ import com.javainiai.chefskiss.ui.mealplanner.PlannerEditDestination
 import com.javainiai.chefskiss.ui.mealplanner.PlannerEditScreen
 import com.javainiai.chefskiss.ui.recipescreen.AddRecipeDestination
 import com.javainiai.chefskiss.ui.recipescreen.AddRecipeScreen
+import com.javainiai.chefskiss.ui.recipescreen.EditRecipeDestination
 import com.javainiai.chefskiss.ui.recipescreen.RecipeDetailsDestination
 import com.javainiai.chefskiss.ui.recipescreen.RecipeDetailsScreen
 import com.javainiai.chefskiss.ui.selectionscreen.SelectionDestination
@@ -41,12 +42,22 @@ fun ChefsKissNavHost(
             AddRecipeScreen(navigateBack = { navController.navigateUp() })
         }
         composable(
+            route = EditRecipeDestination.routeWithArgs,
+            arguments = listOf(navArgument(EditRecipeDestination.editRecipeIdArg) {
+                type = NavType.LongType
+            })
+        ) {
+            AddRecipeScreen(navigateBack = { navController.navigateUp() })
+        }
+        composable(
             route = RecipeDetailsDestination.routeWithArgs,
             arguments = listOf(navArgument(RecipeDetailsDestination.recipeIdArg) {
                 type = NavType.LongType
             })
         ) {
-            RecipeDetailsScreen(navigateBack = { navController.navigateUp() })
+            RecipeDetailsScreen(
+                navigateBack = { navController.navigateUp() },
+                navigateTo = { navController.navigate(it) })
         }
         composable(route = SelectionDestination.route) {
             SelectionScreen(navigateBack = { navController.navigateUp() })
