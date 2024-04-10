@@ -42,9 +42,10 @@ interface RecipesRepository {
         ingredients: List<Ingredient>,
         tags: List<Tag>
     )
+
     suspend fun updateRecipeWithIngredientsAndTags(
         recipe: Recipe,
-        ingredient: List<Ingredient>,
+        ingredients: List<Ingredient>,
         tags: List<Tag>
     )
 

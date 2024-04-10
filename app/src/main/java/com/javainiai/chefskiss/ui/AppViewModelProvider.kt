@@ -21,7 +21,10 @@ object AppViewModelProvider {
             HomeScreenViewModel()
         }
         initializer {
-            AddRecipeViewModel(chefsKissApplication().container.recipesRepository)
+            AddRecipeViewModel(
+                this.createSavedStateHandle(),
+                chefsKissApplication().container.recipesRepository
+            )
         }
         initializer {
             RecipeDetailsViewModel(

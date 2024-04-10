@@ -109,7 +109,7 @@ fun RecipeDetailsScreen(
             RecipeTopBar(
                 isFavorite = uiState.recipe.favorite,
                 onFavorite = viewModel::updateFavorite,
-                onEdit = { navigateTo("${AddRecipeDestination.route}/${recipe.id}") },
+                onEdit = { navigateTo("${EditRecipeDestination.route}/${uiState.recipe.id}") },
                 onShopping = viewModel::addToShoppingList,
                 onBack = navigateBack,
                 onDelete = {
@@ -468,7 +468,7 @@ fun RecipeTopBar(
                         contentDescription = "Favorite"
                     )
                 }
-                IconButton(onClick = { onEdit }) {
+                IconButton(onClick = onEdit) {
                     Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit")
                 }
                 IconButton(onClick = { showDialog = true }) {

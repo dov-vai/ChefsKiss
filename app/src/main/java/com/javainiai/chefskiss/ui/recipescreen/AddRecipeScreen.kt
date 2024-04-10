@@ -60,39 +60,29 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
-import com.javainiai.chefskiss.data.recipe.Recipe
 import com.javainiai.chefskiss.data.tag.Tag
 import com.javainiai.chefskiss.ui.AppViewModelProvider
 import com.javainiai.chefskiss.ui.navigation.NavigationDestination
-import com.javainiai.chefskiss.ui.theme.ChefsKissTheme
 import kotlinx.coroutines.launch
-
-
-@Preview
-@Composable
-fun AddRecipeScreenPreview() {
-    ChefsKissTheme {
-        AddRecipeScreen(navigateBack = {}, existingRecipe = null)
-    }
-}
 
 object AddRecipeDestination : NavigationDestination {
     override val route = "addrecipe"
 }
 
+object EditRecipeDestination : NavigationDestination {
+    override val route = "editrecipe"
+    const val editRecipeIdArg = "editRecipeId"
+    val routeWithArgs = "$route/{${editRecipeIdArg}}"
+}
+
 @Composable
 fun AddRecipeScreen(
     navigateBack: () -> Unit,
-    existingRecipe: Recipe?,
     viewModel: AddRecipeViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
-    if (existingRecipe != null){
-        viewModel.initializeWithExistingRecipe(existingRecipe)
-    }
     val uiState by viewModel.uiState.collectAsState()
     val tags by viewModel.tags.collectAsState()
 

@@ -3,17 +3,20 @@ package com.javainiai.chefskiss.ui.recipescreen
 import android.net.Uri
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.javainiai.chefskiss.data.ingredient.Ingredient
 import com.javainiai.chefskiss.data.recipe.Recipe
 import com.javainiai.chefskiss.data.recipe.RecipesRepository
 import com.javainiai.chefskiss.data.tag.Tag
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -37,8 +40,12 @@ data class AddRecipeUiState(
     val tagRemoveMode: Boolean
 )
 
-class AddRecipeViewModel(private val recipesRepository: RecipesRepository) : ViewModel() {
-    private var existingRecipe: Recipe? = null
+class AddRecipeViewModel(
+    savedStateHandle: SavedStateHandle,
+    private val recipesRepository: RecipesRepository
+) : ViewModel() {
+    private val editRecipeId: Long? = savedStateHandle[EditRecipeDestination.editRecipeIdArg]
+
     private var _uiState =
         MutableStateFlow(
             AddRecipeUiState(
@@ -63,6 +70,12 @@ class AddRecipeViewModel(private val recipesRepository: RecipesRepository) : Vie
             started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
             initialValue = listOf()
         )
+
+    init {
+        editRecipeId?.let {
+            initializeEditRecipe(it)
+        }
+    }
 
     val snackbarHostState = SnackbarHostState()
 
@@ -184,73 +197,70 @@ class AddRecipeViewModel(private val recipesRepository: RecipesRepository) : Vie
         return true
     }
 
-    fun initializeWithExistingRecipe(recipe: Recipe?){
-        recipe?.let {
-            existingRecipe = it
-            _uiState.value = AddRecipeUiState(
-                title = it.title,
-                cookingTime = it.cookingTime.toString(),
-                servings = it.servings.toString(),
-                imageUri = it.imagePath,
-                ingredient = IngredientDisplay("", "", ""),
-                ingredients = listOf(),
-                tag = "",
-                tags = listOf(),
-                directions = it.description,
-                tagRemoveMode = false
-            )
+    private fun initializeEditRecipe(recipeId: Long) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val recipeWithTags = recipesRepository.getRecipeWithTags(recipeId)
+            val recipeWithIngredients = recipesRepository.getRecipeWithIngredients(recipeId)
+            // if we are loading it, it should exist, so assert non-null
+            val recipe = recipeWithTags.first()!!.recipe
+            val tags = recipeWithTags.first()!!.tags
+            val ingredients = recipeWithIngredients.first()!!.ingredients
+
+            _uiState.update {
+                AddRecipeUiState(
+                    title = recipe.title,
+                    cookingTime = recipe.cookingTime.toString(),
+                    servings = recipe.servings.toString(),
+                    imageUri = recipe.imagePath,
+                    ingredient = IngredientDisplay("", "", ""),
+                    ingredients = ingredients.map {
+                        IngredientDisplay(
+                            it.name,
+                            it.size.toString(),
+                            it.unit
+                        )
+                    },
+                    tag = "",
+                    tags = tags,
+                    directions = recipe.description,
+                    tagRemoveMode = false
+                )
+            }
         }
     }
 
     suspend fun saveToDatabase(): Boolean {
         if (validateEntries()) {
-            if(existingRecipe != null) {
-                existingRecipe?.let { existingRecipe ->
-                    val updatedRecipe = existingRecipe.copy(
-                        title = uiState.value.title,
-                        description = uiState.value.directions,
-                        cookingTime = uiState.value.cookingTime.toIntOrNull() ?: 0,
-                        servings = uiState.value.servings.toIntOrNull() ?: 0,
-                        imagePath = uiState.value.imageUri
+            with(uiState.value) {
+                val recipe = Recipe(
+                    id = editRecipeId ?: 0,
+                    title = title,
+                    description = directions,
+                    cookingTime = cookingTime.toIntOrNull() ?: 0,
+                    servings = cookingTime.toIntOrNull() ?: 0,
+                    rating = 0,
+                    favorite = false,
+                    imagePath = imageUri
+                )
+
+                val list = mutableListOf<Ingredient>()
+                for (i in ingredients) {
+                    val ingredient = Ingredient(
+                        recipeId = editRecipeId ?: 0,
+                        name = i.title,
+                        size = i.amount.toFloatOrNull() ?: 0f,
+                        unit = i.units
                     )
-                    val list = mutableListOf<Ingredient>()
-                    for (i in uiState.value.ingredients) {
-                        val ingredient = Ingredient(
-                            recipeId = existingRecipe.id,
-                            name = i.title,
-                            size = i.amount.toFloatOrNull() ?: 0f,
-                            unit = i.units
-                        )
-                        list.add(ingredient)
-                    }
-                    recipesRepository.updateRecipeWithIngredientsAndTags(updatedRecipe, list, uiState.value.tags)
+
+                    list.add(ingredient)
                 }
-            } else {
-                with(uiState.value) {
-                    val recipe = Recipe(
-                        title = title,
-                        description = directions,
-                        cookingTime = cookingTime.toIntOrNull() ?: 0,
-                        servings = cookingTime.toIntOrNull() ?: 0,
-                        rating = 0,
-                        favorite = false,
-                        imagePath = imageUri
-                    )
 
-                    val list = mutableListOf<Ingredient>()
-                    for (i in ingredients) {
-                        val ingredient = Ingredient(
-                            recipeId = 0,
-                            name = i.title,
-                            size = i.amount.toFloatOrNull() ?: 0f,
-                            unit = i.units
-                        )
-
-                        list.add(ingredient)
-                    }
-
+                if (editRecipeId != null) {
+                    recipesRepository.updateRecipeWithIngredientsAndTags(recipe, list, tags)
+                } else {
                     recipesRepository.insertRecipeWithIngredientsAndTags(recipe, list, tags)
                 }
+
             }
         } else {
             return false

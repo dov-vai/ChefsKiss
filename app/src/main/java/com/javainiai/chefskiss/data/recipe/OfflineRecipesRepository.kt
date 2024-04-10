@@ -8,6 +8,7 @@ import com.javainiai.chefskiss.data.ingredient.IngredientDao
 import com.javainiai.chefskiss.data.tag.Tag
 import com.javainiai.chefskiss.data.tag.TagDao
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 
 class OfflineRecipesRepository(
     private val recipeDao: RecipeDao,
@@ -121,12 +122,24 @@ class OfflineRecipesRepository(
         ingredients: List<Ingredient>,
         tags: List<Tag>
     ) {
-        val recipeId = insertRecipe(recipe)
-        for (ingredient in ingredients){
-            ingredientDao.insert(ingredient.copy(recipeId = recipeId))
+        updateRecipe(recipe)
+
+        // have to be cleared before updating
+        val ingredientsToRemove = getRecipeWithIngredients(recipe.id).first()!!.ingredients
+        val tagsToRemove = getRecipeWithTags(recipe.id).first()!!.tags
+
+        for (ingredient in ingredientsToRemove) {
+            ingredientDao.delete(ingredient)
         }
-        for (tag in tags){
-            recipeDao.insert(RecipeTagCrossRef(recipeId, tag.id))
+        for (tag in tagsToRemove) {
+            tagDao.delete(tag)
+        }
+
+        for (ingredient in ingredients) {
+            ingredientDao.insert(ingredient)
+        }
+        for (tag in tags) {
+            recipeDao.insert(RecipeTagCrossRef(recipe.id, tag.id))
         }
     }
 
