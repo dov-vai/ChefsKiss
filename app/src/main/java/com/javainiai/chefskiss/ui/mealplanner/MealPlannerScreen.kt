@@ -110,7 +110,12 @@ fun PlannerRecipeCard(
     Card(modifier = modifier, colors = CardDefaults.cardColors(containerColor = cardColor)) {
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(8.dp)) {
             Text(text = recipe.plannerRecipe.type.title.padEnd(20))
-            Text(text = recipe.recipe.title, maxLines = 1, modifier = Modifier.weight(1f), overflow = TextOverflow.Ellipsis)
+            Text(
+                text = recipe.recipe.title,
+                maxLines = 1,
+                modifier = Modifier.weight(1f),
+                overflow = TextOverflow.Ellipsis
+            )
         }
     }
 }

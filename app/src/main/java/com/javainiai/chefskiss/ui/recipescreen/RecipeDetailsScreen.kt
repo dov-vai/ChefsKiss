@@ -248,10 +248,22 @@ fun IngredientCard(
     modifier: Modifier = Modifier
 ) {
     Card(modifier = modifier, colors = CardDefaults.cardColors(containerColor = containerColor)) {
-        Row(modifier = Modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(text = ingredient.name, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+        Row(
+            modifier = Modifier.padding(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(
+                text = ingredient.name,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f)
+            )
             Text(text = if (ingredient.size == 0f) "" else ingredient.size.toString())
-            Text(text = ingredient.unit, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+            Text(
+                text = ingredient.unit,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f)
+            )
             Checkbox(checked = checked, onCheckedChange = { onCheckedChange(it) })
         }
     }
@@ -265,7 +277,7 @@ fun RecipeIngredients(
     modifier: Modifier = Modifier
 ) {
     Surface(modifier = modifier) {
-        LazyColumn{
+        LazyColumn {
             items(ingredients) { ingredient ->
                 IngredientCard(
                     ingredient = ingredient,

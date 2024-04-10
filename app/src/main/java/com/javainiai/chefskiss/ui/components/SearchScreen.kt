@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -150,7 +149,9 @@ fun RecipeCard(recipe: Recipe, modifier: Modifier = Modifier) {
                 contentScale = ContentScale.Crop
             )
             Column(
-                modifier = Modifier.padding(8.dp).weight(1f),
+                modifier = Modifier
+                    .padding(8.dp)
+                    .weight(1f),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(text = recipe.title, maxLines = 1, overflow = TextOverflow.Ellipsis)

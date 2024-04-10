@@ -399,10 +399,22 @@ fun IngredientCard(
     modifier: Modifier = Modifier
 ) {
     Card(modifier = modifier, colors = CardDefaults.cardColors(containerColor = containerColor)) {
-        Row(modifier = Modifier.padding(4.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(text = ingredient.title, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+        Row(
+            modifier = Modifier.padding(4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(
+                text = ingredient.title,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f)
+            )
             Text(text = ingredient.amount)
-            Text(text = ingredient.units, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+            Text(
+                text = ingredient.units,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f)
+            )
             IconButton(onClick = onRemove) {
                 Icon(imageVector = Icons.Default.Remove, contentDescription = "Remove")
             }
