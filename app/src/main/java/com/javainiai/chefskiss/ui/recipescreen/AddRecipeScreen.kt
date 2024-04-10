@@ -64,6 +64,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import com.javainiai.chefskiss.data.recipe.Recipe
 import com.javainiai.chefskiss.data.tag.Tag
 import com.javainiai.chefskiss.ui.AppViewModelProvider
 import com.javainiai.chefskiss.ui.navigation.NavigationDestination
@@ -75,7 +76,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun AddRecipeScreenPreview() {
     ChefsKissTheme {
-        AddRecipeScreen({})
+        AddRecipeScreen(navigateBack = {}, existingRecipe = null)
     }
 }
 
@@ -86,8 +87,12 @@ object AddRecipeDestination : NavigationDestination {
 @Composable
 fun AddRecipeScreen(
     navigateBack: () -> Unit,
+    existingRecipe: Recipe?,
     viewModel: AddRecipeViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
+    if (existingRecipe != null){
+        viewModel.initializeWithExistingRecipe(existingRecipe)
+    }
     val uiState by viewModel.uiState.collectAsState()
     val tags by viewModel.tags.collectAsState()
 

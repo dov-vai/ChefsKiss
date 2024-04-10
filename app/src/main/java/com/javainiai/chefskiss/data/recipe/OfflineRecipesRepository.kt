@@ -116,6 +116,20 @@ class OfflineRecipesRepository(
         }
     }
 
+    override suspend fun updateRecipeWithIngredientsAndTags(
+        recipe: Recipe,
+        ingredients: List<Ingredient>,
+        tags: List<Tag>
+    ) {
+        val recipeId = insertRecipe(recipe)
+        for (ingredient in ingredients){
+            ingredientDao.insert(ingredient.copy(recipeId = recipeId))
+        }
+        for (tag in tags){
+            recipeDao.insert(RecipeTagCrossRef(recipeId, tag.id))
+        }
+    }
+
     override suspend fun deleteRecipe(recipe: Recipe) = recipeDao.delete(recipe)
     override suspend fun updateRecipe(recipe: Recipe) = recipeDao.update(recipe)
     override suspend fun insertShopRecipe(recipe: ShopRecipe) = recipeDao.insert(recipe)

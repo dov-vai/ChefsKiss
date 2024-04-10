@@ -38,7 +38,7 @@ fun ChefsKissNavHost(
             }
         }
         composable(route = AddRecipeDestination.route) {
-            AddRecipeScreen(navigateBack = { navController.navigateUp() })
+            AddRecipeScreen(navigateBack = { navController.navigateUp() }, existingRecipe = null)
         }
         composable(
             route = RecipeDetailsDestination.routeWithArgs,

@@ -42,6 +42,11 @@ interface RecipesRepository {
         ingredients: List<Ingredient>,
         tags: List<Tag>
     )
+    suspend fun updateRecipeWithIngredientsAndTags(
+        recipe: Recipe,
+        ingredient: List<Ingredient>,
+        tags: List<Tag>
+    )
 
     suspend fun deleteRecipe(recipe: Recipe)
     suspend fun updateRecipe(recipe: Recipe)

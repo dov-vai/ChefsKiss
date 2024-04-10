@@ -38,6 +38,7 @@ data class AddRecipeUiState(
 )
 
 class AddRecipeViewModel(private val recipesRepository: RecipesRepository) : ViewModel() {
+    private var existingRecipe: Recipe? = null
     private var _uiState =
         MutableStateFlow(
             AddRecipeUiState(
@@ -183,32 +184,73 @@ class AddRecipeViewModel(private val recipesRepository: RecipesRepository) : Vie
         return true
     }
 
+    fun initializeWithExistingRecipe(recipe: Recipe?){
+        recipe?.let {
+            existingRecipe = it
+            _uiState.value = AddRecipeUiState(
+                title = it.title,
+                cookingTime = it.cookingTime.toString(),
+                servings = it.servings.toString(),
+                imageUri = it.imagePath,
+                ingredient = IngredientDisplay("", "", ""),
+                ingredients = listOf(),
+                tag = "",
+                tags = listOf(),
+                directions = it.description,
+                tagRemoveMode = false
+            )
+        }
+    }
+
     suspend fun saveToDatabase(): Boolean {
         if (validateEntries()) {
-            with(uiState.value) {
-                val recipe = Recipe(
-                    title = title,
-                    description = directions,
-                    cookingTime = cookingTime.toIntOrNull() ?: 0,
-                    servings = cookingTime.toIntOrNull() ?: 0,
-                    rating = 0,
-                    favorite = false,
-                    imagePath = imageUri
-                )
-
-                val list = mutableListOf<Ingredient>()
-                for (i in ingredients) {
-                    val ingredient = Ingredient(
-                        recipeId = 0,
-                        name = i.title,
-                        size = i.amount.toFloatOrNull() ?: 0f,
-                        unit = i.units
+            if(existingRecipe != null) {
+                existingRecipe?.let { existingRecipe ->
+                    val updatedRecipe = existingRecipe.copy(
+                        title = uiState.value.title,
+                        description = uiState.value.directions,
+                        cookingTime = uiState.value.cookingTime.toIntOrNull() ?: 0,
+                        servings = uiState.value.servings.toIntOrNull() ?: 0,
+                        imagePath = uiState.value.imageUri
+                    )
+                    val list = mutableListOf<Ingredient>()
+                    for (i in uiState.value.ingredients) {
+                        val ingredient = Ingredient(
+                            recipeId = existingRecipe.id,
+                            name = i.title,
+                            size = i.amount.toFloatOrNull() ?: 0f,
+                            unit = i.units
+                        )
+                        list.add(ingredient)
+                    }
+                    recipesRepository.updateRecipeWithIngredientsAndTags(updatedRecipe, list, uiState.value.tags)
+                }
+            } else {
+                with(uiState.value) {
+                    val recipe = Recipe(
+                        title = title,
+                        description = directions,
+                        cookingTime = cookingTime.toIntOrNull() ?: 0,
+                        servings = cookingTime.toIntOrNull() ?: 0,
+                        rating = 0,
+                        favorite = false,
+                        imagePath = imageUri
                     )
 
-                    list.add(ingredient)
-                }
+                    val list = mutableListOf<Ingredient>()
+                    for (i in ingredients) {
+                        val ingredient = Ingredient(
+                            recipeId = 0,
+                            name = i.title,
+                            size = i.amount.toFloatOrNull() ?: 0f,
+                            unit = i.units
+                        )
 
-                recipesRepository.insertRecipeWithIngredientsAndTags(recipe, list, tags)
+                        list.add(ingredient)
+                    }
+
+                    recipesRepository.insertRecipeWithIngredientsAndTags(recipe, list, tags)
+                }
             }
         } else {
             return false
