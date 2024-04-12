@@ -33,6 +33,7 @@ data class AddRecipeUiState(
     val servings: String,
     val imageUri: Uri,
     val ingredient: IngredientDisplay,
+    val editingIngredient: IngredientDisplay?,
     val ingredients: List<IngredientDisplay>,
     val tag: String,
     val tags: List<Tag>,
@@ -54,6 +55,7 @@ class AddRecipeViewModel(
                 "",
                 Uri.EMPTY,
                 IngredientDisplay("", "", ""),
+                null,
                 listOf(),
                 "",
                 listOf(),
@@ -189,6 +191,14 @@ class AddRecipeViewModel(
         }
     }
 
+    fun updateEditingIngredient(ingredient: IngredientDisplay?) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                editingIngredient = ingredient
+            )
+        }
+    }
+
     // TODO: show validation messages to the user
     private fun validateEntries(): Boolean {
         with(uiState.value) {
@@ -213,6 +223,7 @@ class AddRecipeViewModel(
                     servings = recipe.servings.toString(),
                     imageUri = recipe.imagePath,
                     ingredient = IngredientDisplay("", "", ""),
+                    null,
                     ingredients = ingredients.map {
                         IngredientDisplay(
                             it.name,
