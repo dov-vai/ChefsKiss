@@ -3,7 +3,6 @@ package com.javainiai.chefskiss.ui.mealplanner
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -117,9 +116,18 @@ fun PlannerRecipeCard(
     modifier: Modifier = Modifier
 ) {
     Card(modifier = modifier) {
-        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
             Text(text = recipe.plannerRecipe.type.title.padEnd(20))
-            Text(text = recipe.recipe.title, overflow = TextOverflow.Ellipsis, maxLines = 1, modifier = Modifier.weight(1f))
+            Text(
+                text = recipe.recipe.title,
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 1,
+                modifier = Modifier.weight(1f)
+            )
             IconButton(onClick = onDelete) {
                 Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete recipe")
             }

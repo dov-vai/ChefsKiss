@@ -25,6 +25,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Tag
@@ -146,6 +147,8 @@ fun AddRecipeScreen(
                 2 -> RecipeIngredients(
                     ingredient = uiState.ingredient,
                     updateIngredient = viewModel::updateIngredient,
+                    editingIngredient = uiState.editingIngredient,
+                    updateEditingIngredient = viewModel::updateEditingIngredient,
                     ingredients = uiState.ingredients,
                     updateIngredients = viewModel::updateIngredients,
                     modifier = Modifier
@@ -347,6 +350,8 @@ fun RecipeTagsCard(
 fun RecipeIngredients(
     ingredient: IngredientDisplay,
     updateIngredient: (IngredientDisplay) -> Unit,
+    editingIngredient: IngredientDisplay?,
+    updateEditingIngredient: (IngredientDisplay?) -> Unit,
     ingredients: List<IngredientDisplay>,
     updateIngredients: (List<IngredientDisplay>) -> Unit,
     modifier: Modifier = Modifier
@@ -378,14 +383,27 @@ fun RecipeIngredients(
             label = { Text(text = "Unit") },
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
             keyboardActions = KeyboardActions(onDone = {
-                updateIngredients(ingredients + ingredient)
+                if (editingIngredient != null) {
+                    updateIngredients(ingredients.map { i ->
+                        if (i == editingIngredient) ingredient else i
+                    })
+                    updateEditingIngredient(null)
+                } else {
+                    updateIngredients(ingredients + ingredient)
+                }
                 updateIngredient(IngredientDisplay("", "", ""))
                 focusManager.moveFocus(FocusDirection.Next)
             })
         )
         LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             items(items = ingredients) {
-                IngredientCard(ingredient = it, onRemove = { updateIngredients(ingredients - it) })
+                IngredientCard(
+                    ingredient = it,
+                    onRemove = { updateIngredients(ingredients - it) },
+                    onEdit = {
+                        updateEditingIngredient(it)
+                        updateIngredient(it)
+                    })
             }
         }
     }
@@ -395,12 +413,13 @@ fun RecipeIngredients(
 fun IngredientCard(
     ingredient: IngredientDisplay,
     onRemove: () -> Unit,
+    onEdit: () -> Unit,
     containerColor: Color = CardDefaults.cardColors().containerColor,
     modifier: Modifier = Modifier
 ) {
     Card(modifier = modifier, colors = CardDefaults.cardColors(containerColor = containerColor)) {
         Row(
-            modifier = Modifier.padding(4.dp),
+            modifier = Modifier.padding(8.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
@@ -415,6 +434,9 @@ fun IngredientCard(
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f)
             )
+            IconButton(onClick = onEdit) {
+                Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit")
+            }
             IconButton(onClick = onRemove) {
                 Icon(imageVector = Icons.Default.Remove, contentDescription = "Remove")
             }
