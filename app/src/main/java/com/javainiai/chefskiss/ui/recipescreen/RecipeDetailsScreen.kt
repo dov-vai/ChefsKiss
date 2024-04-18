@@ -1,5 +1,7 @@
 package com.javainiai.chefskiss.ui.recipescreen
 
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -28,6 +30,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.People
+import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material.icons.filled.RestaurantMenu
 import androidx.compose.material.icons.filled.ShoppingBasket
 import androidx.compose.material.icons.filled.ShoppingCart
@@ -69,6 +72,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -79,6 +83,8 @@ import coil.compose.AsyncImage
 import com.javainiai.chefskiss.data.CalendarUtils
 import com.javainiai.chefskiss.data.enums.Meal
 import com.javainiai.chefskiss.data.ingredient.Ingredient
+import com.javainiai.chefskiss.data.pdf.exportAsPdf
+import com.javainiai.chefskiss.data.pdf.getRecipeCardHtml
 import com.javainiai.chefskiss.data.recipe.PlannerRecipe
 import com.javainiai.chefskiss.data.recipe.Recipe
 import com.javainiai.chefskiss.data.tag.Tag
@@ -104,7 +110,7 @@ fun RecipeDetailsScreen(
     val tags by viewModel.tags.collectAsState()
     val checkedIngredients by viewModel.checkedIngredients.collectAsState()
     val coroutineScope = rememberCoroutineScope()
-
+    val context = LocalContext.current
 
     Scaffold(
         topBar = {
@@ -128,6 +134,28 @@ fun RecipeDetailsScreen(
                             type = type
                         )
                     )
+                },
+                onExportPdf = {
+                    coroutineScope.launch {
+                        val webView = WebView(context).apply {
+                            webViewClient = WebViewClient()
+                            loadDataWithBaseURL(
+                                null,
+                                getRecipeCardHtml(
+                                    recipe = uiState.recipe,
+                                    ingredients = uiState.ingredients
+                                ),
+                                "text/html",
+                                "UTF-8",
+                                null
+                            )
+                        }
+                        exportAsPdf(
+                            webView = webView,
+                            context = context,
+                            documentName = uiState.recipe.title
+                        )
+                    }
                 }
             )
         },
@@ -431,7 +459,8 @@ fun RecipeTopBar(
     onShopping: () -> Unit,
     onBack: () -> Unit,
     onDelete: () -> Unit,
-    onAddToMealPlanner: (String, Meal) -> Unit
+    onAddToMealPlanner: (String, Meal) -> Unit,
+    onExportPdf: () -> Unit,
 ) {
     var showDialog by remember {
         mutableStateOf(false)
@@ -520,6 +549,15 @@ fun RecipeTopBar(
                             )
                         }, text = { Text(text = "Set timer") }, onClick = {
                             expanded = false
+                        })
+                        DropdownMenuItem(leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.PictureAsPdf,
+                                contentDescription = "Print/Export as PDF"
+                            )
+                        }, text = { Text(text = "Print/Export as PDF") }, onClick = {
+                            expanded = false
+                            onExportPdf()
                         })
                     }
                 }
