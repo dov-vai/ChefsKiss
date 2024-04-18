@@ -31,6 +31,8 @@ data class AddRecipeUiState(
     val title: String,
     val cookingTime: String,
     val servings: String,
+    val rating: Int,
+    val favorite: Boolean,
     val imageUri: Uri,
     val ingredient: IngredientDisplay,
     val editingIngredient: IngredientDisplay?,
@@ -53,6 +55,8 @@ class AddRecipeViewModel(
                 "",
                 "",
                 "",
+                0,
+                false,
                 Uri.EMPTY,
                 IngredientDisplay("", "", ""),
                 null,
@@ -221,9 +225,11 @@ class AddRecipeViewModel(
                     title = recipe.title,
                     cookingTime = recipe.cookingTime.toString(),
                     servings = recipe.servings.toString(),
+                    rating = recipe.rating,
+                    favorite = recipe.favorite,
                     imageUri = recipe.imagePath,
                     ingredient = IngredientDisplay("", "", ""),
-                    null,
+                    editingIngredient = null,
                     ingredients = ingredients.map {
                         IngredientDisplay(
                             it.name,
@@ -248,9 +254,9 @@ class AddRecipeViewModel(
                     title = title,
                     description = directions,
                     cookingTime = cookingTime.toIntOrNull() ?: 0,
-                    servings = cookingTime.toIntOrNull() ?: 0,
-                    rating = 0,
-                    favorite = false,
+                    servings = servings.toIntOrNull() ?: 0,
+                    rating = rating,
+                    favorite = favorite,
                     imagePath = imageUri
                 )
 

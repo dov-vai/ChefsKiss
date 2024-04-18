@@ -62,7 +62,8 @@ fun MealPlannerScreen(
     val uiState by viewModel.uiState.collectAsState()
     val plannerRecipes by viewModel.plannerRecipes.collectAsState()
     val coroutineScope = rememberCoroutineScope()
-    val undoVisible = uiState.startOfWeek.getDateString() != CalendarUtils.getStartOfWeek().getDateString()
+    val undoVisible =
+        uiState.startOfWeek.getDateString() != CalendarUtils.getStartOfWeek().getDateString()
     Scaffold(topBar = {
         MealPlannerTopBar(
             title = uiState.title,
