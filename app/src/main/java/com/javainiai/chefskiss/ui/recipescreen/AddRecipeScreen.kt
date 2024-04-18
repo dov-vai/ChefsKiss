@@ -181,7 +181,7 @@ fun RecipeOverview(
     val context = LocalContext.current
 
     val galleryLauncher =
-        rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) {
+        rememberLauncherForActivityResult(contract = ActivityResultContracts.OpenDocument()) {
             it?.let { uri ->
                 context.contentResolver.takePersistableUriPermission(
                     uri,
@@ -204,9 +204,9 @@ fun RecipeOverview(
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(128.dp)
-                    .clickable { galleryLauncher.launch("image/*") })
+                    .clickable { galleryLauncher.launch(arrayOf("image/*")) })
         } else {
-            Button(onClick = { galleryLauncher.launch("image/*") }) {
+            Button(onClick = { galleryLauncher.launch(arrayOf("image/*")) }) {
                 Text(text = "Pick image from gallery")
             }
         }
