@@ -3,15 +3,19 @@ package com.javainiai.chefskiss.ui.mealplanner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.javainiai.chefskiss.data.CalendarUtils
+import com.javainiai.chefskiss.data.CalendarUtils.getDateString
 import com.javainiai.chefskiss.data.recipe.PlannerRecipeWithRecipe
 import com.javainiai.chefskiss.data.recipe.RecipesRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -26,23 +30,28 @@ data class MealPlannerUiState(
 class MealPlannerViewModel(recipesRepository: RecipesRepository) : ViewModel() {
     private var _uiState = MutableStateFlow(
         MealPlannerUiState(
-            titleFormat(),
+            "",
             CalendarUtils.getCurrentDate(),
             CalendarUtils.getStartOfWeek()
         )
     )
     val uiState = _uiState.asStateFlow()
 
-    private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+    init {
+        updateTitle()
+    }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     val plannerRecipes: StateFlow<Map<String, List<PlannerRecipeWithRecipe>>> =
-        recipesRepository
-            .getPlannerRecipesWithRecipes(
-                (0..6).map {
-                    val date = CalendarUtils.datePlusOffset(CalendarUtils.getStartOfWeek(), it)
-                    dateFormat.format(date)
-                }
-            )
+        _uiState.flatMapLatest { mealPlannerState ->
+            recipesRepository
+                .getPlannerRecipesWithRecipes(
+                    (0..6).map {
+                        val date = CalendarUtils.datePlusOffset(mealPlannerState.startOfWeek, it)
+                        date.getDateString()
+                    }
+                )
+        }
             .map {
                 withContext(Dispatchers.IO) {
                     it.groupBy { it.plannerRecipe.date }
@@ -55,8 +64,8 @@ class MealPlannerViewModel(recipesRepository: RecipesRepository) : ViewModel() {
             )
 
     private fun titleFormat(): String {
-        val start = CalendarUtils.getStartOfWeek()
-        val end = CalendarUtils.getEndOfWeek()
+        val start = _uiState.value.startOfWeek
+        val end = CalendarUtils.datePlusOffset(start, 6)
         val current = CalendarUtils.getCurrentDate()
 
         val dayFormat = SimpleDateFormat("dd", Locale.getDefault())
@@ -67,6 +76,41 @@ class MealPlannerViewModel(recipesRepository: RecipesRepository) : ViewModel() {
                 current.time
             )
         }"
+    }
+
+    private fun updateTitle() {
+        _uiState.update { currentState ->
+            currentState.copy(
+                title = titleFormat()
+            )
+        }
+    }
+
+    fun shiftForward() {
+        _uiState.update { currentState ->
+            currentState.copy(
+                startOfWeek = CalendarUtils.datePlusOffset(currentState.startOfWeek, 7)
+            )
+        }
+        updateTitle()
+    }
+
+    fun shiftBackwards() {
+        _uiState.update { currentState ->
+            currentState.copy(
+                startOfWeek = CalendarUtils.datePlusOffset(currentState.startOfWeek, -7)
+            )
+        }
+        updateTitle()
+    }
+
+    fun revertStartOfWeek() {
+        _uiState.update { currentState ->
+            currentState.copy(
+                startOfWeek = CalendarUtils.getStartOfWeek()
+            )
+        }
+        updateTitle()
     }
 
     companion object {

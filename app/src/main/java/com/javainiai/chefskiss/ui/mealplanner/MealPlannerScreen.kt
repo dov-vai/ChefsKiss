@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Edit
@@ -39,6 +40,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.javainiai.chefskiss.data.CalendarUtils
+import com.javainiai.chefskiss.data.CalendarUtils.getDateString
 import com.javainiai.chefskiss.data.recipe.PlannerRecipeWithRecipe
 import com.javainiai.chefskiss.ui.AppViewModelProvider
 import com.javainiai.chefskiss.ui.navigation.NavigationDestination
@@ -60,11 +62,14 @@ fun MealPlannerScreen(
     val uiState by viewModel.uiState.collectAsState()
     val plannerRecipes by viewModel.plannerRecipes.collectAsState()
     val coroutineScope = rememberCoroutineScope()
+    val undoVisible = uiState.startOfWeek.getDateString() != CalendarUtils.getStartOfWeek().getDateString()
     Scaffold(topBar = {
         MealPlannerTopBar(
             title = uiState.title,
-            onBack = {},
-            onForward = {},
+            onBack = viewModel::shiftBackwards,
+            onForward = viewModel::shiftForward,
+            onUndo = viewModel::revertStartOfWeek,
+            undoVisible = undoVisible,
             onMenuClick = { coroutineScope.launch { drawerState.open() } }
         )
     }) { padding ->
@@ -72,21 +77,20 @@ fun MealPlannerScreen(
             repeat(7) {
                 val date = CalendarUtils.datePlusOffset(uiState.startOfWeek, it)
                 val title = SimpleDateFormat("EEEE, dd MMM", Locale.getDefault()).format(date)
-                val fullDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(date)
                 item {
-                    var opened by remember { mutableStateOf(date == uiState.currentDate) }
+                    var opened by remember { mutableStateOf(date.getDateString() == uiState.currentDate.getDateString()) }
                     WeekdayCard(
                         title = title,
-                        onEdit = { navigateTo("${PlannerEditDestination.route}/$fullDate") },
-                        cardColor = if (date == uiState.currentDate) MaterialTheme.colorScheme.secondary else CardDefaults.cardColors().containerColor,
+                        onEdit = { navigateTo("${PlannerEditDestination.route}/${date.getDateString()}") },
+                        cardColor = if (date.getDateString() == uiState.currentDate.getDateString()) MaterialTheme.colorScheme.secondary else CardDefaults.cardColors().containerColor,
                         opened = opened,
                         onOpen = { opened = !opened },
                         modifier = Modifier.padding(8.dp)
                     ) {
-                        plannerRecipes[fullDate]?.forEach { recipe ->
+                        plannerRecipes[date.getDateString()]?.forEach { recipe ->
                             PlannerRecipeCard(
                                 recipe = recipe,
-                                cardColor = if (date == uiState.currentDate) MaterialTheme.colorScheme.secondary else CardDefaults.cardColors().containerColor,
+                                cardColor = if (date.getDateString() == uiState.currentDate.getDateString()) MaterialTheme.colorScheme.secondary else CardDefaults.cardColors().containerColor,
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable {
@@ -126,6 +130,8 @@ fun MealPlannerTopBar(
     title: String,
     onBack: () -> Unit,
     onForward: () -> Unit,
+    onUndo: () -> Unit,
+    undoVisible: Boolean,
     onMenuClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -137,6 +143,14 @@ fun MealPlannerTopBar(
             ) {
                 Text(text = title)
                 Spacer(modifier = Modifier.weight(1f))
+                if (undoVisible) {
+                    IconButton(onClick = onUndo) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.Undo,
+                            contentDescription = "Revert to current week"
+                        )
+                    }
+                }
                 IconButton(onClick = onBack) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
