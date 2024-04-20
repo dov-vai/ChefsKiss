@@ -1,13 +1,17 @@
 package com.javainiai.chefskiss.ui.mealplanner
 
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.javainiai.chefskiss.data.CalendarUtils
 import com.javainiai.chefskiss.data.CalendarUtils.getDateString
 import com.javainiai.chefskiss.data.recipe.PlannerRecipeWithRecipe
 import com.javainiai.chefskiss.data.recipe.RecipesRepository
+import com.javainiai.chefskiss.data.recipe.ShopRecipe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -16,6 +20,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -27,7 +32,7 @@ data class MealPlannerUiState(
     val startOfWeek: Date
 )
 
-class MealPlannerViewModel(recipesRepository: RecipesRepository) : ViewModel() {
+class MealPlannerViewModel(private val recipesRepository: RecipesRepository) : ViewModel() {
     private var _uiState = MutableStateFlow(
         MealPlannerUiState(
             "",
@@ -35,6 +40,21 @@ class MealPlannerViewModel(recipesRepository: RecipesRepository) : ViewModel() {
             CalendarUtils.getStartOfWeek()
         )
     )
+
+    val snackbarHostState = SnackbarHostState()
+
+    private var messageInProgress: Job? = null
+    private fun showMessage(message: String) {
+        // cancel in case it hasn't finished so the message can be shown immediately
+        messageInProgress?.cancel()
+        messageInProgress = viewModelScope.launch {
+            snackbarHostState.showSnackbar(
+                message = message,
+                duration = SnackbarDuration.Short
+            )
+        }
+    }
+
     val uiState = _uiState.asStateFlow()
 
     init {
@@ -111,6 +131,15 @@ class MealPlannerViewModel(recipesRepository: RecipesRepository) : ViewModel() {
             )
         }
         updateTitle()
+    }
+
+    fun addToShoppingList(plannerRecipeWithRecipes: List<PlannerRecipeWithRecipe>?) {
+        plannerRecipeWithRecipes?.forEach { recipe ->
+            viewModelScope.launch(Dispatchers.IO) {
+                recipesRepository.insertShopRecipe(ShopRecipe(recipe.recipe.id))
+            }
+        }
+        showMessage("Added to shopping list")
     }
 
     companion object {
