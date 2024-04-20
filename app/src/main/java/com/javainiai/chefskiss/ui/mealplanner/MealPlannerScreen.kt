@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -25,6 +26,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -73,7 +75,9 @@ fun MealPlannerScreen(
             undoVisible = undoVisible,
             onMenuClick = { coroutineScope.launch { drawerState.open() } }
         )
-    }) { padding ->
+    },
+        snackbarHost = { SnackbarHost(hostState = viewModel.snackbarHostState) }
+    ) { padding ->
         LazyColumn(contentPadding = padding) {
             repeat(7) {
                 val date = CalendarUtils.datePlusOffset(uiState.startOfWeek, it)
@@ -86,6 +90,7 @@ fun MealPlannerScreen(
                         cardColor = if (date.getDateString() == uiState.currentDate.getDateString()) MaterialTheme.colorScheme.secondary else CardDefaults.cardColors().containerColor,
                         opened = opened,
                         onOpen = { opened = !opened },
+                        onShoppingList = { viewModel.addToShoppingList(plannerRecipes[date.getDateString()]) },
                         modifier = Modifier.padding(8.dp)
                     ) {
                         plannerRecipes[date.getDateString()]?.forEach { recipe ->
@@ -182,6 +187,7 @@ fun WeekdayCard(
     cardColor: Color,
     opened: Boolean,
     onOpen: () -> Unit,
+    onShoppingList: () -> Unit,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
@@ -198,6 +204,12 @@ fun WeekdayCard(
                     Icon(
                         imageVector = if (opened) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
                         contentDescription = "Open/Close card"
+                    )
+                }
+                IconButton(onClick = onShoppingList) {
+                    Icon(
+                        imageVector = Icons.Default.ShoppingCart,
+                        contentDescription = "Add day to Shopping List"
                     )
                 }
                 IconButton(onClick = onEdit) {
