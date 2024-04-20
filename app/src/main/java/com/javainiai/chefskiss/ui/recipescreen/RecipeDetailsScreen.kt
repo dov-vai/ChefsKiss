@@ -23,6 +23,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.MenuBook
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
@@ -31,6 +32,7 @@ import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.PictureAsPdf
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.RestaurantMenu
 import androidx.compose.material.icons.filled.ShoppingBasket
 import androidx.compose.material.icons.filled.ShoppingCart
@@ -111,6 +113,7 @@ fun RecipeDetailsScreen(
     val checkedIngredients by viewModel.checkedIngredients.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
+    val customServingSize by viewModel.customServingSize.collectAsState()
 
     Scaffold(
         topBar = {
@@ -167,14 +170,17 @@ fun RecipeDetailsScreen(
                 recipe = uiState.recipe,
                 tags = tags,
                 modifier = Modifier.padding(padding),
-                onRating = viewModel::updateRating
+                onRating = viewModel::updateRating,
+                customServingSize = customServingSize,
+                onCustomServingSizeUpdate = viewModel::adjustServingSize
             )
 
             1 -> RecipeIngredients(
                 ingredients = uiState.ingredients,
                 checkedIngredients = checkedIngredients,
                 updateChecked = viewModel::updateCheckedIngredients,
-                modifier = Modifier.padding(padding)
+                modifier = Modifier.padding(padding),
+                multiplier = customServingSize.toFloat() / uiState.recipe.servings
             )
 
             2 -> RecipeInstructions(recipe = uiState.recipe, modifier = Modifier.padding(padding))
@@ -187,7 +193,9 @@ fun RecipeAbout(
     recipe: Recipe,
     tags: List<Tag>,
     modifier: Modifier = Modifier,
-    onRating: (Int) -> Unit
+    onRating: (Int) -> Unit,
+    customServingSize: Int,
+    onCustomServingSizeUpdate: (Int) -> Unit,
 ) {
     Surface(modifier = modifier) {
         Column(
@@ -261,7 +269,24 @@ fun RecipeAbout(
                 )
                 Text(text = "Serving size")
                 Spacer(modifier = Modifier.weight(1f))
-                Text(text = recipe.servings.toString())
+                Text(text = customServingSize.toString())
+            }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(text = "Adjust serving size")
+                Spacer(modifier = Modifier.weight(1f))
+                IconButton(onClick = { onCustomServingSizeUpdate(customServingSize - 1) }) {
+                    Icon(
+                        imageVector = Icons.Default.Remove,
+                        contentDescription = "Remove 1 from serving size"
+                    )
+                }
+                IconButton(onClick = { onCustomServingSizeUpdate(customServingSize + 1) }) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Add 1 to serving size"
+                    )
+                }
+
             }
         }
     }
@@ -273,7 +298,8 @@ fun IngredientCard(
     checked: Boolean,
     containerColor: Color = CardDefaults.cardColors().containerColor,
     onCheckedChange: (Boolean) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    multiplier: Float
 ) {
     Card(modifier = modifier, colors = CardDefaults.cardColors(containerColor = containerColor)) {
         Row(
@@ -286,7 +312,12 @@ fun IngredientCard(
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f)
             )
-            Text(text = if (ingredient.size == 0f) "" else ingredient.size.toString())
+            Text(
+                text = if (ingredient.size == 0f) "" else String.format(
+                    "%.1f",
+                    ingredient.size * multiplier
+                )
+            )
             Text(
                 text = ingredient.unit,
                 overflow = TextOverflow.Ellipsis,
@@ -302,7 +333,8 @@ fun RecipeIngredients(
     ingredients: List<Ingredient>,
     checkedIngredients: List<Ingredient>,
     updateChecked: (List<Ingredient>) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    multiplier: Float
 ) {
     Surface(modifier = modifier) {
         LazyColumn {
@@ -319,7 +351,8 @@ fun RecipeIngredients(
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(8.dp)
+                        .padding(8.dp),
+                    multiplier = multiplier
                 )
             }
         }
