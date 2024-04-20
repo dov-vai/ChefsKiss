@@ -41,7 +41,10 @@ class RecipeDetailsViewModel(
     val uiState: StateFlow<RecipeDisplayUiState> = recipesRepository
         .getRecipeWithIngredients(recipeId)
         .filterNotNull()
-        .map { RecipeDisplayUiState(recipe = it.recipe, ingredients = it.ingredients) }
+        .map {
+            adjustServingSize(it.recipe.servings)
+            RecipeDisplayUiState(recipe = it.recipe, ingredients = it.ingredients)
+        }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
@@ -59,6 +62,10 @@ class RecipeDetailsViewModel(
             started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
             initialValue = listOf()
         )
+
+    private val _customServingSize = MutableStateFlow(uiState.value.recipe.servings)
+
+    val customServingSize = _customServingSize.asStateFlow()
 
     private var _checkedIngredients = MutableStateFlow(listOf<Ingredient>())
     val checkedIngredients = _checkedIngredients.asStateFlow()
@@ -119,6 +126,12 @@ class RecipeDetailsViewModel(
             recipesRepository.insertPlannerRecipe(plannerRecipe)
         }
         showMessage("Added to ${plannerRecipe.date} as ${plannerRecipe.type.title}")
+    }
+
+    fun adjustServingSize(size: Int) {
+        if (size >= 1) {
+            _customServingSize.update { size }
+        } else showMessage("Serving size can't be lower than 1")
     }
 
     companion object {

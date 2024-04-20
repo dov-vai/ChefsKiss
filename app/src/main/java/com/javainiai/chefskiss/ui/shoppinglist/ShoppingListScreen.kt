@@ -131,7 +131,8 @@ fun RecipeCard(
                 Column {
                     ingredients.forEach { ingredient ->
                         val shopIngredient = ShopIngredient(ingredient.id, ingredient.recipeId)
-                        IngredientCard(ingredient = ingredient,
+                        IngredientCard(
+                            ingredient = ingredient,
                             containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp),
                             checked = checkedIngredients.contains(shopIngredient),
                             onCheckedChange = {
@@ -140,7 +141,8 @@ fun RecipeCard(
                                 } else {
                                     removeCheckedIngredient(shopIngredient)
                                 }
-                            }
+                            },
+                            multiplier = 1f
                         )
                     }
                 }
