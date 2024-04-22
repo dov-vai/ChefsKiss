@@ -2,6 +2,9 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
+      <entry key="ScreenNavigationTest">
+        <State />
+      </entry>
       <entry key="app">
         <State>
           <targetSelectedWithDropDown>
@@ -17,6 +20,9 @@
           </targetSelectedWithDropDown>
           <timeTargetWasSelectedWithDropDown value="2024-03-03T18:51:09.355244774Z" />
         </State>
+      </entry>
+      <entry key="navHost_clickOnMealPlannerRecipe_navigatesToRecipeDetails()">
+        <State />
       </entry>
     </value>
   </component>

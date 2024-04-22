@@ -232,7 +232,7 @@ class AddRecipeViewModelTest {
         viewModel.updateCookingTime("30")
         viewModel.updateServings("3")
         viewModel.updateDirections("Test Description")
-        viewModel.updateIngredient((IngredientDisplay("Test Ingredient", "Three", "Kg")))
+        viewModel.updateIngredients(listOf(IngredientDisplay("Test Ingredient", "Three", "Kg")))
         val result = viewModel.saveToDatabase()
         Assert.assertFalse(result)
     }
