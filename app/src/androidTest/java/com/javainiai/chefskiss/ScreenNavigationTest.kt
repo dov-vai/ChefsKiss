@@ -69,16 +69,20 @@ class ScreenNavigationTest {
         composeTestRule.onNodeWithText(currentDate.getDateString()).assertExists()
     }
 
-    private fun addRecipe(title: String) {
+    private fun addRecipe(title: String, cookingTime: String, servings: String) {
         composeTestRule.onNodeWithContentDescription("Add recipe").performClick()
         composeTestRule.onNodeWithText("Title").performTextInput(title)
+        composeTestRule.onNodeWithText("Cooking Time (minutes)").performTextInput(cookingTime)
+        composeTestRule.onNodeWithText("Servings").performTextInput(servings)
         composeTestRule.onNodeWithContentDescription("Done").performClick()
     }
 
     @Test
     fun navHost_clickOnRecipeCard_navigatesToRecipeDetails() {
         val title = "Pancakes"
-        addRecipe(title)
+        val cookingTime = "20"
+        val servings = "2"
+        addRecipe(title, cookingTime, servings)
         composeTestRule.onNodeWithText(title).performClick()
         navController.assertCurrentRouteName(RecipeDetailsDestination.routeWithArgs)
         composeTestRule.onNodeWithText(title).assertExists()
@@ -101,7 +105,9 @@ class ScreenNavigationTest {
     @Test
     fun navHost_clickOnMealPlannerRecipe_navigatesToRecipeDetails() {
         val recipe = "Omelette"
-        addRecipe(recipe)
+        val cookingTime = "20"
+        val servings = "2"
+        addRecipe(recipe, cookingTime, servings)
         composeTestRule.onNodeWithContentDescription("Search button").performClick()
         composeTestRule.onNodeWithText("Meal Planner").performClick()
         val currentDate = CalendarUtils.getCurrentDate()

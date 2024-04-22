@@ -185,4 +185,66 @@ class AddRecipeViewModelTest {
         val result = viewModel.saveToDatabase()
         Assert.assertFalse(result)
     }
+
+    @Test
+    fun addRecipeViewModel_saveToDatabaseEmptyCookingTime_returnsFalse() = runBlocking {
+        viewModel.updateTitle("Test Recipe")
+        viewModel.updateCookingTime("")
+        viewModel.updateServings("4")
+        viewModel.updateDirections("Test Description")
+        val result = viewModel.saveToDatabase()
+        Assert.assertFalse(result)
+    }
+
+    @Test
+    fun addRecipeViewModel_saveToDatabaseEmptyServings_returnsFalse() = runBlocking {
+        viewModel.updateTitle("Test Recipe")
+        viewModel.updateCookingTime("30")
+        viewModel.updateServings("")
+        viewModel.updateDirections("Test Description")
+        val result = viewModel.saveToDatabase()
+        Assert.assertFalse(result)
+    }
+
+    @Test
+    fun addRecipeViewModel_saveToDatabaseEmptyDirections_returnsTrue() = runBlocking {
+        viewModel.updateTitle("Test Recipe")
+        viewModel.updateCookingTime("30")
+        viewModel.updateServings("4")
+        viewModel.updateDirections("")
+        val result = viewModel.saveToDatabase()
+        Assert.assertTrue(result)
+    }
+
+    @Test
+    fun addRecipeViewModel_saveToDatabaseNonIntegerServings_returnsFalse() = runBlocking {
+        viewModel.updateTitle("Test Recipe")
+        viewModel.updateCookingTime("30")
+        viewModel.updateServings("Three")
+        viewModel.updateDirections("Test Description")
+        val result = viewModel.saveToDatabase()
+        Assert.assertFalse(result)
+    }
+
+    @Test
+    fun addRecipeViewModel_saveToDatabaseNonIntegerIngredientAmount_returnsFalse() = runBlocking {
+        viewModel.updateTitle("Test Recipe")
+        viewModel.updateCookingTime("30")
+        viewModel.updateServings("3")
+        viewModel.updateDirections("Test Description")
+        viewModel.updateIngredient((IngredientDisplay("Test Ingredient", "Three", "Kg")))
+        val result = viewModel.saveToDatabase()
+        Assert.assertFalse(result)
+    }
+
+    @Test
+    fun addRecipeViewModel_saveToDatabaseIntegerIngredientAmount_returnsTrue() = runBlocking {
+        viewModel.updateTitle("Test Recipe")
+        viewModel.updateCookingTime("30")
+        viewModel.updateServings("Three")
+        viewModel.updateDirections("Test Description")
+        viewModel.updateIngredient((IngredientDisplay("Test Ingredient", "3", "Kg")))
+        val result = viewModel.saveToDatabase()
+        Assert.assertFalse(result)
+    }
 }
