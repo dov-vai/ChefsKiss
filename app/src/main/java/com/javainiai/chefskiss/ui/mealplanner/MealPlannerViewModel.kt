@@ -1,5 +1,6 @@
 package com.javainiai.chefskiss.ui.mealplanner
 
+import androidx.annotation.VisibleForTesting
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.ViewModel
@@ -83,7 +84,8 @@ class MealPlannerViewModel(private val recipesRepository: RecipesRepository) : V
                 initialValue = mapOf()
             )
 
-    private fun titleFormat(): String {
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    public fun titleFormat(): String {
         val start = _uiState.value.startOfWeek
         val end = CalendarUtils.datePlusOffset(start, 6)
         val current = CalendarUtils.getCurrentDate()
