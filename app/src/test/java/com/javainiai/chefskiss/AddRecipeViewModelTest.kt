@@ -1,23 +1,20 @@
 package com.javainiai.chefskiss
 
-import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
-import androidx.room.Room
-import androidx.sqlite.db.SimpleSQLiteQuery
-import androidx.test.core.app.ApplicationProvider
-import com.javainiai.chefskiss.data.RecipeDatabase
-import com.javainiai.chefskiss.data.recipe.OfflineRecipesRepository
 import com.javainiai.chefskiss.data.recipe.Recipe
+import com.javainiai.chefskiss.data.recipe.RecipeWithIngredients
+import com.javainiai.chefskiss.data.recipe.RecipeWithTags
+import com.javainiai.chefskiss.data.recipe.RecipesRepository
 import com.javainiai.chefskiss.data.tag.Tag
 import com.javainiai.chefskiss.ui.recipescreen.AddRecipeViewModel
 import com.javainiai.chefskiss.ui.recipescreen.IngredientDisplay
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -26,20 +23,12 @@ import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
 class AddRecipeViewModelTest {
-    private lateinit var recipesRepository: OfflineRecipesRepository
+    private val recipesRepository = mockk<RecipesRepository>(relaxed = true)
     private val savedStateHandle = mockk<SavedStateHandle>(relaxed = true)
     private lateinit var viewModel: AddRecipeViewModel
-    private lateinit var database: RecipeDatabase
 
     @Before
     fun setup() {
-        val context: Context = ApplicationProvider.getApplicationContext()
-        database = Room.inMemoryDatabaseBuilder(context, RecipeDatabase::class.java).build()
-        recipesRepository = OfflineRecipesRepository(
-            database.RecipeDao(),
-            database.IngredientDao(),
-            database.TagDao()
-        )
         every { savedStateHandle.get<Long>(any()) } returns null
         viewModel = AddRecipeViewModel(savedStateHandle, recipesRepository)
     }
@@ -98,28 +87,14 @@ class AddRecipeViewModelTest {
         val tag = "Test Tag"
         viewModel.updateTag(tag)
         viewModel.addTag()
-        val actualCount: Int
-        withContext(Dispatchers.IO) {
-            val cursor =
-                database.query(SimpleSQLiteQuery("SELECT * FROM tags WHERE title='${tag}'"))
-            actualCount = cursor.count
-            cursor.close()
-        }
-        Assert.assertEquals(1, actualCount)
+        coVerify { recipesRepository.insertTag(Tag(title = tag)) }
     }
 
     @Test
     fun addRecipeViewModel_removeTag_removesFromDatabase() = runBlocking {
         val tag = Tag(title = "Test Tag")
         viewModel.removeTag(tag)
-        val actualCount: Int
-        withContext(Dispatchers.IO) {
-            val cursor =
-                database.query(SimpleSQLiteQuery("SELECT * FROM tags WHERE title='${tag}'"))
-            actualCount = cursor.count
-            cursor.close()
-        }
-        Assert.assertEquals(0, actualCount)
+        coVerify { recipesRepository.deleteTag(tag) }
     }
 
     @Test
@@ -154,7 +129,8 @@ class AddRecipeViewModelTest {
     fun addRecipeViewModel_inizitializeEditRecipe_uiStateUpdates() = runBlocking {
         val recipeId = 1L
         val recipe = Recipe(recipeId, "Test Recipe", "Test Description", 30, 4, 5, false, Uri.EMPTY)
-        recipesRepository.insertRecipe(recipe)
+        every { recipesRepository.getRecipeWithTags(any()) } returns flowOf(RecipeWithTags(recipe, listOf()))
+        every { recipesRepository.getRecipeWithIngredients(any()) } returns flowOf(RecipeWithIngredients(recipe, listOf()))
         viewModel.initializeEditRecipe(recipeId)
         val uiState = viewModel.uiState.first()
         Assert.assertEquals("Test Recipe", uiState.title)
