@@ -29,6 +29,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -64,8 +65,14 @@ fun MealPlannerScreen(
     val uiState by viewModel.uiState.collectAsState()
     val plannerRecipes by viewModel.plannerRecipes.collectAsState()
     val coroutineScope = rememberCoroutineScope()
-    val undoVisible =
-        uiState.startOfWeek.getDateString() != CalendarUtils.getStartOfWeek().getDateString()
+    val undoVisible = uiState.startOfWeek.getDateString() != CalendarUtils.getStartOfWeek().getDateString()
+
+    DisposableEffect(Unit) {
+        onDispose {
+            viewModel.messageInProgress?.cancel()
+        }
+    }
+
     Scaffold(topBar = {
         MealPlannerTopBar(
             title = uiState.title,

@@ -43,7 +43,8 @@ class MealPlannerViewModel(private val recipesRepository: RecipesRepository) : V
 
     val snackbarHostState = SnackbarHostState()
 
-    private var messageInProgress: Job? = null
+    var messageInProgress: Job? = null
+        private set
     private fun showMessage(message: String) {
         // cancel in case it hasn't finished so the message can be shown immediately
         messageInProgress?.cancel()
