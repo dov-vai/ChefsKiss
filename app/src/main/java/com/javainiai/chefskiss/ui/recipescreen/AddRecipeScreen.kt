@@ -209,7 +209,7 @@ fun RecipeOverview(
                 modifier = Modifier
                     .size(128.dp)
                     .clickable {
-                        if (canSelectPhoto){
+                        if (canSelectPhoto) {
                             photoPickerLauncher.launch(arrayOf("image/*"))
                             canSelectPhoto = false
                         }
@@ -217,7 +217,7 @@ fun RecipeOverview(
                     })
         } else {
             Button(onClick = {
-                if (canSelectPhoto){
+                if (canSelectPhoto) {
                     photoPickerLauncher.launch(arrayOf("image/*"))
                     canSelectPhoto = false
                 }
