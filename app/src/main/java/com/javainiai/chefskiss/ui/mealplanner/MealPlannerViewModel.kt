@@ -87,16 +87,8 @@ class MealPlannerViewModel(private val recipesRepository: RecipesRepository) : V
     private fun titleFormat(): String {
         val start = _uiState.value.startOfWeek
         val end = CalendarUtils.datePlusOffset(start, 6)
-        val current = CalendarUtils.getCurrentDate()
-
-        val dayFormat = SimpleDateFormat("dd", Locale.getDefault())
-        val currentFormat = SimpleDateFormat("dd MMM", Locale.getDefault())
-
-        return "${dayFormat.format(start.time)}-${dayFormat.format(end.time)}, ${
-            currentFormat.format(
-                current.time
-            )
-        }"
+        val dayFormat = SimpleDateFormat("dd MMM", Locale.getDefault())
+        return "${dayFormat.format(start.time)} - ${dayFormat.format(end.time)}"
     }
 
     private fun updateTitle() {
