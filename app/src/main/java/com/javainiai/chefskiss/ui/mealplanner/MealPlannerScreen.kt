@@ -15,18 +15,23 @@ import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -50,6 +55,7 @@ import com.javainiai.chefskiss.ui.navigation.NavigationDestination
 import com.javainiai.chefskiss.ui.recipescreen.RecipeDetailsDestination
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 
 object MealPlannerDestination : NavigationDestination {
@@ -64,8 +70,8 @@ fun MealPlannerScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val plannerRecipes by viewModel.plannerRecipes.collectAsState()
-    val coroutineScope = rememberCoroutineScope()
-    val undoVisible = uiState.startOfWeek.getDateString() != CalendarUtils.getStartOfWeek().getDateString()
+    val undoVisible =
+        uiState.startOfWeek.getDateString() != CalendarUtils.getStartOfWeek().getDateString()
 
     DisposableEffect(Unit) {
         onDispose {
@@ -73,37 +79,95 @@ fun MealPlannerScreen(
         }
     }
 
-    Scaffold(topBar = {
-        MealPlannerTopBar(
-            title = uiState.title,
+    if (uiState.bulkEditMode) {
+        MealPlannerBulkEditScreen(
+            startOfWeek = uiState.startOfWeek,
+            topBarTitle = uiState.title,
+            plannerRecipes = plannerRecipes,
+            selectedRecipes = uiState.selectedRecipes,
+            updateSelectedRecipes = viewModel::updateSelectedRecipes,
+            onNavigateBack = {
+                viewModel.updateBulkEditMode(false)
+                viewModel.updateSelectedRecipes(listOf())
+            },
+            onBack = viewModel::shiftBackwards,
+            onForward = viewModel::shiftForward,
+            onCancel = { viewModel.updateStartOfWeek(uiState.bulkEditWeek) },
+            pasteMeals = viewModel::pasteMeals,
+            moveMeals = viewModel::moveMeals
+        )
+    } else {
+        MealPlannerBrowseScreen(
+            navigateTo = navigateTo,
+            topBarTitle = uiState.title,
             onBack = viewModel::shiftBackwards,
             onForward = viewModel::shiftForward,
             onUndo = viewModel::revertStartOfWeek,
             undoVisible = undoVisible,
+            drawerState = drawerState,
+            onBulkEditClick = {
+                viewModel.updateBulkEditMode(true)
+                viewModel.updateBulkEditWeek(uiState.startOfWeek)
+            },
+            snackbarHostState = viewModel.snackbarHostState,
+            startOfWeek = uiState.startOfWeek,
+            currentDate = uiState.currentDate,
+            plannerRecipes = plannerRecipes,
+            addToShoppingList = viewModel::addToShoppingList
+        )
+    }
+}
+
+@Composable
+fun MealPlannerBrowseScreen(
+    modifier: Modifier = Modifier,
+    navigateTo: (String) -> Unit,
+    topBarTitle: String,
+    onBack: () -> Unit,
+    onForward: () -> Unit,
+    onUndo: () -> Unit,
+    undoVisible: Boolean,
+    drawerState: DrawerState,
+    onBulkEditClick: () -> Unit,
+    snackbarHostState: SnackbarHostState,
+    startOfWeek: Date,
+    currentDate: Date,
+    plannerRecipes: Map<String, List<PlannerRecipeWithRecipe>>,
+    addToShoppingList: (List<PlannerRecipeWithRecipe>?) -> Unit,
+) {
+    val coroutineScope = rememberCoroutineScope()
+    Scaffold(topBar = {
+        MealPlannerTopBar(
+            title = topBarTitle,
+            onBack = onBack,
+            onForward = onForward,
+            onUndo = onUndo,
+            undoVisible = undoVisible,
             onMenuClick = { coroutineScope.launch { drawerState.open() } }
         )
     },
-        snackbarHost = { SnackbarHost(hostState = viewModel.snackbarHostState) }
+        bottomBar = { MealPlannerBottomBar(onBulkEditClick = onBulkEditClick) },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { padding ->
         LazyColumn(contentPadding = padding) {
             repeat(7) {
-                val date = CalendarUtils.datePlusOffset(uiState.startOfWeek, it)
+                val date = CalendarUtils.datePlusOffset(startOfWeek, it)
                 val title = SimpleDateFormat("EEEE, dd MMM", Locale.getDefault()).format(date)
                 item {
-                    var opened by remember { mutableStateOf(date.getDateString() == uiState.currentDate.getDateString()) }
+                    var opened by remember { mutableStateOf(date.getDateString() == currentDate.getDateString()) }
                     WeekdayCard(
                         title = title,
                         onEdit = { navigateTo("${PlannerEditDestination.route}/${date.getDateString()}") },
-                        cardColor = if (date.getDateString() == uiState.currentDate.getDateString()) MaterialTheme.colorScheme.secondary else CardDefaults.cardColors().containerColor,
+                        cardColor = if (date.getDateString() == currentDate.getDateString()) MaterialTheme.colorScheme.secondary else CardDefaults.cardColors().containerColor,
                         opened = opened,
                         onOpen = { opened = !opened },
-                        onShoppingList = { viewModel.addToShoppingList(plannerRecipes[date.getDateString()]) },
+                        onShoppingList = { addToShoppingList(plannerRecipes[date.getDateString()]) },
                         modifier = Modifier.padding(8.dp)
                     ) {
                         plannerRecipes[date.getDateString()]?.forEach { recipe ->
                             PlannerRecipeCard(
                                 recipe = recipe,
-                                cardColor = if (date.getDateString() == uiState.currentDate.getDateString()) MaterialTheme.colorScheme.secondary else CardDefaults.cardColors().containerColor,
+                                cardColor = if (date.getDateString() == currentDate.getDateString()) MaterialTheme.colorScheme.secondary else CardDefaults.cardColors().containerColor,
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable {
@@ -133,6 +197,25 @@ fun PlannerRecipeCard(
                 modifier = Modifier.weight(1f),
                 overflow = TextOverflow.Ellipsis
             )
+        }
+    }
+}
+
+@Composable
+fun MealPlannerBottomBar(modifier: Modifier = Modifier, onBulkEditClick: () -> Unit) {
+    BottomAppBar(modifier = modifier) {
+        Row {
+            Spacer(modifier = Modifier.weight(1f))
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                FilledTonalButton(
+                    onClick = onBulkEditClick,
+                    colors = ButtonDefaults.filledTonalButtonColors(containerColor = MaterialTheme.colorScheme.surface)
+                ) {
+                    Icon(imageVector = Icons.Default.EditNote, contentDescription = "Bulk Edit")
+                }
+                Text(text = "Bulk Edit")
+            }
+            Spacer(modifier = Modifier.weight(1f))
         }
     }
 }
