@@ -175,13 +175,13 @@ class MealPlannerViewModel(private val recipesRepository: RecipesRepository) : V
         viewModelScope.launch(Dispatchers.IO) {
             val groupedRecipes = _uiState.value.selectedRecipes.sortedBy { it.plannerRecipe.date }
                 .groupBy { it.plannerRecipe.date }
-            var previousDate: Date? = null
+            var firstDate: Date? = null
             groupedRecipes.keys.forEach { date ->
                 val parsedDate = date.getDate()
-                val offset =
-                    if (previousDate != null && parsedDate != null) {
-                        CalendarUtils.getDaysDifference(previousDate!!, parsedDate)
-                    } else 0
+                if (firstDate == null){
+                    firstDate = parsedDate
+                }
+                val offset = CalendarUtils.getDaysDifference(firstDate!!, parsedDate!!)
                 val dateToInsert =
                     CalendarUtils.datePlusOffset(startingDate, offset.toInt()).getDateString()
                 groupedRecipes[date]?.forEach {
@@ -191,7 +191,6 @@ class MealPlannerViewModel(private val recipesRepository: RecipesRepository) : V
                     )
                     recipesRepository.insertPlannerRecipe(plannerRecipe)
                 }
-                previousDate = parsedDate
             }
         }
     }
