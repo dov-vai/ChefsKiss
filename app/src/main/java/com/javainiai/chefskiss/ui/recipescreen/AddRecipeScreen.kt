@@ -50,6 +50,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -190,9 +192,11 @@ fun RecipeOverview(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-
-    val galleryLauncher =
+    // for blocking the launcher from opening repeatedly if the user clicks the button fast multiple times
+    var canSelectPhoto by remember { mutableStateOf(true) }
+    val photoPickerLauncher =
         rememberLauncherForActivityResult(contract = ActivityResultContracts.OpenDocument()) {
+            canSelectPhoto = true
             it?.let { uri ->
                 context.contentResolver.takePersistableUriPermission(
                     uri,
@@ -215,9 +219,20 @@ fun RecipeOverview(
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(128.dp)
-                    .clickable { galleryLauncher.launch(arrayOf("image/*")) })
+                    .clickable {
+                        if (canSelectPhoto) {
+                            photoPickerLauncher.launch(arrayOf("image/*"))
+                            canSelectPhoto = false
+                        }
+
+                    })
         } else {
-            Button(onClick = { galleryLauncher.launch(arrayOf("image/*")) }) {
+            Button(onClick = {
+                if (canSelectPhoto) {
+                    photoPickerLauncher.launch(arrayOf("image/*"))
+                    canSelectPhoto = false
+                }
+            }) {
                 Text(text = "Pick image from gallery")
             }
         }
