@@ -912,3 +912,7 @@ compose:
   ConditionCouldBeLifted:
     active: true
     ignoreCallsWithArgumentNames: [ 'modifier', 'contentAlignment' ]
+
+ChefsKissRuleSet:
+  NoRawStringInText:
+    active: true
