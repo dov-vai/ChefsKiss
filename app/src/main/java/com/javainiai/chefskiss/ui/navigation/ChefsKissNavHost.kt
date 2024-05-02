@@ -17,6 +17,8 @@ import com.javainiai.chefskiss.ui.recipescreen.RecipeDetailsDestination
 import com.javainiai.chefskiss.ui.recipescreen.RecipeDetailsScreen
 import com.javainiai.chefskiss.ui.selectionscreen.SelectionDestination
 import com.javainiai.chefskiss.ui.selectionscreen.SelectionScreen
+import com.javainiai.chefskiss.ui.timer.TimerDestination
+import com.javainiai.chefskiss.ui.timer.TimerScreen
 
 @Composable
 fun ChefsKissNavHost(
@@ -71,6 +73,14 @@ fun ChefsKissNavHost(
             PlannerEditScreen(
                 navigateBack = { navController.navigateUp() },
                 navigateToSelection = { navController.navigate(SelectionDestination.route) })
+        }
+        composable(
+            route = TimerDestination.routeWithArgs,
+            arguments = listOf(navArgument(TimerDestination.timerRecipeIdArg) {
+                type = NavType.LongType
+            })
+        ) {
+            TimerScreen(navigateBack = { navController.navigateUp() })
         }
     }
 

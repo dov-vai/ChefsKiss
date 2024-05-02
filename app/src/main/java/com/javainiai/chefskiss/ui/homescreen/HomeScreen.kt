@@ -28,9 +28,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.javainiai.chefskiss.ui.AppViewModelProvider
-import com.javainiai.chefskiss.ui.components.RecipeCard
-import com.javainiai.chefskiss.ui.components.SearchScreen
-import com.javainiai.chefskiss.ui.components.SearchScreenViewModel
+import com.javainiai.chefskiss.ui.components.search.RecipeCard
+import com.javainiai.chefskiss.ui.components.search.SearchScreen
+import com.javainiai.chefskiss.ui.components.search.SearchScreenViewModel
 import com.javainiai.chefskiss.ui.navigation.NavigationDestination
 import com.javainiai.chefskiss.ui.recipescreen.AddRecipeDestination
 import com.javainiai.chefskiss.ui.recipescreen.RecipeDetailsDestination

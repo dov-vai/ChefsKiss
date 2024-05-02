@@ -92,6 +92,7 @@ import com.javainiai.chefskiss.data.recipe.Recipe
 import com.javainiai.chefskiss.data.tag.Tag
 import com.javainiai.chefskiss.ui.AppViewModelProvider
 import com.javainiai.chefskiss.ui.navigation.NavigationDestination
+import com.javainiai.chefskiss.ui.timer.TimerDestination
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -118,6 +119,7 @@ fun RecipeDetailsScreen(
     Scaffold(
         topBar = {
             RecipeTopBar(
+                onTimer = { navigateTo("${TimerDestination.route}/${uiState.recipe.id}") },
                 isFavorite = uiState.recipe.favorite,
                 onFavorite = viewModel::updateFavorite,
                 onEdit = { navigateTo("${EditRecipeDestination.route}/${uiState.recipe.id}") },
@@ -486,6 +488,7 @@ fun MealPlannerDialog(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecipeTopBar(
+    onTimer: () -> Unit,
     isFavorite: Boolean,
     onFavorite: () -> Unit,
     onEdit: () -> Unit,
@@ -537,6 +540,9 @@ fun RecipeTopBar(
         title = {
             Row {
                 Spacer(modifier = Modifier.weight(1f))
+                IconButton(onClick = onTimer) {
+                    Icon(imageVector = Icons.Default.Timer, contentDescription = "Timer")
+                }
                 IconButton(onClick = onFavorite) {
                     Icon(
                         imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
@@ -574,14 +580,6 @@ fun RecipeTopBar(
                         }, text = { Text(text = "Add to meal planner") }, onClick = {
                             expanded = false
                             showMealPlannerDialog = true
-                        })
-                        DropdownMenuItem(leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Default.Timer,
-                                contentDescription = "Set timer"
-                            )
-                        }, text = { Text(text = "Set timer") }, onClick = {
-                            expanded = false
                         })
                         DropdownMenuItem(leadingIcon = {
                             Icon(

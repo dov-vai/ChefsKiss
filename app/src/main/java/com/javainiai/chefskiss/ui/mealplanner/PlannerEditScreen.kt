@@ -31,7 +31,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.javainiai.chefskiss.data.enums.Meal
 import com.javainiai.chefskiss.data.recipe.PlannerRecipeWithRecipe
 import com.javainiai.chefskiss.ui.AppViewModelProvider
-import com.javainiai.chefskiss.ui.components.RecipeCard
+import com.javainiai.chefskiss.ui.components.search.RecipeCard
 import com.javainiai.chefskiss.ui.navigation.NavigationDestination
 
 object PlannerEditDestination : NavigationDestination {

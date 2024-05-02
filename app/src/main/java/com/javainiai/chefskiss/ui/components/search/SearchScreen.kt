@@ -1,4 +1,4 @@
-package com.javainiai.chefskiss.ui.components
+package com.javainiai.chefskiss.ui.components.search
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -49,6 +49,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.javainiai.chefskiss.data.recipe.Recipe
+import com.javainiai.chefskiss.ui.components.filter.FavoriteButton
+import com.javainiai.chefskiss.ui.components.filter.FilterDrawer
+import com.javainiai.chefskiss.ui.components.filter.FilterSheet
+import com.javainiai.chefskiss.ui.components.filter.OrderSelection
+import com.javainiai.chefskiss.ui.components.filter.RatingCard
+import com.javainiai.chefskiss.ui.components.filter.SortCard
+import com.javainiai.chefskiss.ui.components.filter.TagCard
 import kotlinx.coroutines.launch
 
 @Composable

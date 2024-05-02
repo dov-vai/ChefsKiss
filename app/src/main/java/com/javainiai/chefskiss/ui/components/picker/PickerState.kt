@@ -1,0 +1,18 @@
+package com.javainiai.chefskiss.ui.components.picker
+
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import kotlin.properties.Delegates
+
+@Composable
+fun rememberPickerState() = remember { PickerState() }
+
+class PickerState {
+    var selectedItem by mutableStateOf("")
+    lateinit var listState: LazyListState
+    var listStartIndex by Delegates.notNull<Int>()
+}
