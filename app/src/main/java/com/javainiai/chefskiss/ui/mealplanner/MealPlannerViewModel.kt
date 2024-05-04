@@ -178,7 +178,7 @@ class MealPlannerViewModel(private val recipesRepository: RecipesRepository) : V
             var firstDate: Date? = null
             groupedRecipes.keys.forEach { date ->
                 val parsedDate = date.getDate()
-                if (firstDate == null){
+                if (firstDate == null) {
                     firstDate = parsedDate
                 }
                 val offset = CalendarUtils.getDaysDifference(firstDate!!, parsedDate!!)

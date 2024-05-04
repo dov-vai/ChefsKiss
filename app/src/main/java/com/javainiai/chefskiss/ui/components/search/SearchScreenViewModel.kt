@@ -1,4 +1,4 @@
-package com.javainiai.chefskiss.ui.components
+package com.javainiai.chefskiss.ui.components.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
