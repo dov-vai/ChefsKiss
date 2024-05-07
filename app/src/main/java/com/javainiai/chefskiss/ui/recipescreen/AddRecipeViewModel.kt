@@ -6,6 +6,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.javainiai.chefskiss.data.enums.Measurement
 import com.javainiai.chefskiss.data.ingredient.Ingredient
 import com.javainiai.chefskiss.data.recipe.Recipe
 import com.javainiai.chefskiss.data.recipe.RecipesRepository
@@ -24,7 +25,7 @@ import kotlinx.coroutines.launch
 data class IngredientDisplay(
     val title: String,
     val amount: String,
-    val units: String
+    val units: Measurement
 )
 
 data class AddRecipeUiState(
@@ -58,7 +59,7 @@ class AddRecipeViewModel(
                 0,
                 false,
                 Uri.EMPTY,
-                IngredientDisplay("", "", ""),
+                IngredientDisplay("", "", Measurement.Gram),
                 null,
                 listOf(),
                 "",
@@ -228,7 +229,7 @@ class AddRecipeViewModel(
                     rating = recipe.rating,
                     favorite = recipe.favorite,
                     imageUri = recipe.imagePath,
-                    ingredient = IngredientDisplay("", "", ""),
+                    ingredient = IngredientDisplay("", "", Measurement.Gram),
                     editingIngredient = null,
                     ingredients = ingredients.map {
                         IngredientDisplay(

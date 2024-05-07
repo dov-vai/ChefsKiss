@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -34,7 +35,11 @@ import androidx.compose.material.icons.filled.Title
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -57,17 +62,16 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import com.javainiai.chefskiss.data.enums.Measurement
 import com.javainiai.chefskiss.data.tag.Tag
 import com.javainiai.chefskiss.ui.AppViewModelProvider
 import com.javainiai.chefskiss.ui.navigation.NavigationDestination
@@ -361,6 +365,7 @@ fun RecipeTagsCard(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecipeIngredients(
     ingredient: IngredientDisplay,
@@ -371,7 +376,11 @@ fun RecipeIngredients(
     updateIngredients: (List<IngredientDisplay>) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val focusManager = LocalFocusManager.current
+    var dropdownExpanded by remember { mutableStateOf(false) }
+    var imperialSelected by remember { mutableStateOf(false) }
+    var weightSelected by remember { mutableStateOf(false) }
+    var volumeSelected by remember { mutableStateOf(false) }
+
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -392,24 +401,78 @@ fun RecipeIngredients(
                 imeAction = ImeAction.Next
             )
         )
-        TextField(
-            value = ingredient.units,
-            onValueChange = { updateIngredient(ingredient.copy(units = it)) },
-            label = { Text(text = "Unit") },
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-            keyboardActions = KeyboardActions(onDone = {
-                if (editingIngredient != null) {
-                    updateIngredients(ingredients.map { i ->
-                        if (i == editingIngredient) ingredient else i
-                    })
-                    updateEditingIngredient(null)
-                } else {
-                    updateIngredients(ingredients + ingredient)
+        ExposedDropdownMenuBox(
+            expanded = dropdownExpanded,
+            onExpandedChange = { dropdownExpanded = !dropdownExpanded }
+        ) {
+            TextField(
+                value = ingredient.units.title,
+                onValueChange = {},
+                readOnly = true,
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = dropdownExpanded) },
+                modifier = Modifier.menuAnchor()
+            )
+
+            ExposedDropdownMenu(
+                expanded = dropdownExpanded,
+                onDismissRequest = { dropdownExpanded = false }) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(8.dp)
+                ) {
+                    FilterChip(
+                        selected = imperialSelected,
+                        onClick = { imperialSelected = !imperialSelected },
+                        label = { Text(text = "Imperial") })
+                    FilterChip(
+                        selected = weightSelected,
+                        onClick = { weightSelected = !weightSelected },
+                        label = { Text(text = "Weight") })
+                    FilterChip(
+                        selected = volumeSelected,
+                        onClick = { volumeSelected = !volumeSelected },
+                        label = { Text(text = "Volume") })
                 }
-                updateIngredient(IngredientDisplay("", "", ""))
-                focusManager.moveFocus(FocusDirection.Next)
-            })
-        )
+                Column(modifier = Modifier
+                    .height(256.dp)
+                    .verticalScroll(rememberScrollState())) {
+                    Measurement.entries.filter {
+                        if (weightSelected && volumeSelected) {
+                            it.metric == !imperialSelected
+                        } else if (weightSelected) {
+                            it.metric == !imperialSelected && it.weight
+                        } else if (volumeSelected) {
+                            it.metric == !imperialSelected && !it.weight
+                        } else {
+                            it.metric == !imperialSelected
+                        }
+                    }.sortedBy { it.title }.forEach { measurement ->
+                        DropdownMenuItem(
+                            text = { Text(text = measurement.title) },
+                            onClick = {
+                                updateIngredient(ingredient.copy(units = measurement))
+                                dropdownExpanded = false
+                            }
+                        )
+                    }
+                }
+            }
+        }
+
+        FilledTonalButton(onClick = {
+            if (editingIngredient != null) {
+                updateIngredients(ingredients.map { i ->
+                    if (i == editingIngredient) ingredient else i
+                })
+                updateEditingIngredient(null)
+            } else {
+                updateIngredients(ingredients + ingredient)
+            }
+            updateIngredient(IngredientDisplay("", "", Measurement.Gram))
+        }) {
+            Text(text = "Add ingredient")
+        }
         LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             items(items = ingredients) {
                 IngredientCard(
@@ -445,7 +508,7 @@ fun IngredientCard(
             )
             Text(text = ingredient.amount)
             Text(
-                text = ingredient.units,
+                text = ingredient.units.title,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f)
             )
