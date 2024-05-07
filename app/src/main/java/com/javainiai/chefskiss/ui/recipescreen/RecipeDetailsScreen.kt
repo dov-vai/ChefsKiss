@@ -257,6 +257,7 @@ fun RecipeAbout(
                 Spacer(modifier = Modifier.weight(1f))
                 Text(
                     text = String.format(
+                        Locale.getDefault(),
                         "%02d:%02d",
                         recipe.cookingTime / 60,
                         recipe.cookingTime % 60
