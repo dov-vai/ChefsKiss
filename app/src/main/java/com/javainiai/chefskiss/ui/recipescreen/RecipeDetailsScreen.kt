@@ -257,6 +257,7 @@ fun RecipeAbout(
                 Spacer(modifier = Modifier.weight(1f))
                 Text(
                     text = String.format(
+                        Locale.getDefault(),
                         "%02d:%02d",
                         recipe.cookingTime / 60,
                         recipe.cookingTime % 60
@@ -316,12 +317,13 @@ fun IngredientCard(
             )
             Text(
                 text = if (ingredient.size == 0f) "" else String.format(
+                    Locale.getDefault(),
                     "%.1f",
                     ingredient.size * multiplier
                 )
             )
             Text(
-                text = ingredient.unit,
+                text = ingredient.unit.title,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f)
             )
