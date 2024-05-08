@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.RestartAlt
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ButtonDefaults
@@ -242,7 +243,7 @@ fun MealPlannerTopBar(
                 if (undoVisible) {
                     IconButton(onClick = onUndo) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Filled.Undo,
+                            imageVector = Icons.Default.RestartAlt,
                             contentDescription = "Revert to current week"
                         )
                     }
