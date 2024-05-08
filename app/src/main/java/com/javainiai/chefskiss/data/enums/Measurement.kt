@@ -14,5 +14,10 @@ enum class Measurement(
     Gram("Grams (g)", 1f, true, true),
     Kilogram("Kilograms (kg)", 1000f, true, true),
     Milliliter("Mililiters (ml)", 1f, true, false),
-    Liter("Liters (l)", 1000f, true, false)
+    Liter("Liters (l)", 1000f, true, false),
+    Teaspoon("Teaspoons (t)", 1f, false, false),
+    Tablespoon("Tablespoon (T)", 3f, false, false),
+    Cup("Cup (c)", 48f, false, false),
+    Ounce("Ounce (oz)", 1f, false, true),
+    Pound("Pound (lb)", 16f, false, true)
 }
