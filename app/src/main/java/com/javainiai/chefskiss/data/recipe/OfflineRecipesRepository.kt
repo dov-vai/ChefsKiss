@@ -88,9 +88,9 @@ class OfflineRecipesRepository(
 
         val order = if (isAsc) "ASC" else "DESC"
 
-        query += " ORDER BY ? $order"
+        query += " ORDER BY $sort $order"
 
-        return recipeDao.query(SimpleSQLiteQuery(query, arrayOf(rating, "%$recipeName%", sort)))
+        return recipeDao.query(SimpleSQLiteQuery(query, arrayOf(rating, "%$recipeName%")))
     }
 
 
