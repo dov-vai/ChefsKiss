@@ -12,9 +12,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Deselect
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.MoveDown
 import androidx.compose.material.icons.filled.SelectAll
 import androidx.compose.material3.BottomAppBar
@@ -59,7 +59,7 @@ fun MealPlannerBulkEditScreen(
     onNavigateBack: () -> Unit,
     onBack: () -> Unit,
     onForward: () -> Unit,
-    onCancel: () -> Unit,
+    onDone: () -> Unit,
     pasteMeals: (Date) -> Unit,
     moveMeals: (Date) -> Unit,
 ) {
@@ -69,7 +69,7 @@ fun MealPlannerBulkEditScreen(
 
     Scaffold(
         topBar = {
-            MealPlannerCopyTopBar(
+            BulkEditTopBar(
                 title = topBarTitle,
                 onNavigateBack = onNavigateBack,
                 currentMode = currentMode,
@@ -78,7 +78,7 @@ fun MealPlannerBulkEditScreen(
             )
         },
         bottomBar = {
-            MealPlannerCopyBottomBar(
+            BulkEditBottomBar(
                 onSelectAll = {
                     updateSelectedRecipes(plannerRecipes.values.flatten())
                 },
@@ -87,9 +87,9 @@ fun MealPlannerBulkEditScreen(
                 },
                 onCopy = { currentMode = BulkMode.Copy },
                 onMove = { currentMode = BulkMode.Move },
-                onCancel = {
+                onDone = {
                     currentMode = BulkMode.Select
-                    onCancel()
+                    onDone()
                 },
                 currentMode = currentMode
             )
@@ -157,7 +157,7 @@ fun MealPlannerBulkEditScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MealPlannerCopyTopBar(
+fun BulkEditTopBar(
     modifier: Modifier = Modifier,
     title: String,
     onNavigateBack: () -> Unit,
@@ -206,13 +206,13 @@ fun MealPlannerCopyTopBar(
 
 
 @Composable
-fun MealPlannerCopyBottomBar(
+fun BulkEditBottomBar(
     modifier: Modifier = Modifier,
     onSelectAll: () -> Unit,
     onDeselectAll: () -> Unit,
     onMove: () -> Unit,
     onCopy: () -> Unit,
-    onCancel: () -> Unit,
+    onDone: () -> Unit,
     currentMode: BulkMode
 ) {
     val buttonColor =
@@ -267,10 +267,10 @@ fun MealPlannerCopyBottomBar(
                 else -> {
                     Spacer(modifier = Modifier.weight(1f))
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        FilledTonalButton(onClick = onCancel, colors = buttonColor) {
-                            Icon(imageVector = Icons.Default.Cancel, contentDescription = "Cancel")
+                        FilledTonalButton(onClick = onDone, colors = buttonColor) {
+                            Icon(imageVector = Icons.Default.Done, contentDescription = "Done")
                         }
-                        Text(text = "Cancel")
+                        Text(text = "Done")
                     }
                     Spacer(modifier = Modifier.weight(1f))
                 }
