@@ -1,13 +1,10 @@
 package com.javainiai.chefskiss.ui.recipescreen
 
 import android.net.Uri
-import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.javainiai.chefskiss.data.ingredient.Ingredient
 import com.javainiai.chefskiss.data.recipe.PlannerRecipe
@@ -15,7 +12,7 @@ import com.javainiai.chefskiss.data.recipe.Recipe
 import com.javainiai.chefskiss.data.recipe.RecipesRepository
 import com.javainiai.chefskiss.data.recipe.ShopRecipe
 import com.javainiai.chefskiss.data.tag.Tag
-import kotlinx.coroutines.Job
+import com.javainiai.chefskiss.ui.components.viewmodel.BaseViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -34,7 +31,7 @@ data class RecipeDisplayUiState(
 class RecipeDetailsViewModel(
     savedStateHandle: SavedStateHandle,
     private val recipesRepository: RecipesRepository
-) : ViewModel() {
+) : BaseViewModel() {
     private val recipeId: Long =
         checkNotNull(savedStateHandle[RecipeDetailsDestination.recipeIdArg])
 
@@ -69,20 +66,6 @@ class RecipeDetailsViewModel(
 
     private var _checkedIngredients = MutableStateFlow(listOf<Ingredient>())
     val checkedIngredients = _checkedIngredients.asStateFlow()
-
-    val snackbarHostState = SnackbarHostState()
-
-    private var messageInProgress: Job? = null
-    private fun showMessage(message: String) {
-        // cancel in case it hasn't finished so the message can be shown immediately
-        messageInProgress?.cancel()
-        messageInProgress = viewModelScope.launch {
-            snackbarHostState.showSnackbar(
-                message = message,
-                duration = SnackbarDuration.Short
-            )
-        }
-    }
 
     var screenIndex by mutableIntStateOf(0)
         private set

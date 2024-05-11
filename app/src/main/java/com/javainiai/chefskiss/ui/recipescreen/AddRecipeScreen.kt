@@ -434,9 +434,11 @@ fun RecipeIngredients(
                         onClick = { volumeSelected = !volumeSelected },
                         label = { Text(text = "Volume") })
                 }
-                Column(modifier = Modifier
-                    .height(256.dp)
-                    .verticalScroll(rememberScrollState())) {
+                Column(
+                    modifier = Modifier
+                        .height(256.dp)
+                        .verticalScroll(rememberScrollState())
+                ) {
                     Measurement.entries.filter {
                         if (weightSelected && volumeSelected) {
                             it.metric == !imperialSelected
