@@ -8,16 +8,16 @@ package com.javainiai.chefskiss.data.enums
 enum class Measurement(
     val title: String,
     val unit: Float,
-    val metric: Boolean,
+    val system: UnitSystem,
     val weight: Boolean
 ) {
-    Gram("Grams (g)", 1f, true, true),
-    Kilogram("Kilograms (kg)", 1000f, true, true),
-    Milliliter("Mililiters (ml)", 1f, true, false),
-    Liter("Liters (l)", 1000f, true, false),
-    Teaspoon("Teaspoons (t)", 1f, false, false),
-    Tablespoon("Tablespoon (T)", 3f, false, false),
-    Cup("Cup (c)", 48f, false, false),
-    Ounce("Ounce (oz)", 1f, false, true),
-    Pound("Pound (lb)", 16f, false, true)
+    Gram("Grams (g)", 1f, UnitSystem.Metric, true),
+    Kilogram("Kilograms (kg)", 1000f, UnitSystem.Metric, true),
+    Milliliter("Mililiters (ml)", 1f, UnitSystem.Metric, false),
+    Liter("Liters (l)", 1000f, UnitSystem.Metric, false),
+    Teaspoon("Teaspoons (t)", 1f, UnitSystem.All, false),
+    Tablespoon("Tablespoon (T)", 3f, UnitSystem.All, false),
+    Cup("Cup (c)", 48f, UnitSystem.All, false),
+    Ounce("Ounce (oz)", 1f, UnitSystem.Imperial, true),
+    Pound("Pound (lb)", 16f, UnitSystem.Imperial, true)
 }
