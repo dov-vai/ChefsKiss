@@ -4,7 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
-import com.javainiai.chefskiss.data.enums.Measurement
+import com.javainiai.chefskiss.data.enums.CookingUnit
 import com.javainiai.chefskiss.data.recipe.Recipe
 
 @Entity(
@@ -25,5 +25,5 @@ data class Ingredient(
     val recipeId: Long,
     val name: String,
     val size: Float,
-    val unit: Measurement
+    val unit: CookingUnit
 )

@@ -3,7 +3,7 @@ package com.javainiai.chefskiss.ui.recipescreen
 import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.javainiai.chefskiss.data.enums.Measurement
+import com.javainiai.chefskiss.data.enums.CookingUnit
 import com.javainiai.chefskiss.data.ingredient.Ingredient
 import com.javainiai.chefskiss.data.recipe.Recipe
 import com.javainiai.chefskiss.data.recipe.RecipesRepository
@@ -22,7 +22,7 @@ import kotlinx.coroutines.launch
 data class IngredientDisplay(
     val title: String,
     val amount: String,
-    val units: Measurement
+    val units: CookingUnit
 )
 
 data class AddRecipeUiState(
@@ -56,7 +56,7 @@ class AddRecipeViewModel(
                 0,
                 false,
                 Uri.EMPTY,
-                IngredientDisplay("", "", Measurement.Gram),
+                IngredientDisplay("", "", CookingUnit.Gram),
                 null,
                 listOf(),
                 "",
@@ -212,7 +212,7 @@ class AddRecipeViewModel(
                     rating = recipe.rating,
                     favorite = recipe.favorite,
                     imageUri = recipe.imagePath,
-                    ingredient = IngredientDisplay("", "", Measurement.Gram),
+                    ingredient = IngredientDisplay("", "", CookingUnit.Gram),
                     editingIngredient = null,
                     ingredients = ingredients.map {
                         IngredientDisplay(

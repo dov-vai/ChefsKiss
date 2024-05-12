@@ -56,6 +56,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -83,7 +86,9 @@ import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.javainiai.chefskiss.data.CalendarUtils
+import com.javainiai.chefskiss.data.UnitUtils.convertUnit
 import com.javainiai.chefskiss.data.enums.Meal
+import com.javainiai.chefskiss.data.enums.UnitSystem
 import com.javainiai.chefskiss.data.ingredient.Ingredient
 import com.javainiai.chefskiss.data.pdf.exportAsPdf
 import com.javainiai.chefskiss.data.pdf.getRecipeCardHtml
@@ -115,6 +120,7 @@ fun RecipeDetailsScreen(
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     val customServingSize by viewModel.customServingSize.collectAsState()
+    val unitSystem by viewModel.unitSystem.collectAsState()
 
     Scaffold(
         topBar = {
@@ -181,8 +187,12 @@ fun RecipeDetailsScreen(
                 ingredients = uiState.ingredients,
                 checkedIngredients = checkedIngredients,
                 updateChecked = viewModel::updateCheckedIngredients,
-                modifier = Modifier.padding(padding),
-                multiplier = customServingSize.toFloat() / uiState.recipe.servings
+                modifier = Modifier
+                    .padding(padding)
+                    .fillMaxWidth(),
+                multiplier = customServingSize.toFloat() / uiState.recipe.servings,
+                unitSystem = unitSystem,
+                onUnitSystemChange = viewModel::updateUnitSystem
             )
 
             2 -> RecipeInstructions(recipe = uiState.recipe, modifier = Modifier.padding(padding))
@@ -317,8 +327,7 @@ fun IngredientCard(
             )
             Text(
                 text = if (ingredient.size == 0f) "" else String.format(
-                    Locale.getDefault(),
-                    "%.1f",
+                    "%.2f",
                     ingredient.size * multiplier
                 )
             )
@@ -332,19 +341,41 @@ fun IngredientCard(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecipeIngredients(
     ingredients: List<Ingredient>,
     checkedIngredients: List<Ingredient>,
     updateChecked: (List<Ingredient>) -> Unit,
     modifier: Modifier = Modifier,
-    multiplier: Float
+    multiplier: Float,
+    unitSystem: UnitSystem,
+    onUnitSystemChange: (UnitSystem) -> Unit
 ) {
-    Surface(modifier = modifier) {
+    Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+        SingleChoiceSegmentedButtonRow {
+            SegmentedButton(
+                selected = unitSystem == UnitSystem.Metric,
+                onClick = { onUnitSystemChange(UnitSystem.Metric) },
+                shape = SegmentedButtonDefaults.itemShape(index = 0, count = 2)
+            )
+            {
+                Text(text = "Metric")
+            }
+            SegmentedButton(
+                selected = unitSystem == UnitSystem.Imperial,
+                onClick = { onUnitSystemChange(UnitSystem.Imperial) },
+                shape = SegmentedButtonDefaults.itemShape(index = 1, count = 2)
+            )
+            {
+                Text(text = "Imperial")
+            }
+        }
+
         LazyColumn {
             items(ingredients) { ingredient ->
                 IngredientCard(
-                    ingredient = ingredient,
+                    ingredient = ingredient.convertUnit(unitSystem),
                     checked = checkedIngredients.contains(ingredient),
                     onCheckedChange = {
                         if (it) {
@@ -432,7 +463,7 @@ fun ConfirmationDialog(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun MealPlannerDialog(
     onDismiss: () -> Unit,
