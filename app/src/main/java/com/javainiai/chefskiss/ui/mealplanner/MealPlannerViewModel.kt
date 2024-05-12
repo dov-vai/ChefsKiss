@@ -1,8 +1,5 @@
 package com.javainiai.chefskiss.ui.mealplanner
 
-import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHostState
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.javainiai.chefskiss.data.CalendarUtils
 import com.javainiai.chefskiss.data.CalendarUtils.getDate
@@ -10,9 +7,9 @@ import com.javainiai.chefskiss.data.CalendarUtils.getDateString
 import com.javainiai.chefskiss.data.recipe.PlannerRecipeWithRecipe
 import com.javainiai.chefskiss.data.recipe.RecipesRepository
 import com.javainiai.chefskiss.data.recipe.ShopRecipe
+import com.javainiai.chefskiss.ui.components.viewmodel.BaseViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -36,7 +33,7 @@ data class MealPlannerUiState(
     val selectedRecipes: List<PlannerRecipeWithRecipe>
 )
 
-class MealPlannerViewModel(private val recipesRepository: RecipesRepository) : ViewModel() {
+class MealPlannerViewModel(private val recipesRepository: RecipesRepository) : BaseViewModel() {
     private var _uiState = MutableStateFlow(
         MealPlannerUiState(
             "",
@@ -47,22 +44,6 @@ class MealPlannerViewModel(private val recipesRepository: RecipesRepository) : V
             listOf()
         )
     )
-
-    val snackbarHostState = SnackbarHostState()
-
-    var messageInProgress: Job? = null
-        private set
-
-    private fun showMessage(message: String) {
-        // cancel in case it hasn't finished so the message can be shown immediately
-        messageInProgress?.cancel()
-        messageInProgress = viewModelScope.launch {
-            snackbarHostState.showSnackbar(
-                message = message,
-                duration = SnackbarDuration.Short
-            )
-        }
-    }
 
     val uiState = _uiState.asStateFlow()
 
