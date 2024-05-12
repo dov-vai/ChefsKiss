@@ -11,7 +11,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Edit
@@ -90,11 +89,12 @@ fun MealPlannerScreen(
             onNavigateBack = {
                 viewModel.updateBulkEditMode(false)
                 viewModel.updateSelectedRecipes(listOf())
+                viewModel.updateStartOfWeek(uiState.bulkEditWeek)
             },
             onBack = viewModel::shiftBackwards,
             onForward = viewModel::shiftForward,
-            onCancel = { viewModel.updateStartOfWeek(uiState.bulkEditWeek) },
-            pasteMeals = viewModel::pasteMeals,
+            onDone = { viewModel.updateStartOfWeek(uiState.bulkEditWeek) },
+            pasteMeals = viewModel::copyMeals,
             moveMeals = viewModel::moveMeals
         )
     } else {
