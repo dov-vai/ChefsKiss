@@ -114,7 +114,7 @@ fun getRecipeCardHtml(recipe: Recipe, ingredients: List<Ingredient>): String {
 fun exportAsPdf(webView: WebView?, context: Context, documentName: String) {
     if (webView != null) {
         val printManager = context.getSystemService(Context.PRINT_SERVICE) as PrintManager
-        val printAdapter = webView.createPrintDocumentAdapter(documentName)
+        val printAdapter = webView.createPrintDocumentAdapter(documentName.ifEmpty { "recipe" })
         val printAttributes = PrintAttributes.Builder()
             .setMediaSize(PrintAttributes.MediaSize.ISO_A4)
             .build()

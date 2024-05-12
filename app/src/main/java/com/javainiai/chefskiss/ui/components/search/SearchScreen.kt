@@ -57,6 +57,7 @@ import com.javainiai.chefskiss.ui.components.filter.RatingCard
 import com.javainiai.chefskiss.ui.components.filter.SortCard
 import com.javainiai.chefskiss.ui.components.filter.TagCard
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 @Composable
 fun SearchScreen(
@@ -166,6 +167,7 @@ fun RecipeCard(recipe: Recipe, modifier: Modifier = Modifier) {
                     Icon(imageVector = Icons.Default.Timer, contentDescription = "Time to cook")
                     Text(
                         text = String.format(
+                            Locale.getDefault(),
                             "%02d:%02d",
                             recipe.cookingTime / 60,
                             recipe.cookingTime % 60
