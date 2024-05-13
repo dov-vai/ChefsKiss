@@ -21,5 +21,7 @@ enum class CookingUnit(
     Ounce("Ounces (oz)", 28f, UnitSystem.Imperial, true),
     FluidOunce("Fluid ounces (floz)", 30f, UnitSystem.Imperial, false),
     Pound("Pounds (lb)", 454f, UnitSystem.Imperial, true),
-    Gallon("Gallons (gal)", 3800f, UnitSystem.Imperial, false)
+    Gallon("Gallons (gal)", 3800f, UnitSystem.Imperial, false),
+    ToTaste("To taste", 0f, UnitSystem.All, false),
+    Pinch("Pinches", 0f, UnitSystem.All, true)
 }
