@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.javainiai.chefskiss.data.enums.UnitSystem
 import com.javainiai.chefskiss.data.ingredient.Ingredient
 import com.javainiai.chefskiss.data.recipe.PlannerRecipe
 import com.javainiai.chefskiss.data.recipe.Recipe
@@ -61,11 +62,13 @@ class RecipeDetailsViewModel(
         )
 
     private val _customServingSize = MutableStateFlow(uiState.value.recipe.servings)
-
     val customServingSize = _customServingSize.asStateFlow()
 
     private var _checkedIngredients = MutableStateFlow(listOf<Ingredient>())
     val checkedIngredients = _checkedIngredients.asStateFlow()
+
+    private var _unitSystem = MutableStateFlow(UnitSystem.Metric)
+    val unitSystem = _unitSystem.asStateFlow()
 
     var screenIndex by mutableIntStateOf(0)
         private set
@@ -115,6 +118,10 @@ class RecipeDetailsViewModel(
         if (size >= 1) {
             _customServingSize.update { size }
         } else showMessage("Serving size can't be lower than 1")
+    }
+
+    fun updateUnitSystem(system: UnitSystem) {
+        _unitSystem.update { system }
     }
 
     companion object {

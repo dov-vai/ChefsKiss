@@ -71,7 +71,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
-import com.javainiai.chefskiss.data.enums.Measurement
+import com.javainiai.chefskiss.data.enums.CookingUnit
+import com.javainiai.chefskiss.data.enums.UnitSystem
 import com.javainiai.chefskiss.data.tag.Tag
 import com.javainiai.chefskiss.ui.AppViewModelProvider
 import com.javainiai.chefskiss.ui.navigation.NavigationDestination
@@ -439,15 +440,16 @@ fun RecipeIngredients(
                         .height(256.dp)
                         .verticalScroll(rememberScrollState())
                 ) {
-                    Measurement.entries.filter {
+                    val system = if (imperialSelected) UnitSystem.Imperial else UnitSystem.Metric
+                    CookingUnit.entries.filter {
                         if (weightSelected && volumeSelected) {
-                            it.metric == !imperialSelected
+                            it.system == system || it.system == UnitSystem.All
                         } else if (weightSelected) {
-                            it.metric == !imperialSelected && it.weight
+                            (it.system == system || it.system == UnitSystem.All) && it.weight
                         } else if (volumeSelected) {
-                            it.metric == !imperialSelected && !it.weight
+                            (it.system == system || it.system == UnitSystem.All) && !it.weight
                         } else {
-                            it.metric == !imperialSelected
+                            (it.system == system || it.system == UnitSystem.All)
                         }
                     }.sortedBy { it.title }.forEach { measurement ->
                         DropdownMenuItem(
@@ -471,7 +473,7 @@ fun RecipeIngredients(
             } else {
                 updateIngredients(ingredients + ingredient)
             }
-            updateIngredient(IngredientDisplay("", "", Measurement.Gram))
+            updateIngredient(IngredientDisplay("", "", CookingUnit.Gram))
         }) {
             Text(text = "Add ingredient")
         }
