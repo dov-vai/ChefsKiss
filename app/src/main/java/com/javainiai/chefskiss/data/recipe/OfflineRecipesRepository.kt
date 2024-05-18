@@ -128,7 +128,7 @@ class OfflineRecipesRepository(
             ingredientDao.delete(ingredient)
         }
         for (tag in tagsToRemove) {
-            tagDao.delete(tag)
+            recipeDao.delete(RecipeTagCrossRef(recipe.id, tag.id))
         }
 
         for (ingredient in ingredients) {
@@ -148,4 +148,5 @@ class OfflineRecipesRepository(
     override suspend fun insertPlannerRecipe(item: PlannerRecipe) = recipeDao.insert(item)
     override suspend fun updatePlannerRecipe(item: PlannerRecipe) = recipeDao.update(item)
     override suspend fun deletePlannerRecipe(item: PlannerRecipe) = recipeDao.delete(item)
+    override suspend fun deleteRecipeTag(item: RecipeTagCrossRef) = recipeDao.delete(item)
 }

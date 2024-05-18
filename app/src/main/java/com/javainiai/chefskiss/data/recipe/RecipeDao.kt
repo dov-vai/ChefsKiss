@@ -29,6 +29,9 @@ interface RecipeDao {
     suspend fun insert(item: PlannerRecipe)
 
     @Delete
+    suspend fun delete(item: RecipeTagCrossRef)
+
+    @Delete
     suspend fun delete(item: ShopIngredient)
 
     @Delete
