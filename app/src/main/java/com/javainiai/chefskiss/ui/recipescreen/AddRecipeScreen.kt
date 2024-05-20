@@ -4,11 +4,14 @@ import android.content.Intent
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,6 +19,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -44,13 +48,18 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TimePicker
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -69,6 +78,8 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.javainiai.chefskiss.data.enums.CookingUnit
@@ -77,6 +88,7 @@ import com.javainiai.chefskiss.data.tag.Tag
 import com.javainiai.chefskiss.ui.AppViewModelProvider
 import com.javainiai.chefskiss.ui.navigation.NavigationDestination
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 object AddRecipeDestination : NavigationDestination {
     override val route = "addrecipe"
@@ -172,6 +184,92 @@ fun AddRecipeScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CookingTimePicker(onCookingTimeChange: (String) -> Unit) {
+    var showTimePicker by remember { mutableStateOf(false) }
+    val state = rememberTimePickerState(is24Hour = true)
+
+    Box(propagateMinConstraints = false) {
+        Button(
+            modifier = Modifier.align(Alignment.Center),
+            onClick = { showTimePicker = true }
+        ) {
+            Text("Set Time")
+        }
+    }
+    if (showTimePicker) {
+        TimePickerDialog(
+            onCancel = { showTimePicker = false },
+            onConfirm = {
+                val hour = if (state.hour == 24) 0 else state.hour
+                val minutes = hour * 60 + state.minute
+                onCookingTimeChange(minutes.toString())
+                showTimePicker = false
+            },
+        ) {
+            TimePicker(state = state)
+        }
+    }
+}
+
+
+@Composable
+fun TimePickerDialog(
+    title: String = "Select Time",
+    onCancel: () -> Unit,
+    onConfirm: () -> Unit,
+    toggle: @Composable () -> Unit = {},
+    content: @Composable () -> Unit,
+) {
+    Dialog(
+        onDismissRequest = onCancel,
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false
+        ),
+    ) {
+        Surface(
+            shape = MaterialTheme.shapes.extraLarge,
+            tonalElevation = 6.dp,
+            modifier = Modifier
+                .width(IntrinsicSize.Min)
+                .height(IntrinsicSize.Min)
+                .background(
+                    shape = MaterialTheme.shapes.extraLarge,
+                    color = MaterialTheme.colorScheme.surface
+                ),
+        ) {
+            Column(
+                modifier = Modifier.padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 20.dp),
+                    text = title,
+                    style = MaterialTheme.typography.labelMedium
+                )
+                content()
+                Row(
+                    modifier = Modifier
+                        .height(40.dp)
+                        .fillMaxWidth()
+                ) {
+                    toggle()
+                    Spacer(modifier = Modifier.weight(1f))
+                    TextButton(
+                        onClick = onCancel
+                    ) { Text("Cancel") }
+                    TextButton(
+                        onClick = onConfirm
+                    ) { Text("Confirm") }
+                }
+            }
+        }
+    }
+}
+
 
 @Composable
 fun RecipeOverview(
@@ -199,6 +297,8 @@ fun RecipeOverview(
                 updateSelectedImage(uri)
             }
         }
+    val hours = cookingTime.toIntOrNull()?.div(60) ?: 0
+    val minutes = cookingTime.toIntOrNull()?.rem(60) ?: 0
 
     Column(
         modifier = modifier,
@@ -243,23 +343,6 @@ fun RecipeOverview(
             },
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
         )
-
-        TextField(
-            value = cookingTime,
-            onValueChange = { onCookingTimeChange(it) },
-            label = { Text(text = "Cooking Time (minutes)") },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Next
-            ),
-            trailingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Timer,
-                    contentDescription = "Cooking time"
-                )
-            }
-        )
-
         TextField(
             value = servings,
             onValueChange = { onServingsChange(it) },
@@ -275,6 +358,22 @@ fun RecipeOverview(
                 )
             }
         )
+
+        Row {
+            Spacer(modifier = Modifier.padding(end = 4.dp))
+            Text(text = "Cooking time ")
+            Text(text = String.format(
+                Locale.getDefault(),
+                "%02d:%02d",
+                hours,
+                minutes
+                )
+            )
+        }
+
+        CookingTimePicker(onCookingTimeChange)
+
+
 
     }
 }
