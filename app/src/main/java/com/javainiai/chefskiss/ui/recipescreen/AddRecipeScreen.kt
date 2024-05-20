@@ -88,6 +88,7 @@ import com.javainiai.chefskiss.data.tag.Tag
 import com.javainiai.chefskiss.ui.AppViewModelProvider
 import com.javainiai.chefskiss.ui.navigation.NavigationDestination
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 object AddRecipeDestination : NavigationDestination {
     override val route = "addrecipe"
@@ -296,6 +297,8 @@ fun RecipeOverview(
                 updateSelectedImage(uri)
             }
         }
+    val hours = cookingTime.toIntOrNull()?.div(60) ?: 0
+    val minutes = cookingTime.toIntOrNull()?.rem(60) ?: 0
 
     Column(
         modifier = modifier,
@@ -340,25 +343,6 @@ fun RecipeOverview(
             },
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
         )
-
-        TextField(
-            value = cookingTime,
-            onValueChange = { onCookingTimeChange(it) },
-            label = { Text(text = "Cooking Time (minutes)") },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Next
-            ),
-            trailingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Timer,
-                    contentDescription = "Cooking time"
-                )
-            }
-        )
-
-        CookingTimePicker(onCookingTimeChange)
-
         TextField(
             value = servings,
             onValueChange = { onServingsChange(it) },
@@ -374,6 +358,22 @@ fun RecipeOverview(
                 )
             }
         )
+
+        Row {
+            Spacer(modifier = Modifier.padding(end = 4.dp))
+            Text(text = "Cooking time ")
+            Text(text = String.format(
+                Locale.getDefault(),
+                "%02d:%02d",
+                hours,
+                minutes
+                )
+            )
+        }
+
+        CookingTimePicker(onCookingTimeChange)
+
+
 
     }
 }
