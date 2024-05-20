@@ -34,8 +34,10 @@ import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
+import com.javainiai.chefskiss.R
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -131,7 +133,7 @@ fun Picker(
                 }
             }
             ) {
-                Icon(imageVector = Icons.Default.Clear, contentDescription = "Reset")
+                Icon(imageVector = Icons.Default.Clear, contentDescription = stringResource(R.string.reset))
             }
         }
     }

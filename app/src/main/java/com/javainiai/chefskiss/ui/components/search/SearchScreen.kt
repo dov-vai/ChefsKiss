@@ -44,10 +44,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.javainiai.chefskiss.R
 import com.javainiai.chefskiss.data.recipe.Recipe
 import com.javainiai.chefskiss.ui.components.filter.FavoriteButton
 import com.javainiai.chefskiss.ui.components.filter.FilterDrawer
@@ -164,7 +166,7 @@ fun RecipeCard(recipe: Recipe, modifier: Modifier = Modifier) {
             ) {
                 Text(text = recipe.title, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Row {
-                    Icon(imageVector = Icons.Default.Timer, contentDescription = "Time to cook")
+                    Icon(imageVector = Icons.Default.Timer, contentDescription = stringResource(R.string.time_to_cook))
                     Text(
                         text = String.format(
                             Locale.getDefault(),
@@ -174,13 +176,13 @@ fun RecipeCard(recipe: Recipe, modifier: Modifier = Modifier) {
                         ),
                         modifier = Modifier.padding(end = 8.dp)
                     )
-                    Icon(imageVector = Icons.Default.Star, contentDescription = "Rating")
+                    Icon(imageVector = Icons.Default.Star, contentDescription = stringResource(R.string.rating))
                     Text(text = recipe.rating.toString())
                 }
             }
             Icon(
                 imageVector = if (recipe.favorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                contentDescription = "Favorite recipe"
+                contentDescription = stringResource(R.string.favorite_Recipe)
             )
         }
     }
@@ -217,7 +219,7 @@ fun SearchBar(
                         onQueryChange("")
                         onSearch()
                     }) {
-                        Icon(imageVector = Icons.Default.Clear, contentDescription = "Clear")
+                        Icon(imageVector = Icons.Default.Clear, contentDescription = stringResource(R.string.clear))
                     }
                 }
             },
@@ -230,7 +232,7 @@ fun SearchBar(
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent
             ),
-            placeholder = { Text(text = "Search") }
+            placeholder = { Text(text = stringResource(R.string.search)) }
         )
     }
 }
@@ -262,7 +264,7 @@ fun SearchTopBar(
                         .padding(top = 4.dp)
                 )
                 IconButton(onClick = onFilterClick) {
-                    Icon(imageVector = Icons.Default.FilterList, contentDescription = "Filter")
+                    Icon(imageVector = Icons.Default.FilterList, contentDescription = stringResource(R.string.filter))
                 }
             }
 

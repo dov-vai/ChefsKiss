@@ -74,6 +74,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
@@ -82,6 +83,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import com.javainiai.chefskiss.R
 import com.javainiai.chefskiss.data.enums.CookingUnit
 import com.javainiai.chefskiss.data.enums.UnitSystem
 import com.javainiai.chefskiss.data.tag.Tag
@@ -114,7 +116,7 @@ fun AddRecipeScreen(
         mutableIntStateOf(0)
     }
 
-    val tabs = listOf("Overview", "Tags", "Ingredients", "Directions")
+    val tabs = listOf(stringResource(R.string.overview), stringResource(R.string.tags), stringResource(R.string.ingredients), stringResource(R.string.directions))
 
     Scaffold(topBar = {
         AddRecipeTopBar(
@@ -195,7 +197,7 @@ fun CookingTimePicker(onCookingTimeChange: (String) -> Unit) {
             modifier = Modifier.align(Alignment.Center),
             onClick = { showTimePicker = true }
         ) {
-            Text("Set Time")
+            Text(stringResource(R.string.setTime))
         }
     }
     if (showTimePicker) {
@@ -216,7 +218,7 @@ fun CookingTimePicker(onCookingTimeChange: (String) -> Unit) {
 
 @Composable
 fun TimePickerDialog(
-    title: String = "Select Time",
+    title: String = stringResource(R.string.selectTime),
     onCancel: () -> Unit,
     onConfirm: () -> Unit,
     toggle: @Composable () -> Unit = {},
@@ -260,10 +262,10 @@ fun TimePickerDialog(
                     Spacer(modifier = Modifier.weight(1f))
                     TextButton(
                         onClick = onCancel
-                    ) { Text("Cancel") }
+                    ) { Text(stringResource(R.string.cancel)) }
                     TextButton(
                         onClick = onConfirm
-                    ) { Text("Confirm") }
+                    ) { Text(stringResource(R.string.confirm)) }
                 }
             }
         }
@@ -309,7 +311,7 @@ fun RecipeOverview(
         if (selectedImage != Uri.EMPTY) {
             AsyncImage(
                 model = selectedImage,
-                contentDescription = "Selected image",
+                contentDescription = stringResource(R.string.selectImage),
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(128.dp)
@@ -327,18 +329,18 @@ fun RecipeOverview(
                     canSelectPhoto = false
                 }
             }) {
-                Text(text = "Pick image from gallery")
+                Text(text = stringResource(R.string.pickImageFromGallery))
             }
         }
 
         TextField(
             value = title,
             onValueChange = { onTitleChange(it) },
-            label = { Text(text = "Title") },
+            label = { Text(text = stringResource(R.string.title)) },
             trailingIcon = {
                 Icon(
                     imageVector = Icons.Default.Title,
-                    contentDescription = "Title"
+                    contentDescription = stringResource(R.string.title)
                 )
             },
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
@@ -346,7 +348,7 @@ fun RecipeOverview(
         TextField(
             value = servings,
             onValueChange = { onServingsChange(it) },
-            label = { Text(text = "Servings") },
+            label = { Text(text = stringResource(R.string.servings)) },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Number,
                 imeAction = ImeAction.Done
@@ -354,14 +356,14 @@ fun RecipeOverview(
             trailingIcon = {
                 Icon(
                     imageVector = Icons.Default.People,
-                    contentDescription = "Servings"
+                    contentDescription = stringResource(R.string.servings)
                 )
             }
         )
 
         Row {
             Spacer(modifier = Modifier.padding(end = 4.dp))
-            Text(text = "Cooking time ")
+            Text(text = stringResource(R.string.cookingTime))
             Text(text = String.format(
                 Locale.getDefault(),
                 "%02d:%02d",
@@ -396,7 +398,7 @@ fun RecipeTags(
             TextField(
                 value = tag,
                 onValueChange = { onTagChange(it) },
-                label = { Text(text = "Add new tag") },
+                label = { Text(text = stringResource(R.string.addNewTag)) },
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Done
                 ),
@@ -409,7 +411,7 @@ fun RecipeTags(
                 trailingIcon = {
                     Icon(
                         imageVector = Icons.Default.Tag,
-                        contentDescription = "Tag"
+                        contentDescription = stringResource(R.string.tag)
                     )
                 }
             )
@@ -417,7 +419,7 @@ fun RecipeTags(
                 onClick = { updateMode(!tagRemoveMode) },
                 colors = IconButtonDefaults.iconButtonColors(containerColor = if (tagRemoveMode) Color.Red else Color.Transparent)
             ) {
-                Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete tags")
+                Icon(imageVector = Icons.Default.Delete, contentDescription = stringResource(R.string.deleteTags))
             }
         }
         RecipeTagsCard(
@@ -489,13 +491,13 @@ fun RecipeIngredients(
         TextField(
             value = ingredient.title,
             onValueChange = { updateIngredient(ingredient.copy(title = it)) },
-            label = { Text(text = "Ingredient") },
+            label = { Text(text = stringResource(R.string.ingredient)) },
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
         )
         TextField(
             value = ingredient.amount,
             onValueChange = { updateIngredient(ingredient.copy(amount = it)) },
-            label = { Text(text = "Amount") },
+            label = { Text(text = stringResource(R.string.amount)) },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Number,
                 imeAction = ImeAction.Next
@@ -524,15 +526,15 @@ fun RecipeIngredients(
                     FilterChip(
                         selected = imperialSelected,
                         onClick = { imperialSelected = !imperialSelected },
-                        label = { Text(text = "Imperial") })
+                        label = { Text(text = stringResource(R.string.imperial)) })
                     FilterChip(
                         selected = weightSelected,
                         onClick = { weightSelected = !weightSelected },
-                        label = { Text(text = "Weight") })
+                        label = { Text(text = stringResource(R.string.weight)) })
                     FilterChip(
                         selected = volumeSelected,
                         onClick = { volumeSelected = !volumeSelected },
-                        label = { Text(text = "Volume") })
+                        label = { Text(text = stringResource(R.string.volume)) })
                 }
                 Column(
                     modifier = Modifier
@@ -574,7 +576,7 @@ fun RecipeIngredients(
             }
             updateIngredient(IngredientDisplay("", "", CookingUnit.Gram))
         }) {
-            Text(text = "Add ingredient")
+            Text(text = stringResource(R.string.addIngredient))
         }
         LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             items(items = ingredients) {
@@ -616,10 +618,10 @@ fun IngredientCard(
                 modifier = Modifier.weight(1f)
             )
             IconButton(onClick = onEdit) {
-                Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit")
+                Icon(imageVector = Icons.Default.Edit, contentDescription = stringResource(R.string.edit))
             }
             IconButton(onClick = onRemove) {
-                Icon(imageVector = Icons.Default.Remove, contentDescription = "Remove")
+                Icon(imageVector = Icons.Default.Remove, contentDescription = stringResource(R.string.remove))
             }
         }
     }
@@ -637,7 +639,7 @@ fun RecipeDirections(
         modifier.fillMaxSize(),
         label = {
             Text(
-                text = "Enter cooking directions"
+                text = stringResource(R.string.enterCookingDirections)
             )
         })
 }
@@ -650,7 +652,7 @@ fun AddRecipeTopBar(onBack: () -> Unit, onSave: () -> Unit) {
         Row {
             Spacer(modifier = Modifier.weight(1f))
             IconButton(onClick = onSave) {
-                Icon(imageVector = Icons.Default.Done, contentDescription = "Done")
+                Icon(imageVector = Icons.Default.Done, contentDescription = stringResource(R.string.done))
             }
         }
     },
@@ -658,7 +660,7 @@ fun AddRecipeTopBar(onBack: () -> Unit, onSave: () -> Unit) {
             IconButton(onClick = onBack) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                    contentDescription = "Back"
+                    contentDescription = stringResource(R.string.back)
                 )
             }
         }

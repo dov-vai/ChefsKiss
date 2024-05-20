@@ -20,9 +20,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.javainiai.chefskiss.R
 import com.javainiai.chefskiss.ui.homescreen.HomeScreenDestination
 import com.javainiai.chefskiss.ui.mealplanner.MealPlannerDestination
 import com.javainiai.chefskiss.ui.navigation.ChefsKissNavHost
@@ -75,10 +77,10 @@ fun ChefsKissDrawerSheet(
                 Row {
                     Icon(
                         imageVector = Icons.Default.Home,
-                        contentDescription = "Home",
+                        contentDescription = stringResource(R.string.home),
                         modifier = Modifier.padding(end = 8.dp)
                     )
-                    Text(text = "Home")
+                    Text(text = stringResource(R.string.home))
                 }
             },
             selected = currentDestination == HomeScreenDestination.route,
@@ -89,10 +91,10 @@ fun ChefsKissDrawerSheet(
                 Row {
                     Icon(
                         imageVector = Icons.Default.Restaurant,
-                        contentDescription = "Meal Planner",
+                        contentDescription = stringResource(R.string.mealPlanner),
                         modifier = Modifier.padding(end = 8.dp)
                     )
-                    Text(text = "Meal Planner")
+                    Text(text = stringResource(R.string.mealPlanner))
                 }
             },
             selected = currentDestination == MealPlannerDestination.route,
@@ -103,10 +105,10 @@ fun ChefsKissDrawerSheet(
                 Row {
                     Icon(
                         imageVector = Icons.Default.ShoppingBasket,
-                        contentDescription = "Shopping List",
+                        contentDescription = stringResource(R.string.shoppingList),
                         modifier = Modifier.padding(end = 8.dp)
                     )
-                    Text(text = "Shopping List")
+                    Text(text = stringResource(R.string.shoppingList))
                 }
             },
             selected = currentDestination == ShoppingListDestination.route,

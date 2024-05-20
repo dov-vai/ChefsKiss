@@ -36,10 +36,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import com.javainiai.chefskiss.R
 import com.javainiai.chefskiss.data.ingredient.Ingredient
 import com.javainiai.chefskiss.data.recipe.Recipe
 import com.javainiai.chefskiss.data.recipe.ShopIngredient
@@ -125,12 +127,12 @@ fun RecipeCard(
                     modifier = Modifier.weight(1f)
                 )
                 IconButton(onClick = onRemove) {
-                    Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete")
+                    Icon(imageVector = Icons.Default.Delete, contentDescription = stringResource(R.string.delete))
                 }
                 IconButton(onClick = { opened = !opened }) {
                     Icon(
                         imageVector = if (opened) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
-                        contentDescription = "Open recipe ingredients"
+                        contentDescription = stringResource(R.string.openRecipeIngredients)
                     )
                 }
             }
@@ -163,13 +165,13 @@ fun RecipeCard(
 fun ShoppingListTopBar(onMenuClick: () -> Unit, modifier: Modifier = Modifier) {
     CenterAlignedTopAppBar(
         title = {
-            Text(text = "Shopping List")
+            Text(text = stringResource(R.string.shoppingList))
         },
         navigationIcon = {
             IconButton(onClick = onMenuClick) {
                 Icon(
                     imageVector = Icons.Default.Menu,
-                    contentDescription = "Open navigation drawer"
+                    contentDescription = stringResource(R.string.openNavigationDrawer)
                 )
             }
         },

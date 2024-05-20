@@ -37,9 +37,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.javainiai.chefskiss.R
 import com.javainiai.chefskiss.data.CalendarUtils
 import com.javainiai.chefskiss.data.CalendarUtils.getDateString
 import com.javainiai.chefskiss.data.enums.BulkMode
@@ -171,7 +173,7 @@ fun BulkEditTopBar(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 when (currentMode) {
                     BulkMode.Select -> {
-                        Text(text = "Select meals")
+                        Text(text = stringResource(R.string.select_meals))
                     }
 
                     else -> {
@@ -180,13 +182,13 @@ fun BulkEditTopBar(
                         IconButton(onClick = onBack) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                                contentDescription = "Back"
+                                contentDescription = stringResource(R.string.back)
                             )
                         }
                         IconButton(onClick = onForward) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                                contentDescription = "Forward"
+                                contentDescription = stringResource(R.string.forward)
                             )
                         }
                     }
@@ -197,7 +199,7 @@ fun BulkEditTopBar(
             IconButton(onClick = onNavigateBack) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back to meal planner"
+                    contentDescription = stringResource(R.string.backToMealPlanner)
                 )
             }
         }
@@ -226,40 +228,40 @@ fun BulkEditBottomBar(
                         FilledTonalButton(onClick = onSelectAll, colors = buttonColor) {
                             Icon(
                                 imageVector = Icons.Default.SelectAll,
-                                contentDescription = "Select meals"
+                                contentDescription = stringResource(R.string.select_meals)
                             )
                         }
-                        Text(text = "Select All")
+                        Text(text = stringResource(R.string.selectAll))
                     }
                     Spacer(modifier = Modifier.weight(1f))
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         FilledTonalButton(onClick = onDeselectAll, colors = buttonColor) {
                             Icon(
                                 imageVector = Icons.Default.Deselect,
-                                contentDescription = "Deselect meals"
+                                contentDescription = stringResource(R.string.deselect_meals)
                             )
                         }
-                        Text(text = "Deselect All")
+                        Text(text = stringResource(R.string.deselectAll))
                     }
                     Spacer(modifier = Modifier.weight(1f))
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         FilledTonalButton(onClick = onMove, colors = buttonColor) {
                             Icon(
                                 imageVector = Icons.Default.MoveDown,
-                                contentDescription = "Move meals"
+                                contentDescription = stringResource(R.string.moveMeals)
                             )
                         }
-                        Text(text = "Move")
+                        Text(text = stringResource(R.string.move))
                     }
                     Spacer(modifier = Modifier.weight(1f))
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         FilledTonalButton(onClick = onCopy, colors = buttonColor) {
                             Icon(
                                 imageVector = Icons.Default.ContentCopy,
-                                contentDescription = "Copy meals"
+                                contentDescription = stringResource(R.string.copyMeals)
                             )
                         }
-                        Text(text = "Copy")
+                        Text(text = stringResource(R.string.copy))
                     }
                     Spacer(modifier = Modifier.weight(1f))
                 }
@@ -268,9 +270,9 @@ fun BulkEditBottomBar(
                     Spacer(modifier = Modifier.weight(1f))
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         FilledTonalButton(onClick = onDone, colors = buttonColor) {
-                            Icon(imageVector = Icons.Default.Done, contentDescription = "Done")
+                            Icon(imageVector = Icons.Default.Done, contentDescription = stringResource(R.string.done))
                         }
-                        Text(text = "Done")
+                        Text(text = stringResource(R.string.done))
                     }
                     Spacer(modifier = Modifier.weight(1f))
                 }
@@ -329,7 +331,7 @@ fun PasteHereCard(
 ) {
     Card(modifier = modifier) {
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(8.dp)) {
-            Text(text = "+ Tap to paste here", fontWeight = FontWeight.Bold)
+            Text(text = stringResource(R.string.tapToPasteHere), fontWeight = FontWeight.Bold)
         }
     }
 }
@@ -340,7 +342,7 @@ fun MoveHereCard(
 ) {
     Card(modifier = modifier) {
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(8.dp)) {
-            Text(text = "+ Tap to move here", fontWeight = FontWeight.Bold)
+            Text(text = stringResource(R.string.tapToMoveHere), fontWeight = FontWeight.Bold)
         }
     }
 }

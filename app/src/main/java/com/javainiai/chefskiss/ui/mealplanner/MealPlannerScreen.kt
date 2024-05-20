@@ -44,9 +44,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.javainiai.chefskiss.R
 import com.javainiai.chefskiss.data.CalendarUtils
 import com.javainiai.chefskiss.data.CalendarUtils.getDateString
 import com.javainiai.chefskiss.data.recipe.PlannerRecipeWithRecipe
@@ -212,9 +214,9 @@ fun MealPlannerBottomBar(modifier: Modifier = Modifier, onBulkEditClick: () -> U
                     onClick = onBulkEditClick,
                     colors = ButtonDefaults.filledTonalButtonColors(containerColor = MaterialTheme.colorScheme.surface)
                 ) {
-                    Icon(imageVector = Icons.Default.EditNote, contentDescription = "Bulk Edit")
+                    Icon(imageVector = Icons.Default.EditNote, contentDescription = stringResource(R.string.bulkEdit))
                 }
-                Text(text = "Bulk Edit")
+                Text(text = stringResource(R.string.bulkEdit))
             }
             Spacer(modifier = Modifier.weight(1f))
         }
@@ -244,27 +246,27 @@ fun MealPlannerTopBar(
                     IconButton(onClick = onUndo) {
                         Icon(
                             imageVector = Icons.Default.RestartAlt,
-                            contentDescription = "Revert to current week"
+                            contentDescription = stringResource(R.string.revertToCurrentWeek)
                         )
                     }
                 }
                 IconButton(onClick = onBack) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                        contentDescription = "Back"
+                        contentDescription = stringResource(R.string.back)
                     )
                 }
                 IconButton(onClick = onForward) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                        contentDescription = "Forward"
+                        contentDescription = stringResource(R.string.forward)
                     )
                 }
             }
         },
         navigationIcon = {
             IconButton(onClick = onMenuClick) {
-                Icon(imageVector = Icons.Default.Menu, contentDescription = "Open navigation menu")
+                Icon(imageVector = Icons.Default.Menu, contentDescription = stringResource(R.string.openNavigationMenu))
             }
         },
         modifier = modifier
@@ -294,17 +296,17 @@ fun WeekdayCard(
                 IconButton(onClick = onOpen) {
                     Icon(
                         imageVector = if (opened) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
-                        contentDescription = "Open/Close card"
+                        contentDescription = stringResource(R.string.open_close_cards)
                     )
                 }
                 IconButton(onClick = onShoppingList) {
                     Icon(
                         imageVector = Icons.Default.ShoppingCart,
-                        contentDescription = "Add day to Shopping List"
+                        contentDescription = stringResource(R.string.addDayToShoppingList)
                     )
                 }
                 IconButton(onClick = onEdit) {
-                    Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit")
+                    Icon(imageVector = Icons.Default.Edit, contentDescription = stringResource(R.string.edit))
                 }
             }
             if (opened) {
