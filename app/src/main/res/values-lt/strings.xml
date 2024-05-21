@@ -129,4 +129,10 @@
     <string name="portion">Porcija</string>
     <string name="delete_meals">Ištrinti patiekalus</string>
     <string name="bulk_edit_delete_confirmation">Ar tikrai norite ištrinti %1$s receptus? (Negrįžtama)</string>
+    <string name="title_should_not_be_empty">Pavadinimas neturėtų būti tuščias!</string>
+    <string name="cooking_time_should_not_be_empty">Gaminimo laikas neturėtų būti tuščias!</string>
+    <string name="cooking_time_should_be_a_whole_number_ex_1_not">Gaminimo laikas turėtų būti sveikasis skaičius (pvz. 1), o ne (%1$s)!</string>
+    <string name="serving_size_should_not_be_empty">Porcijos dydis neturėtų būti tuščias!</string>
+    <string name="serving_size_should_be_a_whole_number_ex_1_not">Porcijos dydis turėtų būti sveikasis skaičius (pvz. 1), o ne (%1$s)!</string>
+    <string name="ingredients_amount_should_be_a_number_ex_1_1_not">Ingrediento (%1$s) kiekis turėtų būti skaičius (pvz. 1.1), o ne (%2$s)!</string>
 </resources>
