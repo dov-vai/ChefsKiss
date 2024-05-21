@@ -1,17 +1,16 @@
 package com.javainiai.chefskiss.ui.recipescreen
 
 import android.net.Uri
-import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHostState
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.javainiai.chefskiss.data.enums.CookingUnit
 import com.javainiai.chefskiss.data.ingredient.Ingredient
 import com.javainiai.chefskiss.data.recipe.Recipe
 import com.javainiai.chefskiss.data.recipe.RecipesRepository
 import com.javainiai.chefskiss.data.tag.Tag
+import com.javainiai.chefskiss.ui.components.viewmodel.BaseViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -20,11 +19,12 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 data class IngredientDisplay(
     val title: String,
     val amount: String,
-    val units: String
+    val units: CookingUnit
 )
 
 data class AddRecipeUiState(
@@ -46,19 +46,19 @@ data class AddRecipeUiState(
 class AddRecipeViewModel(
     savedStateHandle: SavedStateHandle,
     private val recipesRepository: RecipesRepository
-) : ViewModel() {
+) : BaseViewModel() {
     private val editRecipeId: Long? = savedStateHandle[EditRecipeDestination.editRecipeIdArg]
 
     private var _uiState =
         MutableStateFlow(
             AddRecipeUiState(
                 "",
-                "",
-                "",
+                "0",
+                "1",
                 0,
                 false,
                 Uri.EMPTY,
-                IngredientDisplay("", "", ""),
+                IngredientDisplay("", "", CookingUnit.Gram),
                 null,
                 listOf(),
                 "",
@@ -79,21 +79,7 @@ class AddRecipeViewModel(
 
     init {
         editRecipeId?.let {
-            initializeEditRecipe(it)
-        }
-    }
-
-    val snackbarHostState = SnackbarHostState()
-
-    private var messageInProgress: Job? = null
-    private fun showMessage(message: String) {
-        // cancel in case it hasn't finished so the message can be shown immediately
-        messageInProgress?.cancel()
-        messageInProgress = viewModelScope.launch {
-            snackbarHostState.showSnackbar(
-                message = message,
-                duration = SnackbarDuration.Short
-            )
+            viewModelScope.launch { initializeEditRecipe(it) }
         }
     }
 
@@ -153,22 +139,18 @@ class AddRecipeViewModel(
         }
     }
 
-    fun addTag() {
+    suspend fun addTag() {
         // don't add empty tags...
         if (_uiState.value.tag == "")
             return
 
-        viewModelScope.launch {
-            recipesRepository.insertTag(Tag(title = _uiState.value.tag))
-            updateTag("")
-        }
+        recipesRepository.insertTag(Tag(title = _uiState.value.tag))
+        updateTag("")
     }
 
-    fun removeTag(tag: Tag) {
-        viewModelScope.launch {
-            recipesRepository.deleteTag(tag)
-            updateTags(_uiState.value.tags - tag)
-        }
+    suspend fun removeTag(tag: Tag) {
+        recipesRepository.deleteTag(tag)
+        updateTags(_uiState.value.tags - tag)
     }
 
     fun updateTagRemoveMode(mode: Boolean) {
@@ -203,16 +185,9 @@ class AddRecipeViewModel(
         }
     }
 
-    // TODO: show validation messages to the user
-    private fun validateEntries(): Boolean {
-        with(uiState.value) {
-
-        }
-        return true
-    }
-
-    private fun initializeEditRecipe(recipeId: Long) {
-        viewModelScope.launch(Dispatchers.IO) {
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    public suspend fun initializeEditRecipe(recipeId: Long) {
+        withContext(Dispatchers.IO) {
             val recipeWithTags = recipesRepository.getRecipeWithTags(recipeId)
             val recipeWithIngredients = recipesRepository.getRecipeWithIngredients(recipeId)
             // if we are loading it, it should exist, so assert non-null
@@ -228,7 +203,7 @@ class AddRecipeViewModel(
                     rating = recipe.rating,
                     favorite = recipe.favorite,
                     imageUri = recipe.imagePath,
-                    ingredient = IngredientDisplay("", "", ""),
+                    ingredient = IngredientDisplay("", "", CookingUnit.Gram),
                     editingIngredient = null,
                     ingredients = ingredients.map {
                         IngredientDisplay(
@@ -244,6 +219,38 @@ class AddRecipeViewModel(
                 )
             }
         }
+    }
+
+    private fun validateEntries(): Boolean {
+        with(uiState.value) {
+            title.ifEmpty {
+                showMessage("Title should not be empty!")
+                return false
+            }
+            cookingTime.ifEmpty {
+                showMessage("Cooking time should not be empty!")
+                return false
+            }
+            if (cookingTime.toIntOrNull() == null) {
+                showMessage("Cooking time should be a whole number (ex. 1) not ($cookingTime)!")
+                return false
+            }
+            servings.ifEmpty {
+                showMessage("Serving size should not be empty!")
+                return false
+            }
+            if (servings.toIntOrNull() == null) {
+                showMessage("Serving size should be a whole number (ex. 1) not ($servings!)")
+                return false
+            }
+            for (i in ingredients) {
+                if (i.amount.toFloatOrNull() == null) {
+                    showMessage("Ingredients (${i.title}) amount should be a number (ex. 1.1) not (${i.amount})!")
+                    return false
+                }
+            }
+        }
+        return true
     }
 
     suspend fun saveToDatabase(): Boolean {
@@ -277,12 +284,10 @@ class AddRecipeViewModel(
                 } else {
                     recipesRepository.insertRecipeWithIngredientsAndTags(recipe, list, tags)
                 }
-
+                return true
             }
-        } else {
-            return false
         }
-        return true
+        return false
     }
 
     companion object {

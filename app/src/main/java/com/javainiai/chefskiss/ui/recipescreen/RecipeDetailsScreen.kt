@@ -56,6 +56,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -75,6 +78,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -82,16 +86,20 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
-import com.javainiai.chefskiss.data.CalendarUtils
+import com.javainiai.chefskiss.R
 import com.javainiai.chefskiss.data.enums.Meal
+import com.javainiai.chefskiss.data.enums.UnitSystem
 import com.javainiai.chefskiss.data.ingredient.Ingredient
 import com.javainiai.chefskiss.data.pdf.exportAsPdf
 import com.javainiai.chefskiss.data.pdf.getRecipeCardHtml
 import com.javainiai.chefskiss.data.recipe.PlannerRecipe
 import com.javainiai.chefskiss.data.recipe.Recipe
 import com.javainiai.chefskiss.data.tag.Tag
+import com.javainiai.chefskiss.data.utils.CalendarUtils
+import com.javainiai.chefskiss.data.utils.UnitUtils.convertUnit
 import com.javainiai.chefskiss.ui.AppViewModelProvider
 import com.javainiai.chefskiss.ui.navigation.NavigationDestination
+import com.javainiai.chefskiss.ui.timer.TimerDestination
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -114,10 +122,12 @@ fun RecipeDetailsScreen(
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     val customServingSize by viewModel.customServingSize.collectAsState()
+    val unitSystem by viewModel.unitSystem.collectAsState()
 
     Scaffold(
         topBar = {
             RecipeTopBar(
+                onTimer = { navigateTo("${TimerDestination.route}/${uiState.recipe.id}") },
                 isFavorite = uiState.recipe.favorite,
                 onFavorite = viewModel::updateFavorite,
                 onEdit = { navigateTo("${EditRecipeDestination.route}/${uiState.recipe.id}") },
@@ -179,8 +189,12 @@ fun RecipeDetailsScreen(
                 ingredients = uiState.ingredients,
                 checkedIngredients = checkedIngredients,
                 updateChecked = viewModel::updateCheckedIngredients,
-                modifier = Modifier.padding(padding),
-                multiplier = customServingSize.toFloat() / uiState.recipe.servings
+                modifier = Modifier
+                    .padding(padding)
+                    .fillMaxWidth(),
+                multiplier = customServingSize.toFloat() / uiState.recipe.servings,
+                unitSystem = unitSystem,
+                onUnitSystemChange = viewModel::updateUnitSystem
             )
 
             2 -> RecipeInstructions(recipe = uiState.recipe, modifier = Modifier.padding(padding))
@@ -240,7 +254,7 @@ fun RecipeAbout(
             Row {
                 Icon(
                     imageVector = Icons.Default.RestaurantMenu,
-                    contentDescription = "Title",
+                    contentDescription = stringResource(R.string.title),
                     modifier = Modifier.padding(end = 4.dp)
                 )
                 Text(text = recipe.title, fontWeight = FontWeight.Bold)
@@ -248,13 +262,14 @@ fun RecipeAbout(
             Row {
                 Icon(
                     imageVector = Icons.Default.Timer,
-                    contentDescription = "Cooking time",
+                    contentDescription = stringResource(R.string.cookingTime),
                     modifier = Modifier.padding(end = 4.dp)
                 )
-                Text(text = "Cooking time")
+                Text(text = stringResource(R.string.cookingTime))
                 Spacer(modifier = Modifier.weight(1f))
                 Text(
                     text = String.format(
+                        Locale.getDefault(),
                         "%02d:%02d",
                         recipe.cookingTime / 60,
                         recipe.cookingTime % 60
@@ -264,26 +279,26 @@ fun RecipeAbout(
             Row {
                 Icon(
                     imageVector = Icons.Default.People,
-                    contentDescription = "Cooking time",
+                    contentDescription = stringResource(R.string.cookingTime),
                     modifier = Modifier.padding(end = 4.dp)
                 )
-                Text(text = "Serving size")
+                Text(text = stringResource(R.string.servingSize))
                 Spacer(modifier = Modifier.weight(1f))
                 Text(text = customServingSize.toString())
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = "Adjust serving size")
+                Text(text = stringResource(R.string.adjustServingSize))
                 Spacer(modifier = Modifier.weight(1f))
                 IconButton(onClick = { onCustomServingSizeUpdate(customServingSize - 1) }) {
                     Icon(
                         imageVector = Icons.Default.Remove,
-                        contentDescription = "Remove 1 from serving size"
+                        contentDescription = stringResource(R.string.remove1FromServingSize)
                     )
                 }
                 IconButton(onClick = { onCustomServingSizeUpdate(customServingSize + 1) }) {
                     Icon(
                         imageVector = Icons.Default.Add,
-                        contentDescription = "Add 1 to serving size"
+                        contentDescription = stringResource(R.string.add1ToServingSize)
                     )
                 }
 
@@ -301,6 +316,8 @@ fun IngredientCard(
     modifier: Modifier = Modifier,
     multiplier: Float
 ) {
+    val context = LocalContext.current
+
     Card(modifier = modifier, colors = CardDefaults.cardColors(containerColor = containerColor)) {
         Row(
             modifier = Modifier.padding(8.dp),
@@ -314,12 +331,13 @@ fun IngredientCard(
             )
             Text(
                 text = if (ingredient.size == 0f) "" else String.format(
-                    "%.1f",
+                    Locale.getDefault(),
+                    "%.2f",
                     ingredient.size * multiplier
                 )
             )
             Text(
-                text = ingredient.unit,
+                text = ingredient.unit.getTitle(context),
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f)
             )
@@ -328,19 +346,41 @@ fun IngredientCard(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecipeIngredients(
     ingredients: List<Ingredient>,
     checkedIngredients: List<Ingredient>,
     updateChecked: (List<Ingredient>) -> Unit,
     modifier: Modifier = Modifier,
-    multiplier: Float
+    multiplier: Float,
+    unitSystem: UnitSystem,
+    onUnitSystemChange: (UnitSystem) -> Unit
 ) {
-    Surface(modifier = modifier) {
+    Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+        SingleChoiceSegmentedButtonRow {
+            SegmentedButton(
+                selected = unitSystem == UnitSystem.Metric,
+                onClick = { onUnitSystemChange(UnitSystem.Metric) },
+                shape = SegmentedButtonDefaults.itemShape(index = 0, count = 2)
+            )
+            {
+                Text(text = stringResource(R.string.metric))
+            }
+            SegmentedButton(
+                selected = unitSystem == UnitSystem.Imperial,
+                onClick = { onUnitSystemChange(UnitSystem.Imperial) },
+                shape = SegmentedButtonDefaults.itemShape(index = 1, count = 2)
+            )
+            {
+                Text(text = stringResource(R.string.imperial))
+            }
+        }
+
         LazyColumn {
             items(ingredients) { ingredient ->
                 IngredientCard(
-                    ingredient = ingredient,
+                    ingredient = ingredient.convertUnit(unitSystem),
                     checked = checkedIngredients.contains(ingredient),
                     onCheckedChange = {
                         if (it) {
@@ -381,9 +421,9 @@ data class RecipeScreen(
 @Composable
 fun RecipeBottomBar(screenIndex: Int, updateScreen: (Int) -> Unit, modifier: Modifier = Modifier) {
     val screens = listOf(
-        RecipeScreen("About", Icons.Default.RestaurantMenu),
-        RecipeScreen("Ingredients", Icons.Default.ShoppingBasket),
-        RecipeScreen("Directions", Icons.AutoMirrored.Default.MenuBook)
+        RecipeScreen(stringResource(R.string.about), Icons.Default.RestaurantMenu),
+        RecipeScreen(stringResource(R.string.ingredients), Icons.Default.ShoppingBasket),
+        RecipeScreen(stringResource(R.string.directions), Icons.AutoMirrored.Default.MenuBook)
     )
     BottomAppBar(modifier = modifier) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
@@ -416,11 +456,11 @@ fun ConfirmationDialog(
 ) {
     AlertDialog(onDismissRequest = onDismissRequest, confirmButton = {
         TextButton(onClick = onConfirm) {
-            Text(text = "Confirm")
+            Text(text = stringResource(R.string.confirm))
         }
     }, dismissButton = {
         TextButton(onClick = onDismiss) {
-            Text(text = "Dismiss")
+            Text(text = stringResource(R.string.dismiss))
         }
     },
         text = text,
@@ -428,13 +468,14 @@ fun ConfirmationDialog(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun MealPlannerDialog(
     onDismiss: () -> Unit,
     onAddToMealPlanner: (String, Meal) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
     var selectedType by remember { mutableStateOf(Meal.BREAKFAST) }
 
     Dialog(onDismissRequest = onDismiss) {
@@ -446,13 +487,13 @@ fun MealPlannerDialog(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Text(text = "Quick add to Meal Planner")
+                Text(text = stringResource(R.string.quickAddToMealPlanner))
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Meal.entries.forEach {
                         FilterChip(
                             selected = selectedType == it,
                             onClick = { selectedType = it },
-                            label = { Text(text = it.title) })
+                            label = { Text(text = it.getTitle(context)) })
                     }
                 }
                 HorizontalDivider()
@@ -486,6 +527,7 @@ fun MealPlannerDialog(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecipeTopBar(
+    onTimer: () -> Unit,
     isFavorite: Boolean,
     onFavorite: () -> Unit,
     onEdit: () -> Unit,
@@ -515,7 +557,7 @@ fun RecipeTopBar(
                 onDelete()
             },
             onDismissRequest = { showDialog = false },
-            text = { Text("Are you sure that you want to delete this recipe? (Can't be recovered)") })
+            text = { Text(stringResource(R.string.deleteConfirmation)) })
     }
 
     if (showMealPlannerDialog) {
@@ -530,68 +572,84 @@ fun RecipeTopBar(
             IconButton(onClick = onBack) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                    contentDescription = "Back"
+                    contentDescription = stringResource(R.string.back)
                 )
             }
         },
         title = {
             Row {
                 Spacer(modifier = Modifier.weight(1f))
+                IconButton(onClick = onTimer) {
+                    Icon(
+                        imageVector = Icons.Default.Timer,
+                        contentDescription = stringResource(R.string.timer)
+                    )
+                }
                 IconButton(onClick = onFavorite) {
                     Icon(
                         imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                        contentDescription = "Favorite"
+                        contentDescription = stringResource(R.string.favorite)
                     )
                 }
                 IconButton(onClick = onEdit) {
-                    Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit")
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = stringResource(R.string.edit)
+                    )
                 }
                 IconButton(onClick = { showDialog = true }) {
-                    Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete")
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = stringResource(R.string.delete)
+                    )
                 }
                 Box(
                     modifier = Modifier
                         .wrapContentSize(Alignment.TopEnd)
                 ) {
                     IconButton(onClick = { expanded = !expanded }) {
-                        Icon(imageVector = Icons.Default.MoreVert, contentDescription = "More")
+                        Icon(
+                            imageVector = Icons.Default.MoreVert,
+                            contentDescription = stringResource(R.string.more)
+                        )
                     }
                     DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                        DropdownMenuItem(leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Default.ShoppingCart,
-                                contentDescription = "Add to shopping list"
-                            )
-                        }, text = { Text(text = "Add to shopping list") }, onClick = {
-                            expanded = false
-                            onShopping()
-                        })
-                        DropdownMenuItem(leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Default.CalendarMonth,
-                                contentDescription = "Add to meal planner"
-                            )
-                        }, text = { Text(text = "Add to meal planner") }, onClick = {
-                            expanded = false
-                            showMealPlannerDialog = true
-                        })
-                        DropdownMenuItem(leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Default.Timer,
-                                contentDescription = "Set timer"
-                            )
-                        }, text = { Text(text = "Set timer") }, onClick = {
-                            expanded = false
-                        })
-                        DropdownMenuItem(leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Default.PictureAsPdf,
-                                contentDescription = "Print/Export as PDF"
-                            )
-                        }, text = { Text(text = "Print/Export as PDF") }, onClick = {
-                            expanded = false
-                            onExportPdf()
-                        })
+                        DropdownMenuItem(
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.ShoppingCart,
+                                    contentDescription = stringResource(R.string.addToShoppingList)
+                                )
+                            },
+                            text = { Text(text = stringResource(R.string.addToShoppingList)) },
+                            onClick = {
+                                expanded = false
+                                onShopping()
+                            })
+                        DropdownMenuItem(
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.CalendarMonth,
+                                    contentDescription = stringResource(R.string.addToMealPlanner)
+                                )
+                            },
+                            text = { Text(text = stringResource(R.string.addToMealPlanner)) },
+                            onClick = {
+                                expanded = false
+                                showMealPlannerDialog = true
+                            })
+                        DropdownMenuItem(
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.PictureAsPdf,
+                                    contentDescription = stringResource(R.string.printExportasPDF)
+                                )
+                            },
+                            text = { Text(text = stringResource(R.string.printExportasPDF)) },
+                            onClick = {
+                                expanded = false
+                                onExportPdf()
+                            })
                     }
                 }
             }

@@ -67,18 +67,16 @@ class OfflineRecipesRepository(
         tags: List<Tag>,
         favorite: Boolean
     ): Flow<List<Recipe>> {
-        var query = "SELECT * FROM recipes WHERE rating >= ${rating}"
 
-        if (recipeName != "") {
-            query += " AND title LIKE '%${recipeName}%'"
-        }
+        var query = "SELECT * FROM recipes WHERE rating >= ? AND title LIKE ?"
+
         if (favorite) {
             query += " AND favorite = true"
         }
 
         if (tags.isNotEmpty()) {
-            val recipeIds = getRecipeIdsByTagIds(tags.map { it.id })
-            query += " AND id IN (${recipeIds.joinToString()})"
+            val tagIds = tags.map { it.id }.joinToString()
+            query += " AND id IN (SELECT recipeId from recipes_tags WHERE tagId IN ($tagIds))"
         }
 
         val sort = when (sortingMethod) {
@@ -88,13 +86,11 @@ class OfflineRecipesRepository(
             Sort.ADDED -> "id"
         }
 
-        query += " ORDER BY ${sort}"
-
         val order = if (isAsc) "ASC" else "DESC"
 
-        query += " ${order}"
+        query += " ORDER BY $sort $order"
 
-        return recipeDao.query(SimpleSQLiteQuery(query))
+        return recipeDao.query(SimpleSQLiteQuery(query, arrayOf(rating, "%$recipeName%")))
     }
 
 
@@ -132,7 +128,7 @@ class OfflineRecipesRepository(
             ingredientDao.delete(ingredient)
         }
         for (tag in tagsToRemove) {
-            tagDao.delete(tag)
+            recipeDao.delete(RecipeTagCrossRef(recipe.id, tag.id))
         }
 
         for (ingredient in ingredients) {
@@ -152,4 +148,5 @@ class OfflineRecipesRepository(
     override suspend fun insertPlannerRecipe(item: PlannerRecipe) = recipeDao.insert(item)
     override suspend fun updatePlannerRecipe(item: PlannerRecipe) = recipeDao.update(item)
     override suspend fun deletePlannerRecipe(item: PlannerRecipe) = recipeDao.delete(item)
+    override suspend fun deleteRecipeTag(item: RecipeTagCrossRef) = recipeDao.delete(item)
 }
