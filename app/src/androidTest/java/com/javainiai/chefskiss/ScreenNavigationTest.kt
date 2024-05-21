@@ -13,9 +13,9 @@ import androidx.compose.ui.test.performTextInput
 import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.testing.TestNavHostController
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.javainiai.chefskiss.data.CalendarUtils
-import com.javainiai.chefskiss.data.CalendarUtils.getDateString
-import com.javainiai.chefskiss.ui.ChefsKissApp
+import com.javainiai.chefskiss.data.utils.CalendarUtils
+import com.javainiai.chefskiss.data.utils.CalendarUtils.getDateString
+import com.javainiai.chefskiss.ui.app.ChefsKissApp
 import com.javainiai.chefskiss.ui.navigation.NavDrawerNavigatorDestination
 import com.javainiai.chefskiss.ui.recipescreen.AddRecipeDestination
 import com.javainiai.chefskiss.ui.recipescreen.RecipeDetailsDestination
@@ -69,10 +69,9 @@ class ScreenNavigationTest {
         composeTestRule.onNodeWithText(currentDate.getDateString()).assertExists()
     }
 
-    private fun addRecipe(title: String, cookingTime: String, servings: String) {
+    private fun addRecipe(title: String, servings: String) {
         composeTestRule.onNodeWithContentDescription("Add recipe").performClick()
         composeTestRule.onNodeWithText("Title").performTextInput(title)
-        composeTestRule.onNodeWithText("Cooking Time (minutes)").performTextInput(cookingTime)
         composeTestRule.onNodeWithText("Servings").performTextInput(servings)
         composeTestRule.onNodeWithContentDescription("Done").performClick()
     }
@@ -80,9 +79,8 @@ class ScreenNavigationTest {
     @Test
     fun navHost_clickOnRecipeCard_navigatesToRecipeDetails() {
         val title = "Pancakes"
-        val cookingTime = "20"
         val servings = "2"
-        addRecipe(title, cookingTime, servings)
+        addRecipe(title, servings)
         composeTestRule.onNodeWithText(title).performClick()
         navController.assertCurrentRouteName(RecipeDetailsDestination.routeWithArgs)
         composeTestRule.onNodeWithText(title).assertExists()
@@ -105,9 +103,8 @@ class ScreenNavigationTest {
     @Test
     fun navHost_clickOnMealPlannerRecipe_navigatesToRecipeDetails() {
         val recipe = "Omelette"
-        val cookingTime = "20"
         val servings = "2"
-        addRecipe(recipe, cookingTime, servings)
+        addRecipe(recipe, servings)
         composeTestRule.onNodeWithContentDescription("Search button").performClick()
         composeTestRule.onNodeWithText("Meal Planner").performClick()
         val currentDate = CalendarUtils.getCurrentDate()
@@ -118,7 +115,7 @@ class ScreenNavigationTest {
         ).performClick()
         composeTestRule.onNodeWithText("Select Recipe").performClick()
         composeTestRule.onNodeWithText(recipe).performClick()
-        composeTestRule.onNodeWithText("Add To Planner").performClick()
+        composeTestRule.onNodeWithText("Add to Planner").performClick()
         composeTestRule.onNodeWithContentDescription("Back").performClick()
         composeTestRule.onNodeWithText(recipe).performClick()
         navController.assertCurrentRouteName(RecipeDetailsDestination.routeWithArgs)

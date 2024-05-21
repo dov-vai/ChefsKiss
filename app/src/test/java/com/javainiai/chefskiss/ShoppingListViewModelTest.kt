@@ -1,6 +1,8 @@
 package com.javainiai.chefskiss
 
+import android.content.Context
 import android.net.Uri
+import androidx.test.core.app.ApplicationProvider
 import com.javainiai.chefskiss.data.recipe.Recipe
 import com.javainiai.chefskiss.data.recipe.RecipesRepository
 import com.javainiai.chefskiss.data.recipe.ShopIngredient
@@ -23,12 +25,13 @@ import org.robolectric.RobolectricTestRunner
 class ShoppingListViewModelTest {
     private lateinit var recipesRepository: RecipesRepository
     private lateinit var viewModel: ShoppingListViewModel
+    private lateinit var context: Context
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Before
     fun setup() {
+        context = ApplicationProvider.getApplicationContext()
         recipesRepository = mockk(relaxed = true)
-        viewModel = ShoppingListViewModel(recipesRepository)
+        viewModel = ShoppingListViewModel(context, recipesRepository)
     }
 
     @Test

@@ -53,8 +53,8 @@ class AddRecipeViewModel(
         MutableStateFlow(
             AddRecipeUiState(
                 "",
-                "",
-                "",
+                "0",
+                "1",
                 0,
                 false,
                 Uri.EMPTY,

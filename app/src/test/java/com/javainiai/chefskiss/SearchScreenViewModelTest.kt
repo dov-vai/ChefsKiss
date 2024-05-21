@@ -3,8 +3,8 @@ package com.javainiai.chefskiss
 import com.javainiai.chefskiss.data.enums.Sort
 import com.javainiai.chefskiss.data.recipe.RecipesRepository
 import com.javainiai.chefskiss.data.tag.Tag
-import com.javainiai.chefskiss.ui.components.SearchScreenViewModel
-import com.javainiai.chefskiss.ui.components.SearchUiState
+import com.javainiai.chefskiss.ui.components.search.SearchScreenViewModel
+import com.javainiai.chefskiss.ui.components.search.SearchUiState
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals

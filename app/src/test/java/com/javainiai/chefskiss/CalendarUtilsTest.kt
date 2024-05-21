@@ -1,10 +1,10 @@
 package com.javainiai.chefskiss
 
-import com.javainiai.chefskiss.data.CalendarUtils.datePlusOffset
-import com.javainiai.chefskiss.data.CalendarUtils.getCurrentDate
-import com.javainiai.chefskiss.data.CalendarUtils.getDateString
-import com.javainiai.chefskiss.data.CalendarUtils.getEndOfWeek
-import com.javainiai.chefskiss.data.CalendarUtils.getStartOfWeek
+import com.javainiai.chefskiss.data.utils.CalendarUtils.datePlusOffset
+import com.javainiai.chefskiss.data.utils.CalendarUtils.getCurrentDate
+import com.javainiai.chefskiss.data.utils.CalendarUtils.getDateString
+import com.javainiai.chefskiss.data.utils.CalendarUtils.getEndOfWeek
+import com.javainiai.chefskiss.data.utils.CalendarUtils.getStartOfWeek
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.text.SimpleDateFormat

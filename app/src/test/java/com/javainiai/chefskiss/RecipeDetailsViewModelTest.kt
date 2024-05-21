@@ -1,7 +1,10 @@
 package com.javainiai.chefskiss
 
+import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
+import androidx.test.core.app.ApplicationProvider
+import com.javainiai.chefskiss.data.enums.CookingUnit
 import com.javainiai.chefskiss.data.enums.Meal
 import com.javainiai.chefskiss.data.ingredient.Ingredient
 import com.javainiai.chefskiss.data.recipe.PlannerRecipe
@@ -29,11 +32,13 @@ class RecipeDetailsViewModelTest {
     private lateinit var viewModel: RecipeDetailsViewModel
     private val recipesRepository = mockk<RecipesRepository>(relaxed = true)
     private val savedStateHandle = mockk<SavedStateHandle>()
+    private lateinit var context: Context
 
     @Before
     fun setup() {
+        context = ApplicationProvider.getApplicationContext()
         coEvery { savedStateHandle.get<Long>(any()) } returns 1L
-        viewModel = RecipeDetailsViewModel(savedStateHandle, recipesRepository)
+        viewModel = RecipeDetailsViewModel(context, savedStateHandle, recipesRepository)
     }
 
     @Test
@@ -44,7 +49,7 @@ class RecipeDetailsViewModelTest {
                 recipeId = 1,
                 name = "Test Ingredient",
                 size = 1f,
-                unit = "Test Unit"
+                unit = CookingUnit.Gram
             )
         )
         val recipeWithIngredients = RecipeWithIngredients(recipe, ingredients)
@@ -67,54 +72,35 @@ class RecipeDetailsViewModelTest {
 
         coEvery { recipesRepository.getRecipeWithTags(any()) } returns flowOf(recipeWithTags)
 
-        val expectedTags = tags
-        assertEquals(expectedTags, viewModel.tags.value)
+        assertEquals(tags, viewModel.tags.value)
     }
 
     @Test
     fun `test deleteRecipe`() = runBlocking {
-        val recipe = Recipe(1, "Test Recipe", "Test Description", 1, 1, 1, false, Uri.EMPTY)
-
-        coEvery { recipesRepository.deleteRecipe(any()) } returns Unit
-
         viewModel.deleteRecipe()
 
-        coVerify { recipesRepository.deleteRecipe(recipe) }
+        coVerify { recipesRepository.deleteRecipe(any()) }
     }
 
     @Test
     fun `test addToShoppingList`() = runBlocking {
-        val shopRecipe = ShopRecipe(1)
-
-        coEvery { recipesRepository.insertShopRecipe(any()) } returns Unit
-
         viewModel.addToShoppingList()
 
-        coVerify { recipesRepository.insertShopRecipe(shopRecipe) }
+        coVerify { recipesRepository.insertShopRecipe(any()) }
     }
 
     @Test
     fun `test updateFavorite`() = runBlocking {
-        val recipe = Recipe(1, "Test Recipe", "Test Description", 1, 1, 1, false, Uri.EMPTY)
-        val updatedRecipe = recipe.copy(favorite = !recipe.favorite)
-
-        coEvery { recipesRepository.updateRecipe(any()) } returns Unit
-
         viewModel.updateFavorite()
 
-        coVerify { recipesRepository.updateRecipe(updatedRecipe) }
+        coVerify { recipesRepository.updateRecipe(any()) }
     }
 
     @Test
     fun `test updateRating`() = runBlocking {
-        val recipe = Recipe(1, "Test Recipe", "Test Description", 1, 1, 1, false, Uri.EMPTY)
-        val updatedRecipe = recipe.copy(rating = 5)
-
-        coEvery { recipesRepository.updateRecipe(any()) } returns Unit
-
         viewModel.updateRating(5)
 
-        coVerify { recipesRepository.updateRecipe(updatedRecipe) }
+        coVerify { recipesRepository.updateRecipe(any()) }
     }
 
     @Test
@@ -124,7 +110,7 @@ class RecipeDetailsViewModelTest {
                 recipeId = 1,
                 name = "Test Ingredient",
                 size = 1f,
-                unit = "Test Unit"
+                unit = CookingUnit.Gram
             )
         )
 

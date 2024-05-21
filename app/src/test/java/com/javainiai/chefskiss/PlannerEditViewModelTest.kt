@@ -8,9 +8,12 @@ import com.javainiai.chefskiss.data.recipe.OfflineRecipesRepository
 import com.javainiai.chefskiss.data.recipe.PlannerRecipe
 import com.javainiai.chefskiss.data.recipe.Recipe
 import com.javainiai.chefskiss.ui.mealplanner.PlannerEditViewModel
+import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -27,7 +30,12 @@ class PlannerEditViewModelTest {
 
     @Before
     fun setup() {
-        every { savedStateHandle.get<String>(any()) } returns ""
+        val recipe = Recipe(1, "Test Recipe", "Test Description", 1, 1, 1, false, Uri.EMPTY)
+        coEvery { recipesRepository.getRecipeStream(any()) } returns flowOf(recipe)
+
+        every { savedStateHandle.get<String>(any()) } returns "2024-01-01"
+
+        selectedRecipeDataSource.updateRecipeId(1L)
 
         viewModel = PlannerEditViewModel(
             selectedRecipeDataSource,
@@ -51,16 +59,8 @@ class PlannerEditViewModelTest {
 
     @Test
     fun testInsertPlannerRecipe() = runBlocking {
-        // Arrange
-        val expectedRecipe = Recipe(1, "Test Recipe", "Test Description", 1, 1, 1, false, Uri.EMPTY)
-//        coEvery { selectedRecipeDataSource.recipeId } returns MutableStateFlow(expectedRecipe.id).asStateFlow()
-//        coEvery { recipesRepository.getRecipeStream(expectedRecipe.id) } returns flowOf(expectedRecipe)
-
-        every { viewModel.selectedRecipe.value } returns expectedRecipe
-        // Act
         viewModel.insertPlannerRecipe()
 
-        // Assert
         coVerify { recipesRepository.insertPlannerRecipe(any()) }
     }
 

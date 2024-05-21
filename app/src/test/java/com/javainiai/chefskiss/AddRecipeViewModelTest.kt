@@ -2,6 +2,7 @@ package com.javainiai.chefskiss
 
 import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
+import com.javainiai.chefskiss.data.enums.CookingUnit
 import com.javainiai.chefskiss.data.recipe.Recipe
 import com.javainiai.chefskiss.data.recipe.RecipeWithIngredients
 import com.javainiai.chefskiss.data.recipe.RecipeWithTags
@@ -63,14 +64,14 @@ class AddRecipeViewModelTest {
 
     @Test
     fun addRecipeViewModel_updateIngredient_uiStateUpdates() = runBlocking {
-        val ingredient = IngredientDisplay("Test Ingredient", "1", "cup")
+        val ingredient = IngredientDisplay("Test Ingredient", "1", CookingUnit.Cup)
         viewModel.updateIngredient(ingredient)
         Assert.assertEquals(ingredient, viewModel.uiState.first().ingredient)
     }
 
     @Test
     fun addRecipeViewModel_updateIngredients_uiStateUpdates() = runBlocking {
-        val ingredients = listOf(IngredientDisplay("Test Ingredient", "1", "cup"))
+        val ingredients = listOf(IngredientDisplay("Test Ingredient", "1", CookingUnit.Cup))
         viewModel.updateIngredients(ingredients)
         Assert.assertEquals(ingredients, viewModel.uiState.first().ingredients)
     }
@@ -120,7 +121,7 @@ class AddRecipeViewModelTest {
 
     @Test
     fun addRecipeViewModel_updateEditingIngredient_uiStateUpdates() = runBlocking {
-        val ingredient = IngredientDisplay("Test Ingredient", "1", "cup")
+        val ingredient = IngredientDisplay("Test Ingredient", "1", CookingUnit.Cup)
         viewModel.updateEditingIngredient(ingredient)
         Assert.assertEquals(ingredient, viewModel.uiState.first().editingIngredient)
     }
@@ -208,7 +209,7 @@ class AddRecipeViewModelTest {
         viewModel.updateCookingTime("30")
         viewModel.updateServings("3")
         viewModel.updateDirections("Test Description")
-        viewModel.updateIngredients(listOf(IngredientDisplay("Test Ingredient", "Three", "Kg")))
+        viewModel.updateIngredients(listOf(IngredientDisplay("Test Ingredient", "Three", CookingUnit.Kilogram)))
         val result = viewModel.saveToDatabase()
         Assert.assertFalse(result)
     }
@@ -219,7 +220,7 @@ class AddRecipeViewModelTest {
         viewModel.updateCookingTime("30")
         viewModel.updateServings("Three")
         viewModel.updateDirections("Test Description")
-        viewModel.updateIngredient((IngredientDisplay("Test Ingredient", "3", "Kg")))
+        viewModel.updateIngredient((IngredientDisplay("Test Ingredient", "3", CookingUnit.Kilogram)))
         val result = viewModel.saveToDatabase()
         Assert.assertFalse(result)
     }
