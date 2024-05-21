@@ -68,10 +68,10 @@
     <string name="addIngredient">Add Ingredient</string>
     <string name="remove">Remove</string>
     <string name="enterCookingDirections">Enter cooking directions</string>
-    <string name="servingSize">Serving size</string>
-    <string name="adjustServingSize">Adjust serving size</string>
-    <string name="remove1FromServingSize">Remove 1 from serving size</string>
-    <string name="add1ToServingSize">Add 1 to serving size</string>
+    <string name="servingSize">Servings</string>
+    <string name="adjustServingSize">Adjust servings</string>
+    <string name="remove1FromServingSize">Remove 1 from servings</string>
+    <string name="add1ToServingSize">Add 1 to servings</string>
     <string name="metric">Metric</string>
     <string name="about">About</string>
     <string name="dismiss">Dismiss</string>
@@ -114,7 +114,7 @@
     <string name="added_to_shopping_list">Added to shopping list</string>
     <string name="added_to_favorites">Added to favorites</string>
     <string name="removed_from_favorites">Removed from favorites</string>
-    <string name="serving_size_can_t_be_lower_than_1">Serving size can\'t be lower than 1</string>
+    <string name="serving_size_can_t_be_lower_than_1">Servings can\'t be lower than 1</string>
     <string name="added_to_as">Added to %1$s as %2$s</string>
     <string name="removed">Removed %1$s</string>
     <string name="_1_minute">1 minute</string>
@@ -129,4 +129,10 @@
     <string name="portion">Portion</string>
     <string name="delete_meals">Delete meals</string>
     <string name="bulk_edit_delete_confirmation">Are you sure that you want to delete %1$s recipes? (Can\'t be recovered)</string>
+    <string name="title_should_not_be_empty">Title should not be empty!</string>
+    <string name="cooking_time_should_not_be_empty">Cooking time should not be empty!</string>
+    <string name="cooking_time_should_be_a_whole_number_ex_1_not">Cooking time should be a whole number (ex. 1) not (%1$s)!</string>
+    <string name="serving_size_should_not_be_empty">Servings should not be empty!</string>
+    <string name="serving_size_should_be_a_whole_number_ex_1_not">Servings should be a whole number (ex. 1) not (%1$s!)</string>
+    <string name="ingredients_amount_should_be_a_number_ex_1_1_not">Ingredients (%1$s) amount should be a number (ex. 1.1) not (%2$s)!</string>
 </resources>

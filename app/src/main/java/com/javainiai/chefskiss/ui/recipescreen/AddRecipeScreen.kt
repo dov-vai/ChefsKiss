@@ -6,6 +6,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,6 +29,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Edit
@@ -203,18 +205,36 @@ fun AddRecipeScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CookingTimePicker(onCookingTimeChange: (String) -> Unit) {
+fun CookingTimePicker(onCookingTimeChange: (String) -> Unit, cookingTime: String) {
     var showTimePicker by remember { mutableStateOf(false) }
     val state = rememberTimePickerState(is24Hour = true)
+    val interactionSource = remember { MutableInteractionSource() }
 
-    Box(propagateMinConstraints = false) {
-        Button(
-            modifier = Modifier.align(Alignment.Center),
-            onClick = { showTimePicker = true }
-        ) {
-            Text(stringResource(R.string.setTime))
-        }
+
+    Box() {
+        TextField(
+            value = cookingTime,
+            onValueChange = { },
+            readOnly = true,
+            label = { Text(text = stringResource(R.string.cookingTime)) },
+            trailingIcon = {
+                Icon(
+                    imageVector = Icons.Default.AccessTime,
+                    contentDescription = stringResource(R.string.cookingTime)
+                )
+            }
+        )
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .clickable(
+                    onClick = { showTimePicker = true },
+                    interactionSource = interactionSource,
+                    indication = null
+                )
+        )
     }
+
     if (showTimePicker) {
         TimePickerDialog(
             onCancel = { showTimePicker = false },
@@ -376,21 +396,15 @@ fun RecipeOverview(
             }
         )
 
-        Row {
-            Spacer(modifier = Modifier.padding(end = 4.dp))
-            Text(text = stringResource(R.string.cookingTime))
-            Text(
-                text = String.format(
-                    Locale.getDefault(),
-                    "%02d:%02d",
-                    hours,
-                    minutes
-                )
+        CookingTimePicker(
+            onCookingTimeChange = onCookingTimeChange,
+            cookingTime = String.format(
+                Locale.getDefault(),
+                "%02d:%02d",
+                hours,
+                minutes
             )
-        }
-
-        CookingTimePicker(onCookingTimeChange)
-
+        )
 
     }
 }
@@ -605,7 +619,11 @@ fun RecipeIngredients(
                     onEdit = {
                         updateEditingIngredient(it)
                         updateIngredient(it)
-                    })
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                )
             }
         }
     }
@@ -623,9 +641,9 @@ fun IngredientCard(
 
     Card(modifier = modifier, colors = CardDefaults.cardColors(containerColor = containerColor)) {
         Row(
-            modifier = Modifier.padding(8.dp),
+            modifier = Modifier.padding(10.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(
                 text = ingredient.title,

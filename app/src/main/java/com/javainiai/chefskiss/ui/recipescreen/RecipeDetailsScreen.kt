@@ -62,6 +62,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -180,8 +181,7 @@ fun RecipeDetailsScreen(
                 tags = tags,
                 modifier = Modifier.padding(padding),
                 onRating = viewModel::updateRating,
-                customServingSize = customServingSize,
-                onCustomServingSizeUpdate = viewModel::adjustServingSize
+                servingSize = uiState.recipe.servings
             )
 
             1 -> RecipeIngredients(
@@ -193,7 +193,9 @@ fun RecipeDetailsScreen(
                     .fillMaxWidth(),
                 multiplier = customServingSize.toFloat() / uiState.recipe.servings,
                 unitSystem = unitSystem,
-                onUnitSystemChange = viewModel::updateUnitSystem
+                onUnitSystemChange = viewModel::updateUnitSystem,
+                onCustomServingSizeUpdate = viewModel::adjustServingSize,
+                customServingSize = customServingSize
             )
 
             2 -> RecipeInstructions(recipe = uiState.recipe, modifier = Modifier.padding(padding))
@@ -207,8 +209,7 @@ fun RecipeAbout(
     tags: List<Tag>,
     modifier: Modifier = Modifier,
     onRating: (Int) -> Unit,
-    customServingSize: Int,
-    onCustomServingSizeUpdate: (Int) -> Unit,
+    servingSize: Int
 ) {
     Surface(modifier = modifier) {
         Column(
@@ -283,24 +284,7 @@ fun RecipeAbout(
                 )
                 Text(text = stringResource(R.string.servingSize))
                 Spacer(modifier = Modifier.weight(1f))
-                Text(text = customServingSize.toString())
-            }
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = stringResource(R.string.adjustServingSize))
-                Spacer(modifier = Modifier.weight(1f))
-                IconButton(onClick = { onCustomServingSizeUpdate(customServingSize - 1) }) {
-                    Icon(
-                        imageVector = Icons.Default.Remove,
-                        contentDescription = stringResource(R.string.remove1FromServingSize)
-                    )
-                }
-                IconButton(onClick = { onCustomServingSizeUpdate(customServingSize + 1) }) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = stringResource(R.string.add1ToServingSize)
-                    )
-                }
-
+                Text(text = servingSize.toString())
             }
         }
     }
@@ -319,9 +303,9 @@ fun IngredientCard(
 
     Card(modifier = modifier, colors = CardDefaults.cardColors(containerColor = containerColor)) {
         Row(
-            modifier = Modifier.padding(8.dp),
+            modifier = Modifier.padding(10.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(
                 text = ingredient.name,
@@ -354,7 +338,9 @@ fun RecipeIngredients(
     modifier: Modifier = Modifier,
     multiplier: Float,
     unitSystem: UnitSystem,
-    onUnitSystemChange: (UnitSystem) -> Unit
+    onUnitSystemChange: (UnitSystem) -> Unit,
+    customServingSize: Int,
+    onCustomServingSizeUpdate: (Int) -> Unit
 ) {
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         SingleChoiceSegmentedButtonRow {
@@ -373,6 +359,35 @@ fun RecipeIngredients(
             )
             {
                 Text(text = stringResource(R.string.imperial))
+            }
+        }
+
+        Card(
+            modifier = Modifier.padding(10.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp)
+            )
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(12.dp)
+            ) {
+                Text(text = stringResource(R.string.adjustServingSize))
+                Spacer(modifier = Modifier.weight(1f))
+                Text(text = customServingSize.toString())
+                Spacer(modifier = Modifier.weight(1f))
+                IconButton(onClick = { onCustomServingSizeUpdate(customServingSize - 1) }) {
+                    Icon(
+                        imageVector = Icons.Default.Remove,
+                        contentDescription = stringResource(R.string.remove1FromServingSize)
+                    )
+                }
+                IconButton(onClick = { onCustomServingSizeUpdate(customServingSize + 1) }) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = stringResource(R.string.add1ToServingSize)
+                    )
+                }
             }
         }
 

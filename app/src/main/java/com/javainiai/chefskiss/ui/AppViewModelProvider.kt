@@ -24,6 +24,7 @@ object AppViewModelProvider {
         }
         initializer {
             AddRecipeViewModel(
+                chefsKissApplication().container.context,
                 this.createSavedStateHandle(),
                 chefsKissApplication().container.recipesRepository
             )

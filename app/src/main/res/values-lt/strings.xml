@@ -68,10 +68,10 @@
     <string name="addIngredient">Pridėti ingredientą</string>
     <string name="remove">Pašalinti</string>
     <string name="enterCookingDirections">Įveskite gaminimo nurodymus</string>
-    <string name="servingSize">Porcijų dydis</string>
-    <string name="adjustServingSize">Reguliuoti porcijų dydį</string>
-    <string name="remove1FromServingSize">Pašalinti 1 iš porcijų dydžio</string>
-    <string name="add1ToServingSize">Pridėti 1 prie porcijų dydžio</string>
+    <string name="servingSize">Porcijų kiekis</string>
+    <string name="adjustServingSize">Reguliuoti porcijų kiekį</string>
+    <string name="remove1FromServingSize">Pašalinti 1 iš porcijų kiekio</string>
+    <string name="add1ToServingSize">Pridėti 1 prie porcijų kiekio</string>
     <string name="metric">Metrinė</string>
     <string name="about">Apie</string>
     <string name="dismiss">Atmesti</string>
@@ -114,7 +114,7 @@
     <string name="added_to_shopping_list">Pridėta į pirkinių sąrašą</string>
     <string name="added_to_favorites">Pridėta į mėgstamiausius</string>
     <string name="removed_from_favorites">Pašalinta iš mėgstamiausių</string>
-    <string name="serving_size_can_t_be_lower_than_1">Porcijų skaičius negali būti mažesnis nei 1</string>
+    <string name="serving_size_can_t_be_lower_than_1">Porcijų kiekis negali būti mažesnis nei 1</string>
     <string name="added_to_as">Pridėta į %1$s kaip %2$s</string>
     <string name="removed">Pašalinta %1$s</string>
     <string name="_1_minute">1 minutė</string>
@@ -129,4 +129,10 @@
     <string name="portion">Porcija</string>
     <string name="delete_meals">Ištrinti patiekalus</string>
     <string name="bulk_edit_delete_confirmation">Ar tikrai norite ištrinti %1$s receptus? (Negrįžtama)</string>
+    <string name="title_should_not_be_empty">Pavadinimas neturėtų būti tuščias!</string>
+    <string name="cooking_time_should_not_be_empty">Gaminimo laikas neturėtų būti tuščias!</string>
+    <string name="cooking_time_should_be_a_whole_number_ex_1_not">Gaminimo laikas turėtų būti sveikasis skaičius (pvz. 1), o ne (%1$s)!</string>
+    <string name="serving_size_should_not_be_empty">Porcijų kiekis neturėtų būti tuščias!</string>
+    <string name="serving_size_should_be_a_whole_number_ex_1_not">Porcijų kiekis turėtų būti sveikasis skaičius (pvz. 1), o ne (%1$s)!</string>
+    <string name="ingredients_amount_should_be_a_number_ex_1_1_not">Ingrediento (%1$s) kiekis turėtų būti skaičius (pvz. 1.1), o ne (%2$s)!</string>
 </resources>

@@ -1,9 +1,11 @@
 package com.javainiai.chefskiss.ui.recipescreen
 
+import android.content.Context
 import android.net.Uri
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.javainiai.chefskiss.R
 import com.javainiai.chefskiss.data.enums.CookingUnit
 import com.javainiai.chefskiss.data.ingredient.Ingredient
 import com.javainiai.chefskiss.data.recipe.Recipe
@@ -44,6 +46,7 @@ data class AddRecipeUiState(
 )
 
 class AddRecipeViewModel(
+    private val context: Context,
     savedStateHandle: SavedStateHandle,
     private val recipesRepository: RecipesRepository
 ) : BaseViewModel() {
@@ -224,28 +227,44 @@ class AddRecipeViewModel(
     private fun validateEntries(): Boolean {
         with(uiState.value) {
             title.ifEmpty {
-                showMessage("Title should not be empty!")
+                showMessage(context.getString(R.string.title_should_not_be_empty))
                 return false
             }
             cookingTime.ifEmpty {
-                showMessage("Cooking time should not be empty!")
+                showMessage(context.getString(R.string.cooking_time_should_not_be_empty))
                 return false
             }
             if (cookingTime.toIntOrNull() == null) {
-                showMessage("Cooking time should be a whole number (ex. 1) not ($cookingTime)!")
+                showMessage(
+                    context.getString(
+                        R.string.cooking_time_should_be_a_whole_number_ex_1_not,
+                        cookingTime
+                    )
+                )
                 return false
             }
             servings.ifEmpty {
-                showMessage("Serving size should not be empty!")
+                showMessage(context.getString(R.string.serving_size_should_not_be_empty))
                 return false
             }
             if (servings.toIntOrNull() == null) {
-                showMessage("Serving size should be a whole number (ex. 1) not ($servings!)")
+                showMessage(
+                    context.getString(
+                        R.string.serving_size_should_be_a_whole_number_ex_1_not,
+                        servings
+                    )
+                )
                 return false
             }
             for (i in ingredients) {
                 if (i.amount.toFloatOrNull() == null) {
-                    showMessage("Ingredients (${i.title}) amount should be a number (ex. 1.1) not (${i.amount})!")
+                    showMessage(
+                        context.getString(
+                            R.string.ingredients_amount_should_be_a_number_ex_1_1_not,
+                            i.title,
+                            i.amount
+                        )
+                    )
                     return false
                 }
             }
