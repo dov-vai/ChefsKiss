@@ -98,7 +98,8 @@ fun MealPlannerScreen(
             onForward = viewModel::shiftForward,
             onDone = { viewModel.updateStartOfWeek(uiState.bulkEditWeek) },
             pasteMeals = viewModel::copyMeals,
-            moveMeals = viewModel::moveMeals
+            moveMeals = viewModel::moveMeals,
+            deleteMeals = viewModel::deleteMeals
         )
     } else {
         MealPlannerBrowseScreen(

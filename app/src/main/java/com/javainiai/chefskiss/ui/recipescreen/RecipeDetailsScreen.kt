@@ -39,7 +39,6 @@ import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.icons.filled.Timer
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -62,7 +61,6 @@ import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -98,6 +96,7 @@ import com.javainiai.chefskiss.data.tag.Tag
 import com.javainiai.chefskiss.data.utils.CalendarUtils
 import com.javainiai.chefskiss.data.utils.UnitUtils.convertUnit
 import com.javainiai.chefskiss.ui.AppViewModelProvider
+import com.javainiai.chefskiss.ui.components.ConfirmationDialog
 import com.javainiai.chefskiss.ui.navigation.NavigationDestination
 import com.javainiai.chefskiss.ui.timer.TimerDestination
 import kotlinx.coroutines.launch
@@ -444,28 +443,6 @@ fun RecipeBottomBar(screenIndex: Int, updateScreen: (Int) -> Unit, modifier: Mod
             }
         }
     }
-}
-
-@Composable
-fun ConfirmationDialog(
-    onDismiss: () -> Unit,
-    onConfirm: () -> Unit,
-    onDismissRequest: () -> Unit,
-    text: @Composable () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    AlertDialog(onDismissRequest = onDismissRequest, confirmButton = {
-        TextButton(onClick = onConfirm) {
-            Text(text = stringResource(R.string.confirm))
-        }
-    }, dismissButton = {
-        TextButton(onClick = onDismiss) {
-            Text(text = stringResource(R.string.dismiss))
-        }
-    },
-        text = text,
-        modifier = modifier
-    )
 }
 
 @OptIn(ExperimentalLayoutApi::class)

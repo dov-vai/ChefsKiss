@@ -31,7 +31,7 @@
     <string name="done">Baigta</string>
     <string name="move">Perkelti</string>
     <string name="copy">Kopijuoti</string>
-    <string name="selectAll">Pažymėti visus</string>
+    <string name="selectAll">Žymėti visus</string>
     <string name="deselectAll">Atžymėti visus</string>
     <string name="tapToPasteHere">+ Bakstelėkite, kad įklijuotumėte čia</string>
     <string name="tapToMoveHere">+ Bakstelėkite, kad perkeltumėte čia</string>
@@ -127,5 +127,6 @@
     <string name="cooking_time">Gaminimo laikas</string>
     <string name="time_added">Pridėjimo laikas</string>
     <string name="portion">Porcija</string>
-
+    <string name="delete_meals">Ištrinti patiekalus</string>
+    <string name="bulk_edit_delete_confirmation">Ar tikrai norite ištrinti %1$s receptus? (Negrįžtama)</string>
 </resources>

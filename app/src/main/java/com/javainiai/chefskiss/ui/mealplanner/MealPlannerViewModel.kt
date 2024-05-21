@@ -1,8 +1,8 @@
 package com.javainiai.chefskiss.ui.mealplanner
 
 
-import androidx.annotation.VisibleForTesting
 import android.content.Context
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.viewModelScope
 import com.javainiai.chefskiss.R
 import com.javainiai.chefskiss.data.recipe.PlannerRecipeWithRecipe
@@ -190,6 +190,14 @@ class MealPlannerViewModel(
 
     fun moveMeals(startingDate: Date) {
         editMeals(startingDate, false)
+    }
+
+    fun deleteMeals() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _uiState.value.selectedRecipes.forEach {
+                recipesRepository.deletePlannerRecipe(it.plannerRecipe)
+            }
+        }
     }
 
     companion object {
