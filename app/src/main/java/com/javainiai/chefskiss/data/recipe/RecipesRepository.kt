@@ -58,4 +58,5 @@ interface RecipesRepository {
     suspend fun insertPlannerRecipe(item: PlannerRecipe)
     suspend fun updatePlannerRecipe(item: PlannerRecipe)
     suspend fun deletePlannerRecipe(item: PlannerRecipe)
+    suspend fun deleteRecipeTag(item: RecipeTagCrossRef)
 }
