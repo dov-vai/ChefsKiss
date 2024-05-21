@@ -1,19 +1,19 @@
 package com.javainiai.chefskiss.ui.mealplanner
 
+
 import androidx.annotation.VisibleForTesting
-import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHostState
-import androidx.lifecycle.ViewModel
+import android.content.Context
 import androidx.lifecycle.viewModelScope
-import com.javainiai.chefskiss.data.CalendarUtils
-import com.javainiai.chefskiss.data.CalendarUtils.getDate
-import com.javainiai.chefskiss.data.CalendarUtils.getDateString
+import com.javainiai.chefskiss.R
 import com.javainiai.chefskiss.data.recipe.PlannerRecipeWithRecipe
 import com.javainiai.chefskiss.data.recipe.RecipesRepository
 import com.javainiai.chefskiss.data.recipe.ShopRecipe
+import com.javainiai.chefskiss.data.utils.CalendarUtils
+import com.javainiai.chefskiss.data.utils.CalendarUtils.getDate
+import com.javainiai.chefskiss.data.utils.CalendarUtils.getDateString
+import com.javainiai.chefskiss.ui.components.viewmodel.BaseViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -37,7 +37,10 @@ data class MealPlannerUiState(
     val selectedRecipes: List<PlannerRecipeWithRecipe>
 )
 
-class MealPlannerViewModel(private val recipesRepository: RecipesRepository) : ViewModel() {
+class MealPlannerViewModel(
+    private val context: Context,
+    private val recipesRepository: RecipesRepository
+) : BaseViewModel() {
     private var _uiState = MutableStateFlow(
         MealPlannerUiState(
             "",
@@ -48,22 +51,6 @@ class MealPlannerViewModel(private val recipesRepository: RecipesRepository) : V
             listOf()
         )
     )
-
-    val snackbarHostState = SnackbarHostState()
-
-    var messageInProgress: Job? = null
-        private set
-
-    private fun showMessage(message: String) {
-        // cancel in case it hasn't finished so the message can be shown immediately
-        messageInProgress?.cancel()
-        messageInProgress = viewModelScope.launch {
-            snackbarHostState.showSnackbar(
-                message = message,
-                duration = SnackbarDuration.Short
-            )
-        }
-    }
 
     val uiState = _uiState.asStateFlow()
 
@@ -110,26 +97,15 @@ class MealPlannerViewModel(private val recipesRepository: RecipesRepository) : V
     }
 
     fun shiftForward() {
-        _uiState.update { currentState ->
-            currentState.copy(
-                startOfWeek = CalendarUtils.datePlusOffset(currentState.startOfWeek, 7)
-            )
-        }
-        updateTitle()
+        updateStartOfWeek(CalendarUtils.datePlusOffset(_uiState.value.startOfWeek, 7))
     }
 
     fun shiftBackwards() {
-        _uiState.update { currentState ->
-            currentState.copy(
-                startOfWeek = CalendarUtils.datePlusOffset(currentState.startOfWeek, -7)
-            )
-        }
-        updateTitle()
+        updateStartOfWeek(CalendarUtils.datePlusOffset(_uiState.value.startOfWeek, -7))
     }
 
     fun revertStartOfWeek() {
         updateStartOfWeek(CalendarUtils.getStartOfWeek())
-        updateTitle()
     }
 
     fun updateStartOfWeek(date: Date) {
@@ -138,6 +114,7 @@ class MealPlannerViewModel(private val recipesRepository: RecipesRepository) : V
                 startOfWeek = date
             )
         }
+        updateTitle()
     }
 
     fun addToShoppingList(plannerRecipeWithRecipes: List<PlannerRecipeWithRecipe>?) {
@@ -146,7 +123,7 @@ class MealPlannerViewModel(private val recipesRepository: RecipesRepository) : V
                 recipesRepository.insertShopRecipe(ShopRecipe(recipe.recipe.id))
             }
         }
-        showMessage("Added to shopping list")
+        showMessage(context.getString(R.string.added_to_shopping_list))
     }
 
     fun updateBulkEditMode(bulkEditMode: Boolean) {
@@ -173,32 +150,46 @@ class MealPlannerViewModel(private val recipesRepository: RecipesRepository) : V
         }
     }
 
-    fun pasteMeals(startingDate: Date) {
+    private fun editMeals(startingDate: Date, isCopyOperation: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
-            val groupedRecipes = _uiState.value.selectedRecipes.sortedBy { it.plannerRecipe.date }
+            val updatedPlannerRecipes = mutableListOf<PlannerRecipeWithRecipe>()
+            val groupedRecipes = _uiState.value.selectedRecipes
+                .sortedBy { it.plannerRecipe.date }
                 .groupBy { it.plannerRecipe.date }
-            var firstDate: Date? = null
-            groupedRecipes.keys.forEach { date ->
-                val parsedDate = date.getDate()
-                if (firstDate == null){
-                    firstDate = parsedDate
+
+            groupedRecipes.keys.firstOrNull()?.getDate()?.let { firstDate ->
+                groupedRecipes.keys.forEach { date ->
+                    val offset = CalendarUtils.getDaysDifference(firstDate, date.getDate()!!)
+                    val dateToInsert =
+                        CalendarUtils.datePlusOffset(startingDate, offset.toInt()).getDateString()
+                    groupedRecipes[date]?.forEach {
+                        val plannerRecipe = it.plannerRecipe.copy(
+                            id = if (isCopyOperation) 0 else it.plannerRecipe.id,
+                            date = dateToInsert
+                        )
+
+                        if (isCopyOperation)
+                            recipesRepository.insertPlannerRecipe(plannerRecipe)
+                        else {
+                            recipesRepository.updatePlannerRecipe(plannerRecipe)
+                            updatedPlannerRecipes.add(it.copy(plannerRecipe = plannerRecipe))
+                        }
+                    }
                 }
-                val offset = CalendarUtils.getDaysDifference(firstDate!!, parsedDate!!)
-                val dateToInsert =
-                    CalendarUtils.datePlusOffset(startingDate, offset.toInt()).getDateString()
-                groupedRecipes[date]?.forEach {
-                    val plannerRecipe = it.plannerRecipe.copy(
-                        id = 0,
-                        date = dateToInsert
-                    )
-                    recipesRepository.insertPlannerRecipe(plannerRecipe)
-                }
+            }
+
+            if (!isCopyOperation) {
+                updateSelectedRecipes(updatedPlannerRecipes)
             }
         }
     }
 
-    fun moveMeals(startingDate: Date) {
+    fun copyMeals(startingDate: Date) {
+        editMeals(startingDate, true)
+    }
 
+    fun moveMeals(startingDate: Date) {
+        editMeals(startingDate, false)
     }
 
     companion object {

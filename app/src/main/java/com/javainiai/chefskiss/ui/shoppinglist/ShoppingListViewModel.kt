@@ -1,15 +1,14 @@
 package com.javainiai.chefskiss.ui.shoppinglist
 
-import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHostState
-import androidx.lifecycle.ViewModel
+import android.content.Context
 import androidx.lifecycle.viewModelScope
+import com.javainiai.chefskiss.R
 import com.javainiai.chefskiss.data.recipe.Recipe
 import com.javainiai.chefskiss.data.recipe.RecipeWithIngredients
 import com.javainiai.chefskiss.data.recipe.RecipesRepository
 import com.javainiai.chefskiss.data.recipe.ShopIngredient
 import com.javainiai.chefskiss.data.recipe.ShopRecipe
-import kotlinx.coroutines.Job
+import com.javainiai.chefskiss.ui.components.viewmodel.BaseViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
@@ -22,7 +21,10 @@ data class ShoppingListUiState(
     val recipesWithIngredients: List<RecipeWithIngredients>
 )
 
-class ShoppingListViewModel(private val recipesRepository: RecipesRepository) : ViewModel() {
+class ShoppingListViewModel(
+    private val context: Context,
+    private val recipesRepository: RecipesRepository
+) : BaseViewModel() {
 
     val uiState: StateFlow<ShoppingListUiState> =
         recipesRepository
@@ -48,27 +50,11 @@ class ShoppingListViewModel(private val recipesRepository: RecipesRepository) : 
                 initialValue = listOf()
             )
 
-    val snackbarHostState = SnackbarHostState()
-
-    var messageInProgress: Job? = null
-        private set
-
-    private fun showMessage(message: String) {
-        // cancel in case it hasn't finished so the message can be shown immediately
-        messageInProgress?.cancel()
-        messageInProgress = viewModelScope.launch {
-            snackbarHostState.showSnackbar(
-                message = message,
-                duration = SnackbarDuration.Short
-            )
-        }
-    }
-
     fun removeRecipe(recipe: Recipe) {
         viewModelScope.launch {
             recipesRepository.deleteShopRecipe(ShopRecipe(recipe.id))
         }
-        showMessage("Removed ${recipe.title}")
+        showMessage(context.getString(R.string.removed, recipe.title))
     }
 
     fun addCheckedIngredient(ingredient: ShopIngredient) {

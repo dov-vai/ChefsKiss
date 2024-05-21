@@ -1,21 +1,21 @@
 package com.javainiai.chefskiss.ui.recipescreen
 
+import android.content.Context
 import android.net.Uri
-import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.javainiai.chefskiss.R
+import com.javainiai.chefskiss.data.enums.UnitSystem
 import com.javainiai.chefskiss.data.ingredient.Ingredient
 import com.javainiai.chefskiss.data.recipe.PlannerRecipe
 import com.javainiai.chefskiss.data.recipe.Recipe
 import com.javainiai.chefskiss.data.recipe.RecipesRepository
 import com.javainiai.chefskiss.data.recipe.ShopRecipe
 import com.javainiai.chefskiss.data.tag.Tag
-import kotlinx.coroutines.Job
+import com.javainiai.chefskiss.ui.components.viewmodel.BaseViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -32,9 +32,10 @@ data class RecipeDisplayUiState(
 )
 
 class RecipeDetailsViewModel(
+    private val context: Context,
     savedStateHandle: SavedStateHandle,
     private val recipesRepository: RecipesRepository
-) : ViewModel() {
+) : BaseViewModel() {
     private val recipeId: Long =
         checkNotNull(savedStateHandle[RecipeDetailsDestination.recipeIdArg])
 
@@ -64,25 +65,13 @@ class RecipeDetailsViewModel(
         )
 
     private val _customServingSize = MutableStateFlow(uiState.value.recipe.servings)
-
     val customServingSize = _customServingSize.asStateFlow()
 
     private var _checkedIngredients = MutableStateFlow(listOf<Ingredient>())
     val checkedIngredients = _checkedIngredients.asStateFlow()
 
-    val snackbarHostState = SnackbarHostState()
-
-    private var messageInProgress: Job? = null
-    private fun showMessage(message: String) {
-        // cancel in case it hasn't finished so the message can be shown immediately
-        messageInProgress?.cancel()
-        messageInProgress = viewModelScope.launch {
-            snackbarHostState.showSnackbar(
-                message = message,
-                duration = SnackbarDuration.Short
-            )
-        }
-    }
+    private var _unitSystem = MutableStateFlow(UnitSystem.Metric)
+    val unitSystem = _unitSystem.asStateFlow()
 
     var screenIndex by mutableIntStateOf(0)
         private set
@@ -99,7 +88,7 @@ class RecipeDetailsViewModel(
         viewModelScope.launch {
             recipesRepository.insertShopRecipe(ShopRecipe(uiState.value.recipe.id))
         }
-        showMessage("Added to shopping list")
+        showMessage(context.getString(R.string.added_to_shopping_list))
     }
 
     fun updateFavorite() {
@@ -107,7 +96,11 @@ class RecipeDetailsViewModel(
         viewModelScope.launch {
             recipesRepository.updateRecipe(updatedRecipe)
         }
-        showMessage(if (!uiState.value.recipe.favorite) "Added to favorites" else "Removed from favorites")
+        showMessage(
+            if (!uiState.value.recipe.favorite) context.getString(R.string.added_to_favorites) else context.getString(
+                R.string.removed_from_favorites
+            )
+        )
     }
 
     fun updateRating(rating: Int) {
@@ -125,13 +118,23 @@ class RecipeDetailsViewModel(
         viewModelScope.launch {
             recipesRepository.insertPlannerRecipe(plannerRecipe)
         }
-        showMessage("Added to ${plannerRecipe.date} as ${plannerRecipe.type.title}")
+        showMessage(
+            context.getString(
+                R.string.added_to_as,
+                plannerRecipe.date,
+                plannerRecipe.type.getTitle(context)
+            )
+        )
     }
 
     fun adjustServingSize(size: Int) {
         if (size >= 1) {
             _customServingSize.update { size }
-        } else showMessage("Serving size can't be lower than 1")
+        } else showMessage(context.getString(R.string.serving_size_can_t_be_lower_than_1))
+    }
+
+    fun updateUnitSystem(system: UnitSystem) {
+        _unitSystem.update { system }
     }
 
     companion object {
