@@ -1,6 +1,8 @@
-# Chef's Kiss
+<p align="center">
+    <img src="app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.webp" alt="Chef's Kiss logo">
+</p>
 
-<img src="app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.webp" style="float: right" alt="Chef's Kiss logo">
+# Chef's Kiss
 
 Chef's Kiss is a recipe keeper application for Android written using [Jetpack Compose](https://developer.android.com/jetpack/compose).
 
