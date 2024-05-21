@@ -37,15 +37,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.javainiai.chefskiss.R
-import com.javainiai.chefskiss.data.CalendarUtils
-import com.javainiai.chefskiss.data.CalendarUtils.getDateString
 import com.javainiai.chefskiss.data.enums.BulkMode
 import com.javainiai.chefskiss.data.recipe.PlannerRecipeWithRecipe
+import com.javainiai.chefskiss.data.utils.CalendarUtils
+import com.javainiai.chefskiss.data.utils.CalendarUtils.getDateString
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -70,6 +71,7 @@ fun MealPlannerBulkEditScreen(
     }
 
     Scaffold(
+        modifier = modifier,
         topBar = {
             BulkEditTopBar(
                 title = topBarTitle,
@@ -270,7 +272,10 @@ fun BulkEditBottomBar(
                     Spacer(modifier = Modifier.weight(1f))
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         FilledTonalButton(onClick = onDone, colors = buttonColor) {
-                            Icon(imageVector = Icons.Default.Done, contentDescription = stringResource(R.string.done))
+                            Icon(
+                                imageVector = Icons.Default.Done,
+                                contentDescription = stringResource(R.string.done)
+                            )
                         }
                         Text(text = stringResource(R.string.done))
                     }
@@ -311,10 +316,11 @@ fun SelectionPlannerRecipeCard(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit
 ) {
+    val context = LocalContext.current
     Card(modifier = modifier) {
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(8.dp)) {
             Checkbox(checked = checked, onCheckedChange = onCheckedChange)
-            Text(text = recipe.plannerRecipe.type.title.padEnd(20))
+            Text(text = recipe.plannerRecipe.type.getTitle(context).padEnd(20))
             Text(
                 text = recipe.recipe.title,
                 maxLines = 1,

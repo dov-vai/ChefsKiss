@@ -1,6 +1,8 @@
 package com.javainiai.chefskiss.ui.shoppinglist
 
+import android.content.Context
 import androidx.lifecycle.viewModelScope
+import com.javainiai.chefskiss.R
 import com.javainiai.chefskiss.data.recipe.Recipe
 import com.javainiai.chefskiss.data.recipe.RecipeWithIngredients
 import com.javainiai.chefskiss.data.recipe.RecipesRepository
@@ -19,7 +21,10 @@ data class ShoppingListUiState(
     val recipesWithIngredients: List<RecipeWithIngredients>
 )
 
-class ShoppingListViewModel(private val recipesRepository: RecipesRepository) : BaseViewModel() {
+class ShoppingListViewModel(
+    private val context: Context,
+    private val recipesRepository: RecipesRepository
+) : BaseViewModel() {
 
     val uiState: StateFlow<ShoppingListUiState> =
         recipesRepository
@@ -49,7 +54,7 @@ class ShoppingListViewModel(private val recipesRepository: RecipesRepository) : 
         viewModelScope.launch {
             recipesRepository.deleteShopRecipe(ShopRecipe(recipe.id))
         }
-        showMessage("Removed ${recipe.title}")
+        showMessage(context.getString(R.string.removed, recipe.title))
     }
 
     fun addCheckedIngredient(ingredient: ShopIngredient) {

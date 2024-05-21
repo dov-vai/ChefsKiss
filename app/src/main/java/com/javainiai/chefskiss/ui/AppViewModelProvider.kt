@@ -6,6 +6,7 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.javainiai.chefskiss.ChefsKissApplication
+import com.javainiai.chefskiss.ui.app.ChefsKissAppViewModel
 import com.javainiai.chefskiss.ui.components.search.SearchScreenViewModel
 import com.javainiai.chefskiss.ui.homescreen.HomeScreenViewModel
 import com.javainiai.chefskiss.ui.mealplanner.MealPlannerViewModel
@@ -29,15 +30,22 @@ object AppViewModelProvider {
         }
         initializer {
             RecipeDetailsViewModel(
+                this.chefsKissApplication().container.context,
                 this.createSavedStateHandle(),
                 chefsKissApplication().container.recipesRepository
             )
         }
         initializer {
-            ShoppingListViewModel(chefsKissApplication().container.recipesRepository)
+            ShoppingListViewModel(
+                chefsKissApplication().container.context,
+                chefsKissApplication().container.recipesRepository
+            )
         }
         initializer {
-            MealPlannerViewModel(chefsKissApplication().container.recipesRepository)
+            MealPlannerViewModel(
+                chefsKissApplication().container.context,
+                chefsKissApplication().container.recipesRepository
+            )
         }
         initializer {
             PlannerEditViewModel(
@@ -58,6 +66,12 @@ object AppViewModelProvider {
             TimerViewModel(
                 this.createSavedStateHandle(),
                 chefsKissApplication().container.recipesRepository
+            )
+        }
+        initializer {
+            ChefsKissAppViewModel(
+                chefsKissApplication().container.context,
+                chefsKissApplication().container.configRepository
             )
         }
     }

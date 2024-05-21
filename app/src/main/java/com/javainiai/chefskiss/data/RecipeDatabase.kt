@@ -7,6 +7,8 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
+import com.javainiai.chefskiss.data.config.Config
+import com.javainiai.chefskiss.data.config.ConfigDao
 import com.javainiai.chefskiss.data.ingredient.Ingredient
 import com.javainiai.chefskiss.data.ingredient.IngredientDao
 import com.javainiai.chefskiss.data.recipe.PlannerRecipe
@@ -32,7 +34,7 @@ class Converters {
 
 
 @Database(
-    entities = [Recipe::class, PlannerRecipe::class, ShopRecipe::class, ShopIngredient::class, Ingredient::class, Tag::class, RecipeTagCrossRef::class],
+    entities = [Recipe::class, PlannerRecipe::class, ShopRecipe::class, ShopIngredient::class, Ingredient::class, Tag::class, RecipeTagCrossRef::class, Config::class],
     version = 1,
     exportSchema = false
 )
@@ -41,6 +43,7 @@ abstract class RecipeDatabase : RoomDatabase() {
     abstract fun RecipeDao(): RecipeDao
     abstract fun IngredientDao(): IngredientDao
     abstract fun TagDao(): TagDao
+    abstract fun ConfigDao(): ConfigDao
 
     companion object {
         @Volatile

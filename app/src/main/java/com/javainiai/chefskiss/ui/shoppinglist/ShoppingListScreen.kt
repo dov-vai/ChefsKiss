@@ -127,7 +127,10 @@ fun RecipeCard(
                     modifier = Modifier.weight(1f)
                 )
                 IconButton(onClick = onRemove) {
-                    Icon(imageVector = Icons.Default.Delete, contentDescription = stringResource(R.string.delete))
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = stringResource(R.string.delete)
+                    )
                 }
                 IconButton(onClick = { opened = !opened }) {
                     Icon(

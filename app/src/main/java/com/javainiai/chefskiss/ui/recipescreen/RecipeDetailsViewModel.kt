@@ -1,11 +1,13 @@
 package com.javainiai.chefskiss.ui.recipescreen
 
+import android.content.Context
 import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.javainiai.chefskiss.R
 import com.javainiai.chefskiss.data.enums.UnitSystem
 import com.javainiai.chefskiss.data.ingredient.Ingredient
 import com.javainiai.chefskiss.data.recipe.PlannerRecipe
@@ -30,6 +32,7 @@ data class RecipeDisplayUiState(
 )
 
 class RecipeDetailsViewModel(
+    private val context: Context,
     savedStateHandle: SavedStateHandle,
     private val recipesRepository: RecipesRepository
 ) : BaseViewModel() {
@@ -85,7 +88,7 @@ class RecipeDetailsViewModel(
         viewModelScope.launch {
             recipesRepository.insertShopRecipe(ShopRecipe(uiState.value.recipe.id))
         }
-        showMessage("Added to shopping list")
+        showMessage(context.getString(R.string.added_to_shopping_list))
     }
 
     fun updateFavorite() {
@@ -93,7 +96,11 @@ class RecipeDetailsViewModel(
         viewModelScope.launch {
             recipesRepository.updateRecipe(updatedRecipe)
         }
-        showMessage(if (!uiState.value.recipe.favorite) "Added to favorites" else "Removed from favorites")
+        showMessage(
+            if (!uiState.value.recipe.favorite) context.getString(R.string.added_to_favorites) else context.getString(
+                R.string.removed_from_favorites
+            )
+        )
     }
 
     fun updateRating(rating: Int) {
@@ -111,13 +118,19 @@ class RecipeDetailsViewModel(
         viewModelScope.launch {
             recipesRepository.insertPlannerRecipe(plannerRecipe)
         }
-        showMessage("Added to ${plannerRecipe.date} as ${plannerRecipe.type.title}")
+        showMessage(
+            context.getString(
+                R.string.added_to_as,
+                plannerRecipe.date,
+                plannerRecipe.type.getTitle(context)
+            )
+        )
     }
 
     fun adjustServingSize(size: Int) {
         if (size >= 1) {
             _customServingSize.update { size }
-        } else showMessage("Serving size can't be lower than 1")
+        } else showMessage(context.getString(R.string.serving_size_can_t_be_lower_than_1))
     }
 
     fun updateUnitSystem(system: UnitSystem) {

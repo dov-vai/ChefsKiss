@@ -1,4 +1,4 @@
-package com.javainiai.chefskiss.data
+package com.javainiai.chefskiss.data.utils
 
 import java.text.SimpleDateFormat
 import java.util.Calendar

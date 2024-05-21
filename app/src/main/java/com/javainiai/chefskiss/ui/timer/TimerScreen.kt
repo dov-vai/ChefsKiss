@@ -95,7 +95,10 @@ fun TimerScreen(
                 ),
                 trailingIcon = {
                     IconButton(onClick = { viewModel.updateTitle("") }) {
-                        Icon(imageVector = Icons.Default.Clear, contentDescription = stringResource(R.string.clear))
+                        Icon(
+                            imageVector = Icons.Default.Clear,
+                            contentDescription = stringResource(R.string.clear)
+                        )
                     }
                 },
                 modifier = Modifier
@@ -171,21 +174,27 @@ fun TimerScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimerTopBar(modifier: Modifier = Modifier, onBack: () -> Unit) {
-    CenterAlignedTopAppBar(title = { Text(text = stringResource(R.string.setTimer)) }, navigationIcon = {
-        IconButton(onClick = onBack) {
-            Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
-        }
-    })
+    CenterAlignedTopAppBar(
+        title = { Text(text = stringResource(R.string.setTimer)) },
+        navigationIcon = {
+            IconButton(onClick = onBack) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = stringResource(R.string.back)
+                )
+            }
+        })
 }
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun TimerPresets(modifier: Modifier = Modifier, onTimerPreset: (TimerPreset) -> Unit) {
+    val context = LocalContext.current
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         TimerPreset.entries.forEach { preset ->
             SuggestionChip(
                 onClick = { onTimerPreset(preset) },
-                label = { Text(text = preset.title) })
+                label = { Text(text = preset.getTitle(context)) })
         }
     }
 }

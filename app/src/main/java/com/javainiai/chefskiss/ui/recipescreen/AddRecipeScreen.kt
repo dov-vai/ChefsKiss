@@ -34,7 +34,6 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Tag
-import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.filled.Title
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -116,7 +115,12 @@ fun AddRecipeScreen(
         mutableIntStateOf(0)
     }
 
-    val tabs = listOf(stringResource(R.string.overview), stringResource(R.string.tags), stringResource(R.string.ingredients), stringResource(R.string.directions))
+    val tabs = listOf(
+        stringResource(R.string.overview),
+        stringResource(R.string.tags),
+        stringResource(R.string.ingredients),
+        stringResource(R.string.directions)
+    )
 
     Scaffold(topBar = {
         AddRecipeTopBar(
@@ -364,17 +368,17 @@ fun RecipeOverview(
         Row {
             Spacer(modifier = Modifier.padding(end = 4.dp))
             Text(text = stringResource(R.string.cookingTime))
-            Text(text = String.format(
-                Locale.getDefault(),
-                "%02d:%02d",
-                hours,
-                minutes
+            Text(
+                text = String.format(
+                    Locale.getDefault(),
+                    "%02d:%02d",
+                    hours,
+                    minutes
                 )
             )
         }
 
         CookingTimePicker(onCookingTimeChange)
-
 
 
     }
@@ -419,7 +423,10 @@ fun RecipeTags(
                 onClick = { updateMode(!tagRemoveMode) },
                 colors = IconButtonDefaults.iconButtonColors(containerColor = if (tagRemoveMode) Color.Red else Color.Transparent)
             ) {
-                Icon(imageVector = Icons.Default.Delete, contentDescription = stringResource(R.string.deleteTags))
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = stringResource(R.string.deleteTags)
+                )
             }
         }
         RecipeTagsCard(
@@ -478,6 +485,7 @@ fun RecipeIngredients(
     updateIngredients: (List<IngredientDisplay>) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
     var dropdownExpanded by remember { mutableStateOf(false) }
     var imperialSelected by remember { mutableStateOf(false) }
     var weightSelected by remember { mutableStateOf(false) }
@@ -508,7 +516,7 @@ fun RecipeIngredients(
             onExpandedChange = { dropdownExpanded = !dropdownExpanded }
         ) {
             TextField(
-                value = ingredient.units.title,
+                value = ingredient.units.getTitle(context),
                 onValueChange = {},
                 readOnly = true,
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = dropdownExpanded) },
@@ -552,9 +560,9 @@ fun RecipeIngredients(
                         } else {
                             (it.system == system || it.system == UnitSystem.All)
                         }
-                    }.sortedBy { it.title }.forEach { measurement ->
+                    }.sortedBy { it.getTitle(context) }.forEach { measurement ->
                         DropdownMenuItem(
-                            text = { Text(text = measurement.title) },
+                            text = { Text(text = measurement.getTitle(context)) },
                             onClick = {
                                 updateIngredient(ingredient.copy(units = measurement))
                                 dropdownExpanded = false
@@ -600,6 +608,8 @@ fun IngredientCard(
     containerColor: Color = CardDefaults.cardColors().containerColor,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
+
     Card(modifier = modifier, colors = CardDefaults.cardColors(containerColor = containerColor)) {
         Row(
             modifier = Modifier.padding(8.dp),
@@ -613,15 +623,21 @@ fun IngredientCard(
             )
             Text(text = ingredient.amount)
             Text(
-                text = ingredient.units.title,
+                text = ingredient.units.getTitle(context),
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f)
             )
             IconButton(onClick = onEdit) {
-                Icon(imageVector = Icons.Default.Edit, contentDescription = stringResource(R.string.edit))
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = stringResource(R.string.edit)
+                )
             }
             IconButton(onClick = onRemove) {
-                Icon(imageVector = Icons.Default.Remove, contentDescription = stringResource(R.string.remove))
+                Icon(
+                    imageVector = Icons.Default.Remove,
+                    contentDescription = stringResource(R.string.remove)
+                )
             }
         }
     }
@@ -652,7 +668,10 @@ fun AddRecipeTopBar(onBack: () -> Unit, onSave: () -> Unit) {
         Row {
             Spacer(modifier = Modifier.weight(1f))
             IconButton(onClick = onSave) {
-                Icon(imageVector = Icons.Default.Done, contentDescription = stringResource(R.string.done))
+                Icon(
+                    imageVector = Icons.Default.Done,
+                    contentDescription = stringResource(R.string.done)
+                )
             }
         }
     },

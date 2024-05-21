@@ -44,14 +44,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.javainiai.chefskiss.R
-import com.javainiai.chefskiss.data.CalendarUtils
-import com.javainiai.chefskiss.data.CalendarUtils.getDateString
 import com.javainiai.chefskiss.data.recipe.PlannerRecipeWithRecipe
+import com.javainiai.chefskiss.data.utils.CalendarUtils
+import com.javainiai.chefskiss.data.utils.CalendarUtils.getDateString
 import com.javainiai.chefskiss.ui.AppViewModelProvider
 import com.javainiai.chefskiss.ui.navigation.NavigationDestination
 import com.javainiai.chefskiss.ui.recipescreen.RecipeDetailsDestination
@@ -139,16 +140,18 @@ fun MealPlannerBrowseScreen(
     addToShoppingList: (List<PlannerRecipeWithRecipe>?) -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
-    Scaffold(topBar = {
-        MealPlannerTopBar(
-            title = topBarTitle,
-            onBack = onBack,
-            onForward = onForward,
-            onUndo = onUndo,
-            undoVisible = undoVisible,
-            onMenuClick = { coroutineScope.launch { drawerState.open() } }
-        )
-    },
+    Scaffold(
+        modifier = modifier,
+        topBar = {
+            MealPlannerTopBar(
+                title = topBarTitle,
+                onBack = onBack,
+                onForward = onForward,
+                onUndo = onUndo,
+                undoVisible = undoVisible,
+                onMenuClick = { coroutineScope.launch { drawerState.open() } }
+            )
+        },
         bottomBar = { MealPlannerBottomBar(onBulkEditClick = onBulkEditClick) },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { padding ->
@@ -191,9 +194,10 @@ fun PlannerRecipeCard(
     cardColor: Color,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
     Card(modifier = modifier, colors = CardDefaults.cardColors(containerColor = cardColor)) {
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(8.dp)) {
-            Text(text = recipe.plannerRecipe.type.title.padEnd(20))
+            Text(text = recipe.plannerRecipe.type.getTitle(context).padEnd(20))
             Text(
                 text = recipe.recipe.title,
                 maxLines = 1,
@@ -214,7 +218,10 @@ fun MealPlannerBottomBar(modifier: Modifier = Modifier, onBulkEditClick: () -> U
                     onClick = onBulkEditClick,
                     colors = ButtonDefaults.filledTonalButtonColors(containerColor = MaterialTheme.colorScheme.surface)
                 ) {
-                    Icon(imageVector = Icons.Default.EditNote, contentDescription = stringResource(R.string.bulkEdit))
+                    Icon(
+                        imageVector = Icons.Default.EditNote,
+                        contentDescription = stringResource(R.string.bulkEdit)
+                    )
                 }
                 Text(text = stringResource(R.string.bulkEdit))
             }
@@ -266,7 +273,10 @@ fun MealPlannerTopBar(
         },
         navigationIcon = {
             IconButton(onClick = onMenuClick) {
-                Icon(imageVector = Icons.Default.Menu, contentDescription = stringResource(R.string.openNavigationMenu))
+                Icon(
+                    imageVector = Icons.Default.Menu,
+                    contentDescription = stringResource(R.string.openNavigationMenu)
+                )
             }
         },
         modifier = modifier
@@ -306,7 +316,10 @@ fun WeekdayCard(
                     )
                 }
                 IconButton(onClick = onEdit) {
-                    Icon(imageVector = Icons.Default.Edit, contentDescription = stringResource(R.string.edit))
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = stringResource(R.string.edit)
+                    )
                 }
             }
             if (opened) {

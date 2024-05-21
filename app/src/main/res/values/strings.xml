@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name" translatable="false">ChefsKiss</string>
+    <string name="app_name" translatable="false">Chef\'s Kiss</string>
     <string name="recipes">Recipes</string>
     <string name="add_recipe">Add recipe</string>
     <string name="add">Add</string>
@@ -7,7 +7,7 @@
     <string name="filters">Filters</string>
     <string name="clear">Clear</string>
     <string name="apply">Apply</string>
-    <string name="order_by">Order by</string>
+    <string name="order_by" translatable="false">Order by</string>
     <string name="ascending">Ascending</string>
     <string name="descending">Descending</string>
     <string name="sort_by">Sort by</string>
@@ -94,4 +94,37 @@
     <string name="setTimer">Set timer</string>
     <string name="home">Home</string>
     <string name="mealPlanner">Meal Planner</string>
+    <string name="grams_g">Grams (g)</string>
+    <string name="kilograms_kg">Kilograms (kg)</string>
+    <string name="mililiters_ml">Mililiters (ml)</string>
+    <string name="liters_l">Liters (l)</string>
+    <string name="teaspoons_t">Teaspoons (t)</string>
+    <string name="tablespoons_t">Tablespoons (T)</string>
+    <string name="cups_c">Cups (c)</string>
+    <string name="ounces_oz">Ounces (oz)</string>
+    <string name="fluid_ounces_floz">Fluid ounces (floz)</string>
+    <string name="pounds_lb">Pounds (lb)</string>
+    <string name="gallons_gal">Gallons (gal)</string>
+    <string name="to_taste">To taste</string>
+    <string name="pinches">Pinches</string>
+    <string name="breakfast">Breakfast</string>
+    <string name="lunch">Lunch</string>
+    <string name="dinner">Dinner</string>
+    <string name="snack">Snack</string>
+    <string name="added_to_shopping_list">Added to shopping list</string>
+    <string name="added_to_favorites">Added to favorites</string>
+    <string name="removed_from_favorites">Removed from favorites</string>
+    <string name="serving_size_can_t_be_lower_than_1">Serving size can\'t be lower than 1</string>
+    <string name="added_to_as">Added to %1$s as %2$s</string>
+    <string name="removed">Removed %1$s</string>
+    <string name="_1_minute">1 minute</string>
+    <string name="_5_minutes">5 minutes</string>
+    <string name="_10_minutes">10 minutes</string>
+    <string name="_15_minutes">15 minutes</string>
+    <string name="_30_minutes">30 minutes</string>
+    <string name="_1_hour">1 hour</string>
+    <string name="_2_hours">2 hours</string>
+    <string name="cooking_time">Cooking time</string>
+    <string name="time_added">Time added</string>
+    <string name="portion">Portion</string>
 </resources>

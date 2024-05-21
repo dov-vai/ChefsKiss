@@ -133,7 +133,10 @@ fun Picker(
                 }
             }
             ) {
-                Icon(imageVector = Icons.Default.Clear, contentDescription = stringResource(R.string.reset))
+                Icon(
+                    imageVector = Icons.Default.Clear,
+                    contentDescription = stringResource(R.string.reset)
+                )
             }
         }
     }

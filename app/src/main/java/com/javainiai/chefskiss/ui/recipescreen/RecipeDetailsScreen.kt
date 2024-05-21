@@ -87,8 +87,6 @@ import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.javainiai.chefskiss.R
-import com.javainiai.chefskiss.data.CalendarUtils
-import com.javainiai.chefskiss.data.UnitUtils.convertUnit
 import com.javainiai.chefskiss.data.enums.Meal
 import com.javainiai.chefskiss.data.enums.UnitSystem
 import com.javainiai.chefskiss.data.ingredient.Ingredient
@@ -97,6 +95,8 @@ import com.javainiai.chefskiss.data.pdf.getRecipeCardHtml
 import com.javainiai.chefskiss.data.recipe.PlannerRecipe
 import com.javainiai.chefskiss.data.recipe.Recipe
 import com.javainiai.chefskiss.data.tag.Tag
+import com.javainiai.chefskiss.data.utils.CalendarUtils
+import com.javainiai.chefskiss.data.utils.UnitUtils.convertUnit
 import com.javainiai.chefskiss.ui.AppViewModelProvider
 import com.javainiai.chefskiss.ui.navigation.NavigationDestination
 import com.javainiai.chefskiss.ui.timer.TimerDestination
@@ -316,6 +316,8 @@ fun IngredientCard(
     modifier: Modifier = Modifier,
     multiplier: Float
 ) {
+    val context = LocalContext.current
+
     Card(modifier = modifier, colors = CardDefaults.cardColors(containerColor = containerColor)) {
         Row(
             modifier = Modifier.padding(8.dp),
@@ -329,12 +331,13 @@ fun IngredientCard(
             )
             Text(
                 text = if (ingredient.size == 0f) "" else String.format(
+                    Locale.getDefault(),
                     "%.2f",
                     ingredient.size * multiplier
                 )
             )
             Text(
-                text = ingredient.unit.title,
+                text = ingredient.unit.getTitle(context),
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f)
             )
@@ -472,6 +475,7 @@ fun MealPlannerDialog(
     onAddToMealPlanner: (String, Meal) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
     var selectedType by remember { mutableStateOf(Meal.BREAKFAST) }
 
     Dialog(onDismissRequest = onDismiss) {
@@ -489,7 +493,7 @@ fun MealPlannerDialog(
                         FilterChip(
                             selected = selectedType == it,
                             onClick = { selectedType = it },
-                            label = { Text(text = it.title) })
+                            label = { Text(text = it.getTitle(context)) })
                     }
                 }
                 HorizontalDivider()
@@ -576,7 +580,10 @@ fun RecipeTopBar(
             Row {
                 Spacer(modifier = Modifier.weight(1f))
                 IconButton(onClick = onTimer) {
-                    Icon(imageVector = Icons.Default.Timer, contentDescription = stringResource(R.string.timer))
+                    Icon(
+                        imageVector = Icons.Default.Timer,
+                        contentDescription = stringResource(R.string.timer)
+                    )
                 }
                 IconButton(onClick = onFavorite) {
                     Icon(
@@ -585,46 +592,64 @@ fun RecipeTopBar(
                     )
                 }
                 IconButton(onClick = onEdit) {
-                    Icon(imageVector = Icons.Default.Edit, contentDescription = stringResource(R.string.edit))
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = stringResource(R.string.edit)
+                    )
                 }
                 IconButton(onClick = { showDialog = true }) {
-                    Icon(imageVector = Icons.Default.Delete, contentDescription = stringResource(R.string.delete))
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = stringResource(R.string.delete)
+                    )
                 }
                 Box(
                     modifier = Modifier
                         .wrapContentSize(Alignment.TopEnd)
                 ) {
                     IconButton(onClick = { expanded = !expanded }) {
-                        Icon(imageVector = Icons.Default.MoreVert, contentDescription = stringResource(R.string.more))
+                        Icon(
+                            imageVector = Icons.Default.MoreVert,
+                            contentDescription = stringResource(R.string.more)
+                        )
                     }
                     DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                        DropdownMenuItem(leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Default.ShoppingCart,
-                                contentDescription = stringResource(R.string.addToShoppingList)
-                            )
-                        }, text = { Text(text = stringResource(R.string.addToShoppingList)) }, onClick = {
-                            expanded = false
-                            onShopping()
-                        })
-                        DropdownMenuItem(leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Default.CalendarMonth,
-                                contentDescription = stringResource(R.string.addToMealPlanner)
-                            )
-                        }, text = { Text(text = stringResource(R.string.addToMealPlanner)) }, onClick = {
-                            expanded = false
-                            showMealPlannerDialog = true
-                        })
-                        DropdownMenuItem(leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Default.PictureAsPdf,
-                                contentDescription = stringResource(R.string.printExportasPDF)
-                            )
-                        }, text = { Text(text = stringResource(R.string.printExportasPDF)) }, onClick = {
-                            expanded = false
-                            onExportPdf()
-                        })
+                        DropdownMenuItem(
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.ShoppingCart,
+                                    contentDescription = stringResource(R.string.addToShoppingList)
+                                )
+                            },
+                            text = { Text(text = stringResource(R.string.addToShoppingList)) },
+                            onClick = {
+                                expanded = false
+                                onShopping()
+                            })
+                        DropdownMenuItem(
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.CalendarMonth,
+                                    contentDescription = stringResource(R.string.addToMealPlanner)
+                                )
+                            },
+                            text = { Text(text = stringResource(R.string.addToMealPlanner)) },
+                            onClick = {
+                                expanded = false
+                                showMealPlannerDialog = true
+                            })
+                        DropdownMenuItem(
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.PictureAsPdf,
+                                    contentDescription = stringResource(R.string.printExportasPDF)
+                                )
+                            },
+                            text = { Text(text = stringResource(R.string.printExportasPDF)) },
+                            onClick = {
+                                expanded = false
+                                onExportPdf()
+                            })
                     }
                 }
             }

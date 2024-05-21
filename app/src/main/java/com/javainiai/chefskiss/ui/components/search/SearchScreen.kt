@@ -166,7 +166,10 @@ fun RecipeCard(recipe: Recipe, modifier: Modifier = Modifier) {
             ) {
                 Text(text = recipe.title, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Row {
-                    Icon(imageVector = Icons.Default.Timer, contentDescription = stringResource(R.string.time_to_cook))
+                    Icon(
+                        imageVector = Icons.Default.Timer,
+                        contentDescription = stringResource(R.string.time_to_cook)
+                    )
                     Text(
                         text = String.format(
                             Locale.getDefault(),
@@ -176,7 +179,10 @@ fun RecipeCard(recipe: Recipe, modifier: Modifier = Modifier) {
                         ),
                         modifier = Modifier.padding(end = 8.dp)
                     )
-                    Icon(imageVector = Icons.Default.Star, contentDescription = stringResource(R.string.rating))
+                    Icon(
+                        imageVector = Icons.Default.Star,
+                        contentDescription = stringResource(R.string.rating)
+                    )
                     Text(text = recipe.rating.toString())
                 }
             }
@@ -219,7 +225,10 @@ fun SearchBar(
                         onQueryChange("")
                         onSearch()
                     }) {
-                        Icon(imageVector = Icons.Default.Clear, contentDescription = stringResource(R.string.clear))
+                        Icon(
+                            imageVector = Icons.Default.Clear,
+                            contentDescription = stringResource(R.string.clear)
+                        )
                     }
                 }
             },
@@ -264,7 +273,10 @@ fun SearchTopBar(
                         .padding(top = 4.dp)
                 )
                 IconButton(onClick = onFilterClick) {
-                    Icon(imageVector = Icons.Default.FilterList, contentDescription = stringResource(R.string.filter))
+                    Icon(
+                        imageVector = Icons.Default.FilterList,
+                        contentDescription = stringResource(R.string.filter)
+                    )
                 }
             }
 

@@ -1,4 +1,4 @@
-package com.javainiai.chefskiss.data
+package com.javainiai.chefskiss.data.utils
 
 import com.javainiai.chefskiss.data.enums.CookingUnit
 import com.javainiai.chefskiss.data.enums.UnitSystem
