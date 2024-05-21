@@ -127,4 +127,6 @@
     <string name="cooking_time">Cooking time</string>
     <string name="time_added">Time added</string>
     <string name="portion">Portion</string>
+    <string name="delete_meals">Delete meals</string>
+    <string name="bulk_edit_delete_confirmation">Are you sure that you want to delete %1$s recipes? (Can\'t be recovered)</string>
 </resources>

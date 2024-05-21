@@ -13,6 +13,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Deselect
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.MoveDown
@@ -47,6 +48,7 @@ import com.javainiai.chefskiss.data.enums.BulkMode
 import com.javainiai.chefskiss.data.recipe.PlannerRecipeWithRecipe
 import com.javainiai.chefskiss.data.utils.CalendarUtils
 import com.javainiai.chefskiss.data.utils.CalendarUtils.getDateString
+import com.javainiai.chefskiss.ui.components.ConfirmationDialog
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -65,9 +67,24 @@ fun MealPlannerBulkEditScreen(
     onDone: () -> Unit,
     pasteMeals: (Date) -> Unit,
     moveMeals: (Date) -> Unit,
+    deleteMeals: () -> Unit
 ) {
     var currentMode by remember {
         mutableStateOf(BulkMode.Select)
+    }
+
+    if (currentMode == BulkMode.Delete) {
+        ConfirmationDialog(
+            onDismiss = { currentMode = BulkMode.Select },
+            onConfirm = {
+                deleteMeals()
+                currentMode = BulkMode.Select
+            },
+            onDismissRequest = { currentMode = BulkMode.Select },
+            text = { Text(text = stringResource(
+                R.string.bulk_edit_delete_confirmation,
+                selectedRecipes.count()
+            )) })
     }
 
     Scaffold(
@@ -89,6 +106,7 @@ fun MealPlannerBulkEditScreen(
                 onDeselectAll = {
                     updateSelectedRecipes(listOf())
                 },
+                onDelete = { currentMode = BulkMode.Delete },
                 onCopy = { currentMode = BulkMode.Copy },
                 onMove = { currentMode = BulkMode.Move },
                 onDone = {
@@ -112,7 +130,7 @@ fun MealPlannerBulkEditScreen(
                     ) {
                         plannerRecipes[date.getDateString()]?.forEach { recipe ->
                             when (currentMode) {
-                                BulkMode.Select -> {
+                                BulkMode.Select, BulkMode.Delete -> {
                                     SelectionPlannerRecipeCard(
                                         recipe = recipe,
                                         modifier = Modifier
@@ -174,7 +192,7 @@ fun BulkEditTopBar(
         title = {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 when (currentMode) {
-                    BulkMode.Select -> {
+                    BulkMode.Select, BulkMode.Delete -> {
                         Text(text = stringResource(R.string.select_meals))
                     }
 
@@ -215,6 +233,7 @@ fun BulkEditBottomBar(
     onSelectAll: () -> Unit,
     onDeselectAll: () -> Unit,
     onMove: () -> Unit,
+    onDelete: () -> Unit,
     onCopy: () -> Unit,
     onDone: () -> Unit,
     currentMode: BulkMode
@@ -224,7 +243,7 @@ fun BulkEditBottomBar(
     BottomAppBar(modifier = modifier) {
         Row {
             when (currentMode) {
-                BulkMode.Select -> {
+                BulkMode.Select, BulkMode.Delete -> {
                     Spacer(modifier = Modifier.weight(1f))
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         FilledTonalButton(onClick = onSelectAll, colors = buttonColor) {
@@ -254,6 +273,16 @@ fun BulkEditBottomBar(
                             )
                         }
                         Text(text = stringResource(R.string.move))
+                    }
+                    Spacer(modifier = Modifier.weight(1f))
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        FilledTonalButton(onClick = onDelete, colors = buttonColor) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = stringResource(R.string.delete_meals)
+                            )
+                        }
+                        Text(text = stringResource(R.string.delete))
                     }
                     Spacer(modifier = Modifier.weight(1f))
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
