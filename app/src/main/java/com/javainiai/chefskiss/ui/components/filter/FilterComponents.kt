@@ -31,9 +31,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import com.javainiai.chefskiss.R
 import com.javainiai.chefskiss.data.enums.Sort
 import com.javainiai.chefskiss.data.tag.Tag
 
@@ -76,13 +79,13 @@ fun FilterSheet(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(text = "Filters")
+                    Text(text = stringResource(R.string.filters))
                     Spacer(modifier = Modifier.weight(1f))
                     TextButton(onClick = onClear) {
-                        Text(text = "Clear")
+                        Text(text = stringResource(R.string.clear))
                     }
                     TextButton(onClick = onApply) {
-                        Text(text = "Apply")
+                        Text(text = stringResource(R.string.apply))
                     }
                 }
                 content()
@@ -100,16 +103,16 @@ fun OrderSelection(
 ) {
     OutlinedCard(modifier = modifier) {
         Column(modifier = Modifier.padding(12.dp)) {
-            Text(text = "Order by")
+            Text(text = stringResource(R.string.order_by))
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 FilterChip(
                     selected = ascending,
                     onClick = { updateOrder(true) },
-                    label = { Text(text = "Ascending") })
+                    label = { Text(text = stringResource(R.string.ascending)) })
                 FilterChip(
                     selected = !ascending,
                     onClick = { updateOrder(false) },
-                    label = { Text(text = "Descending") })
+                    label = { Text(text = stringResource(R.string.descending)) })
             }
         }
     }
@@ -122,6 +125,8 @@ fun SortCard(
     updateSortingMethod: (Sort) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
+
     var opened by remember {
         mutableStateOf(false)
     }
@@ -131,12 +136,12 @@ fun SortCard(
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = "Sort by")
+                Text(text = stringResource(R.string.sort_by))
                 Spacer(modifier = Modifier.weight(1f))
                 IconButton(onClick = { opened = !opened }) {
                     Icon(
                         imageVector = if (opened) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
-                        contentDescription = "Open/close sorting methods"
+                        contentDescription = stringResource(R.string.open_close_sorting_methods)
                     )
                 }
             }
@@ -146,7 +151,7 @@ fun SortCard(
                         FilterChip(
                             selected = selectedSort == it,
                             onClick = { updateSortingMethod(it) },
-                            label = { Text(it.title) })
+                            label = { Text(it.getTitle(context)) })
                     }
                 }
             }
@@ -170,12 +175,12 @@ fun TagCard(
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = "Tag filter")
+                Text(text = stringResource(R.string.tag_filter))
                 Spacer(modifier = Modifier.weight(1f))
                 IconButton(onClick = { opened = !opened }) {
                     Icon(
                         imageVector = if (opened) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
-                        contentDescription = "Open/close tags"
+                        contentDescription = stringResource(R.string.open_close_tags)
                     )
                 }
             }
@@ -202,7 +207,7 @@ fun TagCard(
 fun RatingCard(rating: Int, onRatingChange: (Int) -> Unit, modifier: Modifier = Modifier) {
     OutlinedCard(modifier = modifier) {
         Column(modifier = Modifier.padding(12.dp)) {
-            Text(text = "Rating")
+            Text(text = stringResource(R.string.rating))
             Row {
                 repeat(rating) {
                     Icon(
@@ -236,7 +241,7 @@ fun FavoriteButton(
                 FilterChip(
                     selected = favorite,
                     onClick = { updateFavorite(!favorite) },
-                    label = { Text(text = "Favorite") })
+                    label = { Text(text = stringResource(R.string.favorite)) })
             }
         }
     }

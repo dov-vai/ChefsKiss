@@ -1,12 +1,14 @@
 package com.javainiai.chefskiss.ui.mealplanner
 
+import android.content.Context
 import androidx.lifecycle.viewModelScope
-import com.javainiai.chefskiss.data.CalendarUtils
-import com.javainiai.chefskiss.data.CalendarUtils.getDate
-import com.javainiai.chefskiss.data.CalendarUtils.getDateString
+import com.javainiai.chefskiss.R
 import com.javainiai.chefskiss.data.recipe.PlannerRecipeWithRecipe
 import com.javainiai.chefskiss.data.recipe.RecipesRepository
 import com.javainiai.chefskiss.data.recipe.ShopRecipe
+import com.javainiai.chefskiss.data.utils.CalendarUtils
+import com.javainiai.chefskiss.data.utils.CalendarUtils.getDate
+import com.javainiai.chefskiss.data.utils.CalendarUtils.getDateString
 import com.javainiai.chefskiss.ui.components.viewmodel.BaseViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -33,7 +35,10 @@ data class MealPlannerUiState(
     val selectedRecipes: List<PlannerRecipeWithRecipe>
 )
 
-class MealPlannerViewModel(private val recipesRepository: RecipesRepository) : BaseViewModel() {
+class MealPlannerViewModel(
+    private val context: Context,
+    private val recipesRepository: RecipesRepository
+) : BaseViewModel() {
     private var _uiState = MutableStateFlow(
         MealPlannerUiState(
             "",
@@ -115,7 +120,7 @@ class MealPlannerViewModel(private val recipesRepository: RecipesRepository) : B
                 recipesRepository.insertShopRecipe(ShopRecipe(recipe.recipe.id))
             }
         }
-        showMessage("Added to shopping list")
+        showMessage(context.getString(R.string.added_to_shopping_list))
     }
 
     fun updateBulkEditMode(bulkEditMode: Boolean) {

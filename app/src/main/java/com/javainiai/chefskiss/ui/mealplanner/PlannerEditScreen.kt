@@ -25,9 +25,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.javainiai.chefskiss.R
 import com.javainiai.chefskiss.data.enums.Meal
 import com.javainiai.chefskiss.data.recipe.PlannerRecipeWithRecipe
 import com.javainiai.chefskiss.ui.AppViewModelProvider
@@ -46,6 +49,7 @@ fun PlannerEditScreen(
     navigateToSelection: () -> Unit,
     viewModel: PlannerEditViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
+    val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
     val plannerRecipes by viewModel.plannerRecipes.collectAsState()
     val selectedRecipe by viewModel.selectedRecipe.collectAsState()
@@ -65,7 +69,7 @@ fun PlannerEditScreen(
                     FilterChip(
                         selected = uiState.selectedType == it,
                         onClick = { viewModel.updateType(it) },
-                        label = { Text(text = it.title) })
+                        label = { Text(text = it.getTitle(context)) })
                 }
             }
             selectedRecipe?.let {
@@ -73,10 +77,10 @@ fun PlannerEditScreen(
             }
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 FilledTonalButton(onClick = navigateToSelection) {
-                    Text(text = "Select Recipe")
+                    Text(text = stringResource(R.string.selectRecipe))
                 }
                 FilledTonalButton(onClick = viewModel::insertPlannerRecipe) {
-                    Text(text = "Add To Planner")
+                    Text(text = stringResource(R.string.addToPlanner))
                 }
             }
             HorizontalDivider()
@@ -103,7 +107,10 @@ fun PlannerEditTopBar(title: String, navigateBack: () -> Unit, modifier: Modifie
         title = { Text(text = title) },
         navigationIcon = {
             IconButton(onClick = navigateBack) {
-                Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = stringResource(R.string.back)
+                )
             }
         }
     )
@@ -115,13 +122,14 @@ fun PlannerRecipeCard(
     onDelete: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
     Card(modifier = modifier) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text(text = recipe.plannerRecipe.type.title.padEnd(20))
+            Text(text = recipe.plannerRecipe.type.getTitle(context).padEnd(20))
             Text(
                 text = recipe.recipe.title,
                 overflow = TextOverflow.Ellipsis,
@@ -129,7 +137,10 @@ fun PlannerRecipeCard(
                 modifier = Modifier.weight(1f)
             )
             IconButton(onClick = onDelete) {
-                Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete recipe")
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = stringResource(R.string.deleteRecipe)
+                )
             }
         }
     }

@@ -25,8 +25,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.javainiai.chefskiss.R
 import com.javainiai.chefskiss.ui.AppViewModelProvider
 import com.javainiai.chefskiss.ui.components.search.RecipeCard
 import com.javainiai.chefskiss.ui.components.search.SearchScreen
@@ -49,13 +51,15 @@ fun HomeScreen(
 ) {
     val coroutineScope = rememberCoroutineScope()
     val recipes by searchViewModel.recipes.collectAsState()
+
     SearchScreen(
         customButtonIcon = Icons.Default.Menu,
         onCustomButtonClick = { coroutineScope.launch { drawerState.open() } },
         bottomBar = {
             RecipeBottomBar(
                 recipesOnClick = { },
-                addOnClick = { navigateTo(AddRecipeDestination.route) })
+                addOnClick = { navigateTo(AddRecipeDestination.route) },
+            )
         },
         viewModel = searchViewModel
     ) { padding ->
@@ -77,7 +81,7 @@ fun HomeScreen(
 fun RecipeBottomBar(
     recipesOnClick: () -> Unit,
     addOnClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     BottomAppBar(modifier = modifier) {
         Row {
@@ -87,9 +91,12 @@ fun RecipeBottomBar(
                     onClick = recipesOnClick,
                     colors = ButtonDefaults.filledTonalButtonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
                 ) {
-                    Icon(imageVector = Icons.Default.RestaurantMenu, contentDescription = "Recipes")
+                    Icon(
+                        imageVector = Icons.Default.RestaurantMenu,
+                        contentDescription = stringResource(R.string.recipes)
+                    )
                 }
-                Text(text = "Recipes")
+                Text(text = stringResource(R.string.recipes))
             }
             Spacer(modifier = Modifier.weight(1f))
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -97,12 +104,14 @@ fun RecipeBottomBar(
                     onClick = addOnClick,
                     colors = ButtonDefaults.filledTonalButtonColors(containerColor = MaterialTheme.colorScheme.background)
                 ) {
-                    Icon(imageVector = Icons.Default.Add, contentDescription = "Add recipe")
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = stringResource(R.string.add_recipe)
+                    )
                 }
-                Text(text = "Add")
+                Text(text = stringResource(R.string.add))
             }
             Spacer(modifier = Modifier.weight(1f))
         }
     }
 }
-

@@ -36,11 +36,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.javainiai.chefskiss.R
 import com.javainiai.chefskiss.data.enums.TimerPreset
 import com.javainiai.chefskiss.ui.AppViewModelProvider
 import com.javainiai.chefskiss.ui.components.picker.Picker
@@ -80,7 +82,7 @@ fun TimerScreen(
                 onValueChange = viewModel::updateTitle,
                 keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
                 placeholder = {
-                    Text(text = "Timer title")
+                    Text(text = stringResource(R.string.timerTitle))
                 },
                 shape = RoundedCornerShape(32.dp),
                 colors = TextFieldDefaults.colors(
@@ -93,7 +95,10 @@ fun TimerScreen(
                 ),
                 trailingIcon = {
                     IconButton(onClick = { viewModel.updateTitle("") }) {
-                        Icon(imageVector = Icons.Default.Clear, contentDescription = "Clear")
+                        Icon(
+                            imageVector = Icons.Default.Clear,
+                            contentDescription = stringResource(R.string.clear)
+                        )
                     }
                 },
                 modifier = Modifier
@@ -105,7 +110,7 @@ fun TimerScreen(
                     modifier = Modifier.weight(0.3f),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(text = "Hours")
+                    Text(text = stringResource(R.string.hours))
                     Picker(
                         state = viewModel.hoursPickerState,
                         items = viewModel.hours,
@@ -116,7 +121,7 @@ fun TimerScreen(
                     modifier = Modifier.weight(0.3f),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(text = "Minutes")
+                    Text(text = stringResource(R.string.minutes))
                     Picker(
                         state = viewModel.minutesPickerState,
                         items = viewModel.minutesSeconds,
@@ -127,7 +132,7 @@ fun TimerScreen(
                     modifier = Modifier.weight(0.3f),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(text = "Seconds")
+                    Text(text = stringResource(R.string.seconds))
                     Picker(
                         state = viewModel.secondsPickerState,
                         items = viewModel.minutesSeconds,
@@ -153,13 +158,13 @@ fun TimerScreen(
                     navigateBack()
                 }
                 ) {
-                    Text(text = "Start", style = TextStyle(fontSize = 32.sp))
+                    Text(text = stringResource(R.string.start), style = TextStyle(fontSize = 32.sp))
                 }
                 FilledTonalButton(
                     onClick = viewModel::resetTimer,
                     colors = ButtonDefaults.filledTonalButtonColors(containerColor = MaterialTheme.colorScheme.errorContainer)
                 ) {
-                    Text(text = "Reset", style = TextStyle(fontSize = 32.sp))
+                    Text(text = stringResource(R.string.reset), style = TextStyle(fontSize = 32.sp))
                 }
             }
         }
@@ -169,21 +174,27 @@ fun TimerScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimerTopBar(modifier: Modifier = Modifier, onBack: () -> Unit) {
-    CenterAlignedTopAppBar(title = { Text(text = "Set Timer") }, navigationIcon = {
-        IconButton(onClick = onBack) {
-            Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-        }
-    })
+    CenterAlignedTopAppBar(
+        title = { Text(text = stringResource(R.string.setTimer)) },
+        navigationIcon = {
+            IconButton(onClick = onBack) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = stringResource(R.string.back)
+                )
+            }
+        })
 }
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun TimerPresets(modifier: Modifier = Modifier, onTimerPreset: (TimerPreset) -> Unit) {
+    val context = LocalContext.current
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         TimerPreset.entries.forEach { preset ->
             SuggestionChip(
                 onClick = { onTimerPreset(preset) },
-                label = { Text(text = preset.title) })
+                label = { Text(text = preset.getTitle(context)) })
         }
     }
 }
