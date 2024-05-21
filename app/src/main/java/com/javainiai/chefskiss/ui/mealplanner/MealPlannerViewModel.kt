@@ -1,5 +1,7 @@
 package com.javainiai.chefskiss.ui.mealplanner
 
+
+import androidx.annotation.VisibleForTesting
 import android.content.Context
 import androidx.lifecycle.viewModelScope
 import com.javainiai.chefskiss.R
@@ -78,7 +80,8 @@ class MealPlannerViewModel(
                 initialValue = mapOf()
             )
 
-    private fun titleFormat(): String {
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    public fun titleFormat(): String {
         val start = _uiState.value.startOfWeek
         val end = CalendarUtils.datePlusOffset(start, 6)
         val dayFormat = SimpleDateFormat("dd MMM", Locale.getDefault())

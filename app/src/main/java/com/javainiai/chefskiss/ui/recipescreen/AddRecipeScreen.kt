@@ -88,7 +88,9 @@ import com.javainiai.chefskiss.data.enums.UnitSystem
 import com.javainiai.chefskiss.data.tag.Tag
 import com.javainiai.chefskiss.ui.AppViewModelProvider
 import com.javainiai.chefskiss.ui.navigation.NavigationDestination
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Locale
 
 object AddRecipeDestination : NavigationDestination {
@@ -125,7 +127,16 @@ fun AddRecipeScreen(
     Scaffold(topBar = {
         AddRecipeTopBar(
             onBack = navigateBack,
-            onSave = { coroutineScope.launch { if (viewModel.saveToDatabase()) navigateBack() } })
+            onSave = {
+                coroutineScope.launch {
+                    if (viewModel.saveToDatabase()) {
+                        withContext(Dispatchers.Main) {
+                            navigateBack()
+                        }
+                    }
+                }
+            }
+        )
     },
         snackbarHost = { SnackbarHost(hostState = viewModel.snackbarHostState) }
     ) { padding ->
@@ -157,8 +168,8 @@ fun AddRecipeScreen(
                 1 -> RecipeTags(
                     tag = uiState.tag,
                     onTagChange = viewModel::updateTag,
-                    onAddTag = viewModel::addTag,
-                    onRemoveTag = viewModel::removeTag,
+                    onAddTag = { coroutineScope.launch { viewModel.addTag() } },
+                    onRemoveTag = { coroutineScope.launch { viewModel.removeTag(it) } },
                     tags = tags,
                     selectedTags = uiState.tags,
                     updateTags = viewModel::updateTags,

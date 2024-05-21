@@ -216,7 +216,7 @@ fun SearchBar(
             singleLine = true,
             leadingIcon = {
                 IconButton(onClick = onCustomButtonClick) {
-                    Icon(imageVector = customButtonIcon, contentDescription = null)
+                    Icon(imageVector = customButtonIcon, contentDescription = "Search button")
                 }
             },
             trailingIcon = {
