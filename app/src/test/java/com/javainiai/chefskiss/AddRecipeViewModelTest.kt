@@ -1,7 +1,9 @@
 package com.javainiai.chefskiss
 
+import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
+import androidx.test.core.app.ApplicationProvider
 import com.javainiai.chefskiss.data.enums.CookingUnit
 import com.javainiai.chefskiss.data.recipe.Recipe
 import com.javainiai.chefskiss.data.recipe.RecipeWithIngredients
@@ -27,11 +29,13 @@ class AddRecipeViewModelTest {
     private val recipesRepository = mockk<RecipesRepository>(relaxed = true)
     private val savedStateHandle = mockk<SavedStateHandle>(relaxed = true)
     private lateinit var viewModel: AddRecipeViewModel
+    private lateinit var context: Context
 
     @Before
     fun setup() {
+        context = ApplicationProvider.getApplicationContext()
         every { savedStateHandle.get<Long>(any()) } returns null
-        viewModel = AddRecipeViewModel(savedStateHandle, recipesRepository)
+        viewModel = AddRecipeViewModel(context, savedStateHandle, recipesRepository)
     }
 
     @Test
