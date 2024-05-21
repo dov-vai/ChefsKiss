@@ -619,7 +619,11 @@ fun RecipeIngredients(
                     onEdit = {
                         updateEditingIngredient(it)
                         updateIngredient(it)
-                    })
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                )
             }
         }
     }
@@ -637,9 +641,9 @@ fun IngredientCard(
 
     Card(modifier = modifier, colors = CardDefaults.cardColors(containerColor = containerColor)) {
         Row(
-            modifier = Modifier.padding(8.dp),
+            modifier = Modifier.padding(10.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(
                 text = ingredient.title,
