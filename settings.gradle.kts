@@ -15,4 +15,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "ChefsKiss"
 include(":app")
- 
+include(":rules")
