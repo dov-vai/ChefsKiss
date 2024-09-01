@@ -8,13 +8,15 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.javainiai.chefskiss.R
+import com.javainiai.chefskiss.data.database.ingredient.Ingredient
+import com.javainiai.chefskiss.data.database.planner.PlannerRecipe
+import com.javainiai.chefskiss.data.database.recipe.Recipe
+import com.javainiai.chefskiss.data.database.services.plannerservice.PlannerService
+import com.javainiai.chefskiss.data.database.services.recipeservice.RecipeService
+import com.javainiai.chefskiss.data.database.services.shoppingservice.ShoppingService
+import com.javainiai.chefskiss.data.database.shoppinglist.ShopRecipe
+import com.javainiai.chefskiss.data.database.tag.Tag
 import com.javainiai.chefskiss.data.enums.UnitSystem
-import com.javainiai.chefskiss.data.ingredient.Ingredient
-import com.javainiai.chefskiss.data.recipe.PlannerRecipe
-import com.javainiai.chefskiss.data.recipe.Recipe
-import com.javainiai.chefskiss.data.recipe.RecipesRepository
-import com.javainiai.chefskiss.data.recipe.ShopRecipe
-import com.javainiai.chefskiss.data.tag.Tag
 import com.javainiai.chefskiss.ui.components.viewmodel.BaseViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -34,12 +36,14 @@ data class RecipeDisplayUiState(
 class RecipeDetailsViewModel(
     private val context: Context,
     savedStateHandle: SavedStateHandle,
-    private val recipesRepository: RecipesRepository
+    private val recipeService: RecipeService,
+    private val shoppingService: ShoppingService,
+    private val plannerService: PlannerService
 ) : BaseViewModel() {
     private val recipeId: Long =
         checkNotNull(savedStateHandle[RecipeDetailsDestination.recipeIdArg])
 
-    val uiState: StateFlow<RecipeDisplayUiState> = recipesRepository
+    val uiState: StateFlow<RecipeDisplayUiState> = recipeService
         .getRecipeWithIngredients(recipeId)
         .filterNotNull()
         .map {
@@ -54,7 +58,7 @@ class RecipeDetailsViewModel(
             )
         )
 
-    val tags: StateFlow<List<Tag>> = recipesRepository
+    val tags: StateFlow<List<Tag>> = recipeService
         .getRecipeWithTags(recipeId)
         .filterNotNull()
         .map { it.tags }
@@ -81,12 +85,12 @@ class RecipeDetailsViewModel(
     }
 
     suspend fun deleteRecipe() {
-        recipesRepository.deleteRecipe(uiState.value.recipe)
+        recipeService.deleteRecipe(uiState.value.recipe)
     }
 
     fun addToShoppingList() {
         viewModelScope.launch {
-            recipesRepository.insertShopRecipe(ShopRecipe(uiState.value.recipe.id))
+            shoppingService.insertShopRecipe(ShopRecipe(uiState.value.recipe.id))
         }
         showMessage(context.getString(R.string.added_to_shopping_list))
     }
@@ -94,7 +98,7 @@ class RecipeDetailsViewModel(
     fun updateFavorite() {
         val updatedRecipe = uiState.value.recipe.copy(favorite = !uiState.value.recipe.favorite)
         viewModelScope.launch {
-            recipesRepository.updateRecipe(updatedRecipe)
+            recipeService.updateRecipe(updatedRecipe)
         }
         showMessage(
             if (!uiState.value.recipe.favorite) context.getString(R.string.added_to_favorites) else context.getString(
@@ -106,7 +110,7 @@ class RecipeDetailsViewModel(
     fun updateRating(rating: Int) {
         val updatedRecipe = uiState.value.recipe.copy(rating = rating)
         viewModelScope.launch {
-            recipesRepository.updateRecipe(updatedRecipe)
+            recipeService.updateRecipe(updatedRecipe)
         }
     }
 
@@ -116,7 +120,7 @@ class RecipeDetailsViewModel(
 
     fun addToMealPlanner(plannerRecipe: PlannerRecipe) {
         viewModelScope.launch {
-            recipesRepository.insertPlannerRecipe(plannerRecipe)
+            plannerService.insertPlannerRecipe(plannerRecipe)
         }
         showMessage(
             context.getString(

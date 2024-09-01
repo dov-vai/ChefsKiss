@@ -4,12 +4,12 @@ import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.test.core.app.ApplicationProvider
+import com.javainiai.chefskiss.data.database.recipe.Recipe
+import com.javainiai.chefskiss.data.database.recipe.RecipeWithIngredients
+import com.javainiai.chefskiss.data.database.recipe.RecipeWithTags
+import com.javainiai.chefskiss.data.database.services.recipeservice.RecipeService
+import com.javainiai.chefskiss.data.database.tag.Tag
 import com.javainiai.chefskiss.data.enums.CookingUnit
-import com.javainiai.chefskiss.data.recipe.Recipe
-import com.javainiai.chefskiss.data.recipe.RecipeWithIngredients
-import com.javainiai.chefskiss.data.recipe.RecipeWithTags
-import com.javainiai.chefskiss.data.recipe.RecipesRepository
-import com.javainiai.chefskiss.data.tag.Tag
 import com.javainiai.chefskiss.ui.recipescreen.AddRecipeViewModel
 import com.javainiai.chefskiss.ui.recipescreen.IngredientDisplay
 import io.mockk.coVerify
@@ -26,7 +26,7 @@ import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
 class AddRecipeViewModelTest {
-    private val recipesRepository = mockk<RecipesRepository>(relaxed = true)
+    private val recipesRepository = mockk<RecipeService>(relaxed = true)
     private val savedStateHandle = mockk<SavedStateHandle>(relaxed = true)
     private lateinit var viewModel: AddRecipeViewModel
     private lateinit var context: Context
@@ -134,8 +134,15 @@ class AddRecipeViewModelTest {
     fun addRecipeViewModel_inizitializeEditRecipe_uiStateUpdates() = runBlocking {
         val recipeId = 1L
         val recipe = Recipe(recipeId, "Test Recipe", "Test Description", 30, 4, 5, false, Uri.EMPTY)
-        every { recipesRepository.getRecipeWithTags(any()) } returns flowOf(RecipeWithTags(recipe, listOf()))
-        every { recipesRepository.getRecipeWithIngredients(any()) } returns flowOf(RecipeWithIngredients(recipe, listOf()))
+        every { recipesRepository.getRecipeWithTags(any()) } returns flowOf(
+            RecipeWithTags(
+                recipe,
+                listOf()
+            )
+        )
+        every { recipesRepository.getRecipeWithIngredients(any()) } returns flowOf(
+            RecipeWithIngredients(recipe, listOf())
+        )
         viewModel.initializeEditRecipe(recipeId)
         val uiState = viewModel.uiState.first()
         Assert.assertEquals("Test Recipe", uiState.title)
@@ -213,7 +220,15 @@ class AddRecipeViewModelTest {
         viewModel.updateCookingTime("30")
         viewModel.updateServings("3")
         viewModel.updateDirections("Test Description")
-        viewModel.updateIngredients(listOf(IngredientDisplay("Test Ingredient", "Three", CookingUnit.Kilogram)))
+        viewModel.updateIngredients(
+            listOf(
+                IngredientDisplay(
+                    "Test Ingredient",
+                    "Three",
+                    CookingUnit.Kilogram
+                )
+            )
+        )
         val result = viewModel.saveToDatabase()
         Assert.assertFalse(result)
     }
@@ -224,7 +239,13 @@ class AddRecipeViewModelTest {
         viewModel.updateCookingTime("30")
         viewModel.updateServings("Three")
         viewModel.updateDirections("Test Description")
-        viewModel.updateIngredient((IngredientDisplay("Test Ingredient", "3", CookingUnit.Kilogram)))
+        viewModel.updateIngredient(
+            (IngredientDisplay(
+                "Test Ingredient",
+                "3",
+                CookingUnit.Kilogram
+            ))
+        )
         val result = viewModel.saveToDatabase()
         Assert.assertFalse(result)
     }

@@ -1,7 +1,7 @@
 package com.javainiai.chefskiss
 
 import android.net.Uri
-import com.javainiai.chefskiss.data.Converters
+import com.javainiai.chefskiss.data.database.Converters
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic

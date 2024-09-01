@@ -50,7 +50,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.javainiai.chefskiss.R
-import com.javainiai.chefskiss.data.recipe.PlannerRecipeWithRecipe
+import com.javainiai.chefskiss.data.database.planner.PlannerRecipeWithRecipe
 import com.javainiai.chefskiss.data.utils.CalendarUtils
 import com.javainiai.chefskiss.data.utils.CalendarUtils.getDateString
 import com.javainiai.chefskiss.ui.AppViewModelProvider

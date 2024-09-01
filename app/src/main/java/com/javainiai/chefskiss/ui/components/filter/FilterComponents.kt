@@ -37,8 +37,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.javainiai.chefskiss.R
+import com.javainiai.chefskiss.data.database.tag.Tag
 import com.javainiai.chefskiss.data.enums.Sort
-import com.javainiai.chefskiss.data.tag.Tag
 
 @Composable
 fun FilterDrawer(

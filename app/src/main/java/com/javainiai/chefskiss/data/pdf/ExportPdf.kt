@@ -4,8 +4,8 @@ import android.content.Context
 import android.print.PrintAttributes
 import android.print.PrintManager
 import android.webkit.WebView
-import com.javainiai.chefskiss.data.ingredient.Ingredient
-import com.javainiai.chefskiss.data.recipe.Recipe
+import com.javainiai.chefskiss.data.database.ingredient.Ingredient
+import com.javainiai.chefskiss.data.database.recipe.Recipe
 
 fun getRecipeCardHtml(recipe: Recipe, ingredients: List<Ingredient>): String {
     var rating = ""

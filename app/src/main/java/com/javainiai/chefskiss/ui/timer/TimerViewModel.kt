@@ -3,8 +3,8 @@ package com.javainiai.chefskiss.ui.timer
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.javainiai.chefskiss.data.database.services.recipeservice.RecipeService
 import com.javainiai.chefskiss.data.enums.TimerPreset
-import com.javainiai.chefskiss.data.recipe.RecipesRepository
 import com.javainiai.chefskiss.ui.components.picker.PickerState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,7 +17,7 @@ data class TimerUiState(
     val title: String
 )
 
-class TimerViewModel(savedStateHandle: SavedStateHandle, recipesRepository: RecipesRepository) :
+class TimerViewModel(savedStateHandle: SavedStateHandle, recipeService: RecipeService) :
     ViewModel() {
     private val recipeId: Long = checkNotNull(savedStateHandle[TimerDestination.timerRecipeIdArg])
 
@@ -33,7 +33,7 @@ class TimerViewModel(savedStateHandle: SavedStateHandle, recipesRepository: Reci
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            recipesRepository.getRecipeStream(recipeId).firstOrNull()?.let {
+            recipeService.getRecipeStream(recipeId).firstOrNull()?.let {
                 updateTitle(it.title)
             }
         }

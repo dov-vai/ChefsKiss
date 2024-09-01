@@ -44,8 +44,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.javainiai.chefskiss.R
+import com.javainiai.chefskiss.data.database.planner.PlannerRecipeWithRecipe
 import com.javainiai.chefskiss.data.enums.BulkMode
-import com.javainiai.chefskiss.data.recipe.PlannerRecipeWithRecipe
 import com.javainiai.chefskiss.data.utils.CalendarUtils
 import com.javainiai.chefskiss.data.utils.CalendarUtils.getDateString
 import com.javainiai.chefskiss.ui.components.ConfirmationDialog
@@ -81,10 +81,14 @@ fun MealPlannerBulkEditScreen(
                 currentMode = BulkMode.Select
             },
             onDismissRequest = { currentMode = BulkMode.Select },
-            text = { Text(text = stringResource(
-                R.string.bulk_edit_delete_confirmation,
-                selectedRecipes.count()
-            )) })
+            text = {
+                Text(
+                    text = stringResource(
+                        R.string.bulk_edit_delete_confirmation,
+                        selectedRecipes.count()
+                    )
+                )
+            })
     }
 
     Scaffold(

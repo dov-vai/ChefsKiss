@@ -26,38 +26,43 @@ object AppViewModelProvider {
             AddRecipeViewModel(
                 chefsKissApplication().container.context,
                 this.createSavedStateHandle(),
-                chefsKissApplication().container.recipesRepository
+                chefsKissApplication().container.recipeService
             )
         }
         initializer {
             RecipeDetailsViewModel(
                 this.chefsKissApplication().container.context,
                 this.createSavedStateHandle(),
-                chefsKissApplication().container.recipesRepository
+                chefsKissApplication().container.recipeService,
+                chefsKissApplication().container.shoppingListService,
+                chefsKissApplication().container.plannerService
             )
         }
         initializer {
             ShoppingListViewModel(
                 chefsKissApplication().container.context,
-                chefsKissApplication().container.recipesRepository
+                chefsKissApplication().container.shoppingListService,
+                chefsKissApplication().container.recipeService
             )
         }
         initializer {
             MealPlannerViewModel(
                 chefsKissApplication().container.context,
-                chefsKissApplication().container.recipesRepository
+                chefsKissApplication().container.plannerService,
+                chefsKissApplication().container.shoppingListService
             )
         }
         initializer {
             PlannerEditViewModel(
                 chefsKissApplication().container.selectedRecipeDataSource,
                 this.createSavedStateHandle(),
-                chefsKissApplication().container.recipesRepository
+                chefsKissApplication().container.recipeService,
+                chefsKissApplication().container.plannerService
             )
         }
         initializer {
             SearchScreenViewModel(
-                chefsKissApplication().container.recipesRepository
+                chefsKissApplication().container.recipeService
             )
         }
         initializer {
@@ -66,13 +71,13 @@ object AppViewModelProvider {
         initializer {
             TimerViewModel(
                 this.createSavedStateHandle(),
-                chefsKissApplication().container.recipesRepository
+                chefsKissApplication().container.recipeService
             )
         }
         initializer {
             ChefsKissAppViewModel(
                 chefsKissApplication().container.context,
-                chefsKissApplication().container.configRepository
+                chefsKissApplication().container.configService
             )
         }
     }

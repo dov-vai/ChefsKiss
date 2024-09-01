@@ -3,12 +3,13 @@ package com.javainiai.chefskiss.ui.mealplanner
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.javainiai.chefskiss.data.database.planner.PlannerRecipe
+import com.javainiai.chefskiss.data.database.planner.PlannerRecipeWithRecipe
+import com.javainiai.chefskiss.data.database.recipe.Recipe
+import com.javainiai.chefskiss.data.database.services.plannerservice.PlannerService
+import com.javainiai.chefskiss.data.database.services.recipeservice.RecipeService
 import com.javainiai.chefskiss.data.datasources.SelectedRecipeDataSource
 import com.javainiai.chefskiss.data.enums.Meal
-import com.javainiai.chefskiss.data.recipe.PlannerRecipe
-import com.javainiai.chefskiss.data.recipe.PlannerRecipeWithRecipe
-import com.javainiai.chefskiss.data.recipe.Recipe
-import com.javainiai.chefskiss.data.recipe.RecipesRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,7 +30,8 @@ data class MealEditUiState(
 class PlannerEditViewModel(
     selectedRecipeDataSource: SelectedRecipeDataSource,
     savedStateHandle: SavedStateHandle,
-    private val recipesRepository: RecipesRepository
+    private val recipeService: RecipeService,
+    private val plannerService: PlannerService
 ) : ViewModel() {
     private val plannerDate: String =
         checkNotNull(savedStateHandle[PlannerEditDestination.plannerDateArg])
@@ -37,7 +39,7 @@ class PlannerEditViewModel(
     @OptIn(ExperimentalCoroutinesApi::class)
     val selectedRecipe: StateFlow<Recipe?> = selectedRecipeDataSource.recipeId
         .filterNotNull()
-        .flatMapLatest { recipesRepository.getRecipeStream(it) }
+        .flatMapLatest { recipeService.getRecipeStream(it) }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
@@ -47,7 +49,7 @@ class PlannerEditViewModel(
     private var _uiState = MutableStateFlow(MealEditUiState(plannerDate, Meal.BREAKFAST))
     val uiState = _uiState.asStateFlow()
 
-    val plannerRecipes: StateFlow<List<PlannerRecipeWithRecipe>> = recipesRepository
+    val plannerRecipes: StateFlow<List<PlannerRecipeWithRecipe>> = plannerService
         .getPlannerRecipesWithRecipes(plannerDate)
         .filterNotNull()
         .stateIn(
@@ -70,7 +72,7 @@ class PlannerEditViewModel(
 
         with(_uiState.value) {
             viewModelScope.launch(Dispatchers.IO) {
-                recipesRepository.insertPlannerRecipe(
+                plannerService.insertPlannerRecipe(
                     PlannerRecipe(
                         date = plannerDate,
                         recipeId = selectedRecipe.value!!.id,
@@ -83,7 +85,7 @@ class PlannerEditViewModel(
 
     fun deletePlannerRecipe(recipe: PlannerRecipe) {
         viewModelScope.launch(Dispatchers.IO) {
-            recipesRepository.deletePlannerRecipe(recipe)
+            plannerService.deletePlannerRecipe(recipe)
         }
     }
 
