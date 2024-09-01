@@ -5,9 +5,10 @@ import android.content.Context
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.viewModelScope
 import com.javainiai.chefskiss.R
-import com.javainiai.chefskiss.data.recipe.PlannerRecipeWithRecipe
-import com.javainiai.chefskiss.data.recipe.RecipesRepository
-import com.javainiai.chefskiss.data.recipe.ShopRecipe
+import com.javainiai.chefskiss.data.database.planner.PlannerRecipeWithRecipe
+import com.javainiai.chefskiss.data.database.services.plannerservice.PlannerService
+import com.javainiai.chefskiss.data.database.services.shoppingservice.ShoppingService
+import com.javainiai.chefskiss.data.database.shoppinglist.ShopRecipe
 import com.javainiai.chefskiss.data.utils.CalendarUtils
 import com.javainiai.chefskiss.data.utils.CalendarUtils.getDate
 import com.javainiai.chefskiss.data.utils.CalendarUtils.getDateString
@@ -39,7 +40,8 @@ data class MealPlannerUiState(
 
 class MealPlannerViewModel(
     private val context: Context,
-    private val recipesRepository: RecipesRepository
+    private val plannerService: PlannerService,
+    private val shoppingService: ShoppingService
 ) : BaseViewModel() {
     private var _uiState = MutableStateFlow(
         MealPlannerUiState(
@@ -61,7 +63,7 @@ class MealPlannerViewModel(
     @OptIn(ExperimentalCoroutinesApi::class)
     val plannerRecipes: StateFlow<Map<String, List<PlannerRecipeWithRecipe>>> =
         _uiState.flatMapLatest { mealPlannerState ->
-            recipesRepository
+            plannerService
                 .getPlannerRecipesWithRecipes(
                     (0..6).map {
                         val date = CalendarUtils.datePlusOffset(mealPlannerState.startOfWeek, it)
@@ -120,7 +122,7 @@ class MealPlannerViewModel(
     fun addToShoppingList(plannerRecipeWithRecipes: List<PlannerRecipeWithRecipe>?) {
         plannerRecipeWithRecipes?.forEach { recipe ->
             viewModelScope.launch(Dispatchers.IO) {
-                recipesRepository.insertShopRecipe(ShopRecipe(recipe.recipe.id))
+                shoppingService.insertShopRecipe(ShopRecipe(recipe.recipe.id))
             }
         }
         showMessage(context.getString(R.string.added_to_shopping_list))
@@ -169,9 +171,9 @@ class MealPlannerViewModel(
                         )
 
                         if (isCopyOperation)
-                            recipesRepository.insertPlannerRecipe(plannerRecipe)
+                            plannerService.insertPlannerRecipe(plannerRecipe)
                         else {
-                            recipesRepository.updatePlannerRecipe(plannerRecipe)
+                            plannerService.updatePlannerRecipe(plannerRecipe)
                             updatedPlannerRecipes.add(it.copy(plannerRecipe = plannerRecipe))
                         }
                     }
@@ -195,7 +197,7 @@ class MealPlannerViewModel(
     fun deleteMeals() {
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.value.selectedRecipes.forEach {
-                recipesRepository.deletePlannerRecipe(it.plannerRecipe)
+                plannerService.deletePlannerRecipe(it.plannerRecipe)
             }
         }
     }

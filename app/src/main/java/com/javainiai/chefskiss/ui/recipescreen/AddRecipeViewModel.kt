@@ -6,11 +6,11 @@ import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.javainiai.chefskiss.R
+import com.javainiai.chefskiss.data.database.ingredient.Ingredient
+import com.javainiai.chefskiss.data.database.recipe.Recipe
+import com.javainiai.chefskiss.data.database.services.recipeservice.RecipeService
+import com.javainiai.chefskiss.data.database.tag.Tag
 import com.javainiai.chefskiss.data.enums.CookingUnit
-import com.javainiai.chefskiss.data.ingredient.Ingredient
-import com.javainiai.chefskiss.data.recipe.Recipe
-import com.javainiai.chefskiss.data.recipe.RecipesRepository
-import com.javainiai.chefskiss.data.tag.Tag
 import com.javainiai.chefskiss.ui.components.viewmodel.BaseViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -48,7 +48,7 @@ data class AddRecipeUiState(
 class AddRecipeViewModel(
     private val context: Context,
     savedStateHandle: SavedStateHandle,
-    private val recipesRepository: RecipesRepository
+    private val recipeService: RecipeService
 ) : BaseViewModel() {
     private val editRecipeId: Long? = savedStateHandle[EditRecipeDestination.editRecipeIdArg]
 
@@ -72,7 +72,7 @@ class AddRecipeViewModel(
         )
     val uiState = _uiState.asStateFlow()
 
-    val tags: StateFlow<List<Tag>> = recipesRepository
+    val tags: StateFlow<List<Tag>> = recipeService
         .getAllTags()
         .stateIn(
             scope = viewModelScope,
@@ -147,12 +147,12 @@ class AddRecipeViewModel(
         if (_uiState.value.tag == "")
             return
 
-        recipesRepository.insertTag(Tag(title = _uiState.value.tag))
+        recipeService.insertTag(Tag(title = _uiState.value.tag))
         updateTag("")
     }
 
     suspend fun removeTag(tag: Tag) {
-        recipesRepository.deleteTag(tag)
+        recipeService.deleteTag(tag)
         updateTags(_uiState.value.tags - tag)
     }
 
@@ -191,8 +191,8 @@ class AddRecipeViewModel(
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     public suspend fun initializeEditRecipe(recipeId: Long) {
         withContext(Dispatchers.IO) {
-            val recipeWithTags = recipesRepository.getRecipeWithTags(recipeId)
-            val recipeWithIngredients = recipesRepository.getRecipeWithIngredients(recipeId)
+            val recipeWithTags = recipeService.getRecipeWithTags(recipeId)
+            val recipeWithIngredients = recipeService.getRecipeWithIngredients(recipeId)
             // if we are loading it, it should exist, so assert non-null
             val recipe = recipeWithTags.first()!!.recipe
             val tags = recipeWithTags.first()!!.tags
@@ -299,9 +299,9 @@ class AddRecipeViewModel(
                 }
 
                 if (editRecipeId != null) {
-                    recipesRepository.updateRecipeWithIngredientsAndTags(recipe, list, tags)
+                    recipeService.updateRecipeWithIngredientsAndTags(recipe, list, tags)
                 } else {
-                    recipesRepository.insertRecipeWithIngredientsAndTags(recipe, list, tags)
+                    recipeService.insertRecipeWithIngredientsAndTags(recipe, list, tags)
                 }
                 return true
             }

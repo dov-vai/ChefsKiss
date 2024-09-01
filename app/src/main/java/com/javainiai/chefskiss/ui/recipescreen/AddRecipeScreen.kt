@@ -85,9 +85,9 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.javainiai.chefskiss.R
+import com.javainiai.chefskiss.data.database.tag.Tag
 import com.javainiai.chefskiss.data.enums.CookingUnit
 import com.javainiai.chefskiss.data.enums.UnitSystem
-import com.javainiai.chefskiss.data.tag.Tag
 import com.javainiai.chefskiss.ui.AppViewModelProvider
 import com.javainiai.chefskiss.ui.navigation.NavigationDestination
 import kotlinx.coroutines.Dispatchers

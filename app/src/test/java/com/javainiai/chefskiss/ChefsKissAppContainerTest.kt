@@ -19,8 +19,23 @@ class ChefsKissAppContainerTest {
     }
 
     @Test
-    fun `recipesRepository is initialized`() {
-        assertNotNull(appContainer.recipesRepository)
+    fun `recipesService is initialized`() {
+        assertNotNull(appContainer.recipeService)
+    }
+
+    @Test
+    fun `plannerService is initialized`() {
+        assertNotNull(appContainer.plannerService)
+    }
+
+    @Test
+    fun `shoppingListService is initialized`() {
+        assertNotNull(appContainer.shoppingListService)
+    }
+
+    @Test
+    fun `configService is initialized`() {
+        assertNotNull(appContainer.configService)
     }
 
     @Test

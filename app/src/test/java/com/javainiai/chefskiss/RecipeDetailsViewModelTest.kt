@@ -4,16 +4,17 @@ import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.test.core.app.ApplicationProvider
+import com.javainiai.chefskiss.data.database.ingredient.Ingredient
+import com.javainiai.chefskiss.data.database.planner.PlannerRecipe
+import com.javainiai.chefskiss.data.database.recipe.Recipe
+import com.javainiai.chefskiss.data.database.recipe.RecipeWithIngredients
+import com.javainiai.chefskiss.data.database.recipe.RecipeWithTags
+import com.javainiai.chefskiss.data.database.services.plannerservice.PlannerService
+import com.javainiai.chefskiss.data.database.services.recipeservice.RecipeService
+import com.javainiai.chefskiss.data.database.services.shoppingservice.ShoppingService
+import com.javainiai.chefskiss.data.database.tag.Tag
 import com.javainiai.chefskiss.data.enums.CookingUnit
 import com.javainiai.chefskiss.data.enums.Meal
-import com.javainiai.chefskiss.data.ingredient.Ingredient
-import com.javainiai.chefskiss.data.recipe.PlannerRecipe
-import com.javainiai.chefskiss.data.recipe.Recipe
-import com.javainiai.chefskiss.data.recipe.RecipeWithIngredients
-import com.javainiai.chefskiss.data.recipe.RecipeWithTags
-import com.javainiai.chefskiss.data.recipe.RecipesRepository
-import com.javainiai.chefskiss.data.recipe.ShopRecipe
-import com.javainiai.chefskiss.data.tag.Tag
 import com.javainiai.chefskiss.ui.recipescreen.RecipeDetailsViewModel
 import com.javainiai.chefskiss.ui.recipescreen.RecipeDisplayUiState
 import io.mockk.coEvery
@@ -30,7 +31,9 @@ import org.robolectric.RobolectricTestRunner
 @RunWith(RobolectricTestRunner::class)
 class RecipeDetailsViewModelTest {
     private lateinit var viewModel: RecipeDetailsViewModel
-    private val recipesRepository = mockk<RecipesRepository>(relaxed = true)
+    private val recipeService = mockk<RecipeService>(relaxed = true)
+    private val shoppingService = mockk<ShoppingService>(relaxed = true)
+    private val plannerService = mockk<PlannerService>(relaxed = true)
     private val savedStateHandle = mockk<SavedStateHandle>()
     private lateinit var context: Context
 
@@ -38,7 +41,13 @@ class RecipeDetailsViewModelTest {
     fun setup() {
         context = ApplicationProvider.getApplicationContext()
         coEvery { savedStateHandle.get<Long>(any()) } returns 1L
-        viewModel = RecipeDetailsViewModel(context, savedStateHandle, recipesRepository)
+        viewModel = RecipeDetailsViewModel(
+            context,
+            savedStateHandle,
+            recipeService,
+            shoppingService,
+            plannerService
+        )
     }
 
     @Test
@@ -54,7 +63,7 @@ class RecipeDetailsViewModelTest {
         )
         val recipeWithIngredients = RecipeWithIngredients(recipe, ingredients)
 
-        coEvery { recipesRepository.getRecipeWithIngredients(any()) } returns flowOf(
+        coEvery { recipeService.getRecipeWithIngredients(any()) } returns flowOf(
             recipeWithIngredients
         )
 
@@ -70,7 +79,7 @@ class RecipeDetailsViewModelTest {
             tags
         )
 
-        coEvery { recipesRepository.getRecipeWithTags(any()) } returns flowOf(recipeWithTags)
+        coEvery { recipeService.getRecipeWithTags(any()) } returns flowOf(recipeWithTags)
 
         assertEquals(tags, viewModel.tags.value)
     }
@@ -79,28 +88,28 @@ class RecipeDetailsViewModelTest {
     fun `test deleteRecipe`() = runBlocking {
         viewModel.deleteRecipe()
 
-        coVerify { recipesRepository.deleteRecipe(any()) }
+        coVerify { recipeService.deleteRecipe(any()) }
     }
 
     @Test
     fun `test addToShoppingList`() = runBlocking {
         viewModel.addToShoppingList()
 
-        coVerify { recipesRepository.insertShopRecipe(any()) }
+        coVerify { shoppingService.insertShopRecipe(any()) }
     }
 
     @Test
     fun `test updateFavorite`() = runBlocking {
         viewModel.updateFavorite()
 
-        coVerify { recipesRepository.updateRecipe(any()) }
+        coVerify { recipeService.updateRecipe(any()) }
     }
 
     @Test
     fun `test updateRating`() = runBlocking {
         viewModel.updateRating(5)
 
-        coVerify { recipesRepository.updateRecipe(any()) }
+        coVerify { recipeService.updateRecipe(any()) }
     }
 
     @Test
@@ -123,11 +132,11 @@ class RecipeDetailsViewModelTest {
     fun `test addToMealPlanner`() = runBlocking {
         val plannerRecipe = PlannerRecipe(recipeId = 1, date = "2024-04-20", type = Meal.BREAKFAST)
 
-        coEvery { recipesRepository.insertPlannerRecipe(any()) } returns Unit
+        coEvery { plannerService.insertPlannerRecipe(any()) } returns Unit
 
         viewModel.addToMealPlanner(plannerRecipe)
 
-        coVerify { recipesRepository.insertPlannerRecipe(plannerRecipe) }
+        coVerify { plannerService.insertPlannerRecipe(plannerRecipe) }
     }
 
 }

@@ -2,17 +2,17 @@ package com.javainiai.chefskiss
 
 import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
+import com.javainiai.chefskiss.data.database.planner.PlannerRecipe
+import com.javainiai.chefskiss.data.database.recipe.Recipe
+import com.javainiai.chefskiss.data.database.services.plannerservice.PlannerService
+import com.javainiai.chefskiss.data.database.services.recipeservice.RecipeService
 import com.javainiai.chefskiss.data.datasources.SelectedRecipeDataSource
 import com.javainiai.chefskiss.data.enums.Meal
-import com.javainiai.chefskiss.data.recipe.OfflineRecipesRepository
-import com.javainiai.chefskiss.data.recipe.PlannerRecipe
-import com.javainiai.chefskiss.data.recipe.Recipe
 import com.javainiai.chefskiss.ui.mealplanner.PlannerEditViewModel
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -23,7 +23,8 @@ import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
 class PlannerEditViewModelTest {
-    private val recipesRepository = mockk<OfflineRecipesRepository>(relaxed = true)
+    private val recipeService = mockk<RecipeService>(relaxed = true)
+    private val plannerService = mockk<PlannerService>(relaxed = true)
     private val selectedRecipeDataSource = SelectedRecipeDataSource()
     private val savedStateHandle = mockk<SavedStateHandle>()
     private lateinit var viewModel: PlannerEditViewModel
@@ -31,7 +32,7 @@ class PlannerEditViewModelTest {
     @Before
     fun setup() {
         val recipe = Recipe(1, "Test Recipe", "Test Description", 1, 1, 1, false, Uri.EMPTY)
-        coEvery { recipesRepository.getRecipeStream(any()) } returns flowOf(recipe)
+        coEvery { recipeService.getRecipeStream(any()) } returns flowOf(recipe)
 
         every { savedStateHandle.get<String>(any()) } returns "2024-01-01"
 
@@ -40,7 +41,8 @@ class PlannerEditViewModelTest {
         viewModel = PlannerEditViewModel(
             selectedRecipeDataSource,
             savedStateHandle,
-            recipesRepository
+            recipeService,
+            plannerService
         )
     }
 
@@ -61,7 +63,7 @@ class PlannerEditViewModelTest {
     fun testInsertPlannerRecipe() = runBlocking {
         viewModel.insertPlannerRecipe()
 
-        coVerify { recipesRepository.insertPlannerRecipe(any()) }
+        coVerify { plannerService.insertPlannerRecipe(any()) }
     }
 
     @Test
@@ -73,6 +75,6 @@ class PlannerEditViewModelTest {
         viewModel.deletePlannerRecipe(expectedRecipe)
 
         // Assert
-        coVerify { recipesRepository.deletePlannerRecipe(expectedRecipe) }
+        coVerify { plannerService.deletePlannerRecipe(expectedRecipe) }
     }
 }

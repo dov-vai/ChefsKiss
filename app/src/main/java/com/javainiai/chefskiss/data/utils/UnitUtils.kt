@@ -1,8 +1,8 @@
 package com.javainiai.chefskiss.data.utils
 
+import com.javainiai.chefskiss.data.database.ingredient.Ingredient
 import com.javainiai.chefskiss.data.enums.CookingUnit
 import com.javainiai.chefskiss.data.enums.UnitSystem
-import com.javainiai.chefskiss.data.ingredient.Ingredient
 import okhttp3.internal.toImmutableMap
 
 object UnitUtils {

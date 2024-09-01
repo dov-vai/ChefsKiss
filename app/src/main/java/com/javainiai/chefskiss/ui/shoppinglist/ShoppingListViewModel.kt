@@ -3,11 +3,12 @@ package com.javainiai.chefskiss.ui.shoppinglist
 import android.content.Context
 import androidx.lifecycle.viewModelScope
 import com.javainiai.chefskiss.R
-import com.javainiai.chefskiss.data.recipe.Recipe
-import com.javainiai.chefskiss.data.recipe.RecipeWithIngredients
-import com.javainiai.chefskiss.data.recipe.RecipesRepository
-import com.javainiai.chefskiss.data.recipe.ShopIngredient
-import com.javainiai.chefskiss.data.recipe.ShopRecipe
+import com.javainiai.chefskiss.data.database.recipe.Recipe
+import com.javainiai.chefskiss.data.database.recipe.RecipeWithIngredients
+import com.javainiai.chefskiss.data.database.services.recipeservice.RecipeService
+import com.javainiai.chefskiss.data.database.services.shoppingservice.ShoppingService
+import com.javainiai.chefskiss.data.database.shoppinglist.ShopIngredient
+import com.javainiai.chefskiss.data.database.shoppinglist.ShopRecipe
 import com.javainiai.chefskiss.ui.components.viewmodel.BaseViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -23,15 +24,16 @@ data class ShoppingListUiState(
 
 class ShoppingListViewModel(
     private val context: Context,
-    private val recipesRepository: RecipesRepository
+    private val shoppingService: ShoppingService,
+    private val recipeService: RecipeService,
 ) : BaseViewModel() {
 
     val uiState: StateFlow<ShoppingListUiState> =
-        recipesRepository
+        shoppingService
             .getShoppingList()
             .map { shoppingList ->
                 ShoppingListUiState(
-                    recipesRepository.getRecipesWithIngredients(shoppingList.map { it.recipeId })
+                    recipeService.getRecipesWithIngredients(shoppingList.map { it.recipeId })
                         .first()
                 )
             }
@@ -42,7 +44,7 @@ class ShoppingListViewModel(
             )
 
     val checkedIngredients: StateFlow<List<ShopIngredient>> =
-        recipesRepository
+        shoppingService
             .getShoppingCheckedIngredients()
             .stateIn(
                 scope = viewModelScope,
@@ -52,20 +54,20 @@ class ShoppingListViewModel(
 
     fun removeRecipe(recipe: Recipe) {
         viewModelScope.launch {
-            recipesRepository.deleteShopRecipe(ShopRecipe(recipe.id))
+            shoppingService.deleteShopRecipe(ShopRecipe(recipe.id))
         }
         showMessage(context.getString(R.string.removed, recipe.title))
     }
 
     fun addCheckedIngredient(ingredient: ShopIngredient) {
         viewModelScope.launch {
-            recipesRepository.insertShopIngredient(ingredient)
+            shoppingService.insertShopIngredient(ingredient)
         }
     }
 
     fun removeCheckedIngredient(ingredient: ShopIngredient) {
         viewModelScope.launch {
-            recipesRepository.deleteShopIngredient(ingredient)
+            shoppingService.deleteShopIngredient(ingredient)
         }
     }
 

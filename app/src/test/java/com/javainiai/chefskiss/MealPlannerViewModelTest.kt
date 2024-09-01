@@ -2,8 +2,9 @@ package com.javainiai.chefskiss
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
+import com.javainiai.chefskiss.data.database.services.plannerservice.PlannerService
+import com.javainiai.chefskiss.data.database.services.shoppingservice.ShoppingService
 import com.javainiai.chefskiss.data.utils.CalendarUtils
-import com.javainiai.chefskiss.data.recipe.RecipesRepository
 import com.javainiai.chefskiss.ui.mealplanner.MealPlannerViewModel
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
@@ -16,15 +17,17 @@ import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
 class MealPlannerViewModelTest {
-    private lateinit var recipesRepository: RecipesRepository
+    private lateinit var plannerService: PlannerService
+    private lateinit var shoppingService: ShoppingService
     private lateinit var viewModel: MealPlannerViewModel
     private lateinit var context: Context
 
     @Before
     fun setup() {
         context = ApplicationProvider.getApplicationContext()
-        recipesRepository = mockk(relaxed = true)
-        viewModel = MealPlannerViewModel(context, recipesRepository)
+        plannerService = mockk(relaxed = true)
+        shoppingService = mockk(relaxed = true)
+        viewModel = MealPlannerViewModel(context, plannerService, shoppingService)
     }
 
     @Test

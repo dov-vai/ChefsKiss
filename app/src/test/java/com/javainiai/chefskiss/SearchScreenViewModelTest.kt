@@ -1,8 +1,8 @@
 package com.javainiai.chefskiss
 
+import com.javainiai.chefskiss.data.database.services.recipeservice.RecipeService
+import com.javainiai.chefskiss.data.database.tag.Tag
 import com.javainiai.chefskiss.data.enums.Sort
-import com.javainiai.chefskiss.data.recipe.RecipesRepository
-import com.javainiai.chefskiss.data.tag.Tag
 import com.javainiai.chefskiss.ui.components.search.SearchScreenViewModel
 import com.javainiai.chefskiss.ui.components.search.SearchUiState
 import io.mockk.mockk
@@ -12,13 +12,13 @@ import org.junit.Before
 import org.junit.Test
 
 class SearchScreenViewModelTest {
-    private lateinit var recipesRepository: RecipesRepository
+    private lateinit var recipeService: RecipeService
     private lateinit var viewModel: SearchScreenViewModel
 
     @Before
     fun setup() {
-        recipesRepository = mockk(relaxed = true)
-        viewModel = SearchScreenViewModel(recipesRepository)
+        recipeService = mockk(relaxed = true)
+        viewModel = SearchScreenViewModel(recipeService)
     }
 
     @Test

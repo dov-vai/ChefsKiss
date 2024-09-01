@@ -2,10 +2,10 @@ package com.javainiai.chefskiss.ui.components.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.javainiai.chefskiss.data.database.recipe.Recipe
+import com.javainiai.chefskiss.data.database.services.recipeservice.RecipeService
+import com.javainiai.chefskiss.data.database.tag.Tag
 import com.javainiai.chefskiss.data.enums.Sort
-import com.javainiai.chefskiss.data.recipe.Recipe
-import com.javainiai.chefskiss.data.recipe.RecipesRepository
-import com.javainiai.chefskiss.data.tag.Tag
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,7 +26,7 @@ data class SearchUiState(
     val favorite: Boolean
 )
 
-class SearchScreenViewModel(private val recipesRepository: RecipesRepository) : ViewModel() {
+class SearchScreenViewModel(private val recipeService: RecipeService) : ViewModel() {
     private var _finalSearch =
         MutableStateFlow(SearchUiState("", 0, listOf(), Sort.ADDED, false, false))
 
@@ -38,7 +38,7 @@ class SearchScreenViewModel(private val recipesRepository: RecipesRepository) : 
     @OptIn(ExperimentalCoroutinesApi::class)
     val recipes: StateFlow<List<Recipe>> = _finalSearch.flatMapLatest {
         withContext(Dispatchers.IO) {
-            recipesRepository.query(
+            recipeService.query(
                 recipeName = it.query,
                 rating = it.rating,
                 isAsc = it.ascending,
@@ -55,7 +55,7 @@ class SearchScreenViewModel(private val recipesRepository: RecipesRepository) : 
         )
 
 
-    val tags: StateFlow<List<Tag>> = recipesRepository
+    val tags: StateFlow<List<Tag>> = recipeService
         .getAllTags()
         .stateIn(
             scope = viewModelScope,

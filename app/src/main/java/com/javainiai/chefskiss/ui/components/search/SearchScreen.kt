@@ -50,7 +50,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.javainiai.chefskiss.R
-import com.javainiai.chefskiss.data.recipe.Recipe
+import com.javainiai.chefskiss.data.database.recipe.Recipe
 import com.javainiai.chefskiss.ui.components.filter.FavoriteButton
 import com.javainiai.chefskiss.ui.components.filter.FilterDrawer
 import com.javainiai.chefskiss.ui.components.filter.FilterSheet

@@ -3,7 +3,7 @@ package com.javainiai.chefskiss
 import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
-import com.javainiai.chefskiss.data.RecipeDatabase
+import com.javainiai.chefskiss.data.database.RecipeDatabase
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -44,6 +44,18 @@ class RecipeDatabaseTest {
     fun testTagDao() {
         val tagDao = db.TagDao()
         assertNotNull(tagDao)
+    }
+
+    @Test
+    fun testPlannerDao() {
+        val plannerDao = db.PlannerDao()
+        assertNotNull(plannerDao)
+    }
+
+    @Test
+    fun testShoppingDao() {
+        val shoppingDao = db.ShoppingListDao()
+        assertNotNull(shoppingDao)
     }
 
     @Test
