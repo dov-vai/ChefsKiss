@@ -6,6 +6,12 @@
 
 Chef's Kiss is a recipe keeper application for Android written using [Jetpack Compose](https://developer.android.com/jetpack/compose).
 
+<p align="center">
+    <img src="https://github.com/dov-vai/ChefsKiss/assets/160327869/06a41e3f-7f47-4117-9313-b6b045d46c16" width="18%"></img>
+    <img src="https://github.com/dov-vai/ChefsKiss/assets/160327869/84158821-ace9-4231-b8e5-ec6073b0a5ad" width="18%"></img>
+    <img src="https://github.com/dov-vai/ChefsKiss/assets/160327869/2d821a66-59f9-498e-834d-a1de992079ee" width="18%"></img>
+</p>
+
 ## Features
 
 - Store, edit, remove, search recipes in the app
